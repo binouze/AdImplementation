@@ -1,0 +1,14 @@
+{
+  "name": "com.binouze.adimplementation",
+  "version": "0.1.0",
+  "displayName": "AdImplementation",
+  "description": "Simple implementation of Video Ads using Admob mediation.",
+  "author": {
+    "name": "Benjamin BOUFFIER",
+    "email": "benjamin.bouffier@gmail.com"
+  },
+  "dependencies":
+  {
+    "com.binouze.googleusermessagingplatform": "0.1.0"
+  }
+}

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if UNITY_ANDROID
+#if UNITY_ANDROID || true
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -47,21 +47,23 @@ public class ManifestProcessor : MonoBehaviour, IPreprocessBuild
     private const string METADATA_OPTIMIZE_AD_LOADING =
             "com.google.android.gms.ads.flag.OPTIMIZE_AD_LOADING";
 
-    private XNamespace ns = "http://schemas.android.com/apk/res/android";
+    private static  readonly XNamespace ns = "http://schemas.android.com/apk/res/android";
 
     public int callbackOrder { get { return 0; } }
 
-    [MenuItem( "Assets/Google Mobile Ads/Update AndroidManifest.xml")]
-    private void FixManifest()
+    
+
+    #if UNITY_2018_1_OR_NEWER
+    public void OnPreprocessBuild( BuildReport report )
+    #else
+    public void OnPreprocessBuild(BuildTarget target, string path)
+    #endif
     {
-        OnPreprocessBuild(null);
+        FixManifest();
     }
 
-#if UNITY_2018_1_OR_NEWER
-    public void OnPreprocessBuild(BuildReport report)
-#else
-    public void OnPreprocessBuild(BuildTarget target, string path)
-#endif
+    [MenuItem( "Assets/Google Mobile Ads/Update AndroidManifest.xml")]
+    private static void FixManifest()
     {
         string manifestPath = Path.Combine( Application.dataPath, MANIFEST_RELATIVE_PATH);
 
@@ -124,13 +126,13 @@ public class ManifestProcessor : MonoBehaviour, IPreprocessBuild
         elemManifest.Save(manifestPath);
     }
 
-    private XElement CreateMetaElement(string name, object value)
+    private static XElement CreateMetaElement(string name, object value)
     {
         return new XElement("meta-data",
                 new XAttribute(ns + "name", name), new XAttribute(ns + "value", value));
     }
 
-    private XElement GetMetaElement(IEnumerable<XElement> metas, string metaName)
+    private static XElement GetMetaElement(IEnumerable<XElement> metas, string metaName)
     {
         foreach (XElement elem in metas)
         {
@@ -154,10 +156,10 @@ public class ManifestProcessor : MonoBehaviour, IPreprocessBuild
     /// <param name="metas">all metadata elements</param>
     /// <param name="metadataName">name of the element to set</param>
     /// <param name="metadataValue">value to set</param>
-    private void SetMetadataElement(XElement elemApplication,
-                                    IEnumerable<XElement> metas,
-                                    string metadataName,
-                                    string metadataValue)
+    private static void SetMetadataElement(XElement              elemApplication,
+                                           IEnumerable<XElement> metas,
+                                           string                metadataName,
+                                           string                metadataValue)
     {
         XElement element = GetMetaElement(metas, metadataName);
         if (element == null)
@@ -178,11 +180,11 @@ public class ManifestProcessor : MonoBehaviour, IPreprocessBuild
     /// <param name="metadataName">name of the element to set</param>
     /// <param name="metadataValue">value to set</param>
     /// <param name="defaultValue">If metadataValue is default, node will be removed.</param>
-    private void SetMetadataElement(XElement elemApplication,
-                                    IEnumerable<XElement> metas,
-                                    string metadataName,
-                                    bool metadataValue,
-                                    bool defaultValue = false)
+    private static void SetMetadataElement(XElement              elemApplication,
+                                           IEnumerable<XElement> metas,
+                                           string                metadataName,
+                                           bool                  metadataValue,
+                                           bool                  defaultValue = false)
     {
         XElement element = GetMetaElement(metas, metadataName);
         if (metadataValue != defaultValue)
@@ -205,7 +207,7 @@ public class ManifestProcessor : MonoBehaviour, IPreprocessBuild
         }
     }
 
-    private void StopBuildWithMessage(string message)
+    private static void StopBuildWithMessage(string message)
     {
         string prefix = "[GoogleMobileAds] ";
     #if UNITY_2017_1_OR_NEWER

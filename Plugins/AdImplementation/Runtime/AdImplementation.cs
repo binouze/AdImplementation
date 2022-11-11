@@ -55,14 +55,14 @@ namespace com.binouze
 
         private static bool LogEnabled;
         [UsedImplicitly]
-        public static void SeLogEnabled( bool enabled )
+        public static void SetLogEnabled( bool enabled )
         {
             LogEnabled = enabled;
         }
         
         public static bool IsDebug { get; private set; }
         [UsedImplicitly]
-        public static void SeIsDebug( bool isDebug )
+        public static void SetIsDebug( bool isDebug )
         {
             IsDebug = isDebug;
         }

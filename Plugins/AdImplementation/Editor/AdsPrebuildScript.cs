@@ -20,7 +20,7 @@ namespace com.binouze.Editor
         }
         
         [MenuItem( "Assets/Google Mobile Ads/Copy Necesssary Files")]
-        static void CopyAssetsIntoProject()
+        private static void CopyAssetsIntoProject()
         {
             if( !AssetDatabase.IsValidFolder("Assets/GoogleMobileAds") )
             {

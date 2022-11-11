@@ -1,6 +1,6 @@
 {
   "name": "com.binouze.adimplementation",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "displayName": "AdImplementation",
   "description": "Simple implementation of Video Ads using Admob mediation.",
   "author": {

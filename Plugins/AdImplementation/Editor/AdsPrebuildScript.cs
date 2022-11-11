@@ -3,7 +3,7 @@ using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
 
-namespace AdImplementation.Editor
+namespace com.binouze.Editor
 {
     public class AdsPrebuildScript : IPreprocessBuildWithReport
     {

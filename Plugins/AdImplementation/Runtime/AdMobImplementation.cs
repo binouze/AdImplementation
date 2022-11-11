@@ -154,7 +154,7 @@ namespace com.binouze
                 
                 IsInitComplete = ok;
                 
-                await AsyncUtils.Delay( 500 );
+                await AdsAsyncUtils.Delay( 500 );
             }
             
             // a priori ici on est bon

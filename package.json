@@ -1,8 +1,11 @@
 {
   "name": "com.binouze.adimplementation",
   "version": "0.1.1",
+  "unity": "2021.3",
   "displayName": "AdImplementation",
   "description": "Simple implementation of Video Ads using Admob mediation.",
+  "changelogUrl": "https://github.com/binouze/AdImplementation/releases",
+  "documentationUrl": "https://github.com/binouze/AdImplementation",
   "author": {
     "name": "Benjamin BOUFFIER",
     "email": "benjamin.bouffier@gmail.com"

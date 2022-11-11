@@ -1,0 +1,16 @@
+{
+    "name": "AdImplementation.Runtime",
+    "rootNamespace": "",
+    "references": [
+        "com.binouze.GoogleUserMessagingPlatform"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -29,7 +29,7 @@ using GoogleMobileAds.Editor;
 #if UNITY_2018_1_OR_NEWER
 public class ManifestProcessor : IPreprocessBuildWithReport
 #else
-public class ManifestProcessor : IPreprocessBuild
+public class ManifestProcessor : MonoBehaviour, IPreprocessBuild
 #endif
 {
     private const string MANIFEST_RELATIVE_PATH =
@@ -50,6 +50,12 @@ public class ManifestProcessor : IPreprocessBuild
     private XNamespace ns = "http://schemas.android.com/apk/res/android";
 
     public int callbackOrder { get { return 0; } }
+
+    [MenuItem( "Assets/Google Mobile Ads/Update AndroidManifest.xml")]
+    private void FixManifest()
+    {
+        OnPreprocessBuild(null)
+    }
 
 #if UNITY_2018_1_OR_NEWER
     public void OnPreprocessBuild(BuildReport report)

@@ -54,7 +54,7 @@ public class ManifestProcessor : MonoBehaviour, IPreprocessBuild
     [MenuItem( "Assets/Google Mobile Ads/Update AndroidManifest.xml")]
     private void FixManifest()
     {
-        OnPreprocessBuild(null)
+        OnPreprocessBuild(null);
     }
 
 #if UNITY_2018_1_OR_NEWER

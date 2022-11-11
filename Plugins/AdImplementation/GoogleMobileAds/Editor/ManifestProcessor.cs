@@ -27,7 +27,7 @@ using UnityEngine;
 using GoogleMobileAds.Editor;
 
 #if UNITY_2018_1_OR_NEWER
-public class ManifestProcessor : IPreprocessBuildWithReport
+public class ManifestProcessor : MonoBehaviour, IPreprocessBuildWithReport
 #else
 public class ManifestProcessor : MonoBehaviour, IPreprocessBuild
 #endif

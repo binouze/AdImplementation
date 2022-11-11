@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if UNITY_ANDROID || true
+#if UNITY_ANDROID
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;

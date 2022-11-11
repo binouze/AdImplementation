@@ -33,7 +33,7 @@ public class ManifestProcessor : IPreprocessBuild
 #endif
 {
     private const string MANIFEST_RELATIVE_PATH =
-            "Plugins/Android/GoogleMobileAdsPlugin.androidlib/AndroidManifest.xml";
+            "Plugins/AdImplementation/Android/GoogleMobileAdsPlugin.androidlib/AndroidManifest.xml";
 
     private const string METADATA_APPLICATION_ID  =
             "com.google.android.gms.ads.APPLICATION_ID";
@@ -59,10 +59,7 @@ public class ManifestProcessor : IPreprocessBuild
     {
         string manifestPath = Path.Combine(
                 Application.dataPath, MANIFEST_RELATIVE_PATH);
-        if (AssetDatabase.IsValidFolder("Packages/com.google.ads.mobile"))
-        {
-            manifestPath = Path.Combine("Packages/com.google.ads.mobile", MANIFEST_RELATIVE_PATH);
-        }
+        manifestPath = Path.Combine("Packages/com.binouze.adimplementation", MANIFEST_RELATIVE_PATH);
 
         XDocument manifest = null;
         try

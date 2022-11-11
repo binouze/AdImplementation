@@ -7,6 +7,8 @@ namespace com.binouze.Editor
 {
     public class AdsPrebuildScript : MonoBehaviour, IPreprocessBuildWithReport
     {
+        public const string BASE_FOLDER = "Packages/com.binouze.adimplementation/Plugins/AdImplementation/";
+        
         public int callbackOrder => 0;
 
         public void OnPreprocessBuild(BuildReport report)
@@ -25,30 +27,18 @@ namespace com.binouze.Editor
                 AssetDatabase.CreateFolder("Assets", "GoogleMobileAds");
             }
 
-            if( !AssetDatabase.IsValidFolder("Packages/com.binouze.adimplementation") )
+            if( !AssetDatabase.IsValidFolder(BASE_FOLDER) )
             {
-                Debug.LogError("PACKAGE com.binouze.adimplementation NOT INSTALLED");
+                Debug.LogError($"FOLDER {BASE_FOLDER} NOT FOUND");
                 return;
             }
 
-            if( !AssetDatabase.IsValidFolder( "Packages/com.binouze.adimplementation/Plugins/GoogleMobileAds" ) )
-            {
-                Debug.LogError("FOLDER Packages/com.binouze.adimplementation/Plugins/GoogleMobileAds DOES NOT EXISTS");
-                return;
-            }
-            if( !AssetDatabase.IsValidFolder( "Packages/com.binouze.adimplementation/Plugins/GoogleMobileAds/Editor/" ) )
-            {
-                Debug.LogError("FOLDER Packages/com.binouze.adimplementation/Plugins/GoogleMobileAds/Editor/ DOES NOT EXISTS");
-                return;
-            }
-            
-            
             // Copy link.xml into project
-            AssetDatabase.CopyAsset( "Packages/com.binouze.adimplementation/Plugins/GoogleMobileAds/link.xml",
+            AssetDatabase.CopyAsset( BASE_FOLDER+"GoogleMobileAds/link.xml",
                 "Assets/GoogleMobileAds/link.xml" );
 
             // Copy GoogleMobileAdsSKAdNetworkItems.xml into project
-            AssetDatabase.CopyAsset( "Packages/com.binouze.adimplementation/Plugins/GoogleMobileAds/Editor/GoogleMobileAdsSKAdNetworkItems.xml",
+            AssetDatabase.CopyAsset( BASE_FOLDER+"Editor/GoogleMobileAdsSKAdNetworkItems.xml",
                 "Assets/GoogleMobileAds/Editor/GoogleMobileAdsSKAdNetworkItems.xml" );
         }
     }

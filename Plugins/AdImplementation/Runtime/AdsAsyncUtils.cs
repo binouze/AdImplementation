@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace com.binouze
 {
-    public static class AdsAsyncUtils
+    internal static class AdsAsyncUtils
     {
         public static async Task Delay(int milisecondsDelay)
         {

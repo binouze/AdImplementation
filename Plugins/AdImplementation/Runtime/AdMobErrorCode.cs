@@ -1,6 +1,6 @@
 namespace com.binouze
 {
-    public enum AdMobErrorCode
+    internal enum AdMobErrorCode
     {
         INVALID_REQUEST,
         NO_FILL,
@@ -19,7 +19,7 @@ namespace com.binouze
         APP_ID_MISSING,
         
     }
-    public class AdMobErrorCodeHelper
+    internal static class AdMobErrorCodeHelper
     {
         public static AdMobErrorCode GetErrorCodeFromInteger( int errorCode )
         {

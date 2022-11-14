@@ -4,7 +4,7 @@ using GoogleMobileAds.Api;
 
 namespace com.binouze
 {
-    public class AdMobAd
+    internal class AdMobAd
     {
         /// <summary>
         /// true si une pub est dispo
@@ -277,7 +277,7 @@ namespace com.binouze
     }
     
     // ADMOB VIDEO INTERFACE
-    public interface IAdMobAd
+    internal interface IAdMobAd
     {
         public event EventHandler<EventArgs>               OnAdLoaded;
         public event EventHandler<AdFailedToLoadEventArgs> OnAdFailedToLoad;
@@ -298,7 +298,7 @@ namespace com.binouze
     }
     
     // IADMOBAD IMPLEMENTATION OF REWARDED AD
-    public class AdRewarded : Factory<AdRewarded, string>, IAdMobAd
+    internal class AdRewarded : Factory<AdRewarded, string>, IAdMobAd
     {
         [Obsolete( FactoryMessage, true)]
         public AdRewarded() { }
@@ -389,7 +389,7 @@ namespace com.binouze
     }
     
     // IADMOBAD IMPLEMENTATION OF INTERSTITIALS AD
-    public class AdInterstitial : Factory<AdInterstitial, string>, IAdMobAd
+    internal class AdInterstitial : Factory<AdInterstitial, string>, IAdMobAd
     {
         [Obsolete( FactoryMessage, true)]
         public AdInterstitial() { }
@@ -475,7 +475,7 @@ namespace com.binouze
     
     
     // FACTORY ABSTRACT CLASS
-    public abstract class Factory<TSelf, TParameter> where TSelf : Factory<TSelf, TParameter>, new()
+    internal abstract class Factory<TSelf, TParameter> where TSelf : Factory<TSelf, TParameter>, new()
     {
         protected const string FactoryMessage = "Use YourClass.Create(...) instead";
         public static TSelf Create(TParameter parameter)

@@ -19,7 +19,7 @@ namespace com.binouze
             implementation = new AdMobImplementation();
         }
 
-        public static void Log( string str )
+        internal static void Log( string str )
         {
             if( LogEnabled )
                 Debug.Log( $"[AdImplementation] {str}" );
@@ -39,18 +39,18 @@ namespace com.binouze
             OnImpressionDatas = onImpressionDatas;
         }
 
-        public static string AdMobDevice { get; private set; } = string.Empty;
+        public static string AdMobTestDevice { get; private set; } = string.Empty;
         [UsedImplicitly]
         public static void SetTestDeviceAdMob( string adMobDevice )
         {
-            AdMobDevice = adMobDevice;
+            AdMobTestDevice = adMobDevice;
         }
         
-        public static string UMPDevice { get; private set; } = string.Empty;
+        public static string UMPTestDevice { get; private set; } = string.Empty;
         [UsedImplicitly]
         public static void SetTestDeviceUMP( string umpDevice )
         {
-            UMPDevice = umpDevice;
+            UMPTestDevice = umpDevice;
         }
 
         private static bool LogEnabled;
@@ -110,15 +110,15 @@ namespace com.binouze
             } );
         }
     }
-
+    
     public class ImpressionDatas
     {
-        public float  ImpressionRevenue;
-        public string Precision;
-        public bool   Rewarded;
-        public string CurrencyCode;
-        public string AdSourceName;
-        public string AdPlacementName;
-        public string AdGroupName;
+        [UsedImplicitly] public float  ImpressionRevenue;
+        [UsedImplicitly] public string Precision;
+        [UsedImplicitly] public bool   Rewarded;
+        [UsedImplicitly] public string CurrencyCode;
+        [UsedImplicitly] public string AdSourceName;
+        [UsedImplicitly] public string AdPlacementName;
+        [UsedImplicitly] public string AdGroupName;
     }
 }

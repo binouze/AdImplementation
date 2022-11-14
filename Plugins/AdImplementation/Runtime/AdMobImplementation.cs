@@ -5,7 +5,7 @@ using GoogleMobileAds.Api.Mediation.AdColony;
 
 namespace com.binouze
 {
-    public class AdMobImplementation : IAdImplementation
+    internal class AdMobImplementation : IAdImplementation
     {
         private string AdRewarUnit = "testRewarded";
         private string AdInterUnit = "testInter";
@@ -64,7 +64,7 @@ namespace com.binouze
             if( AdImplementation.IsDebug )
             {
                 GoogleUserMessagingPlatform.SetDebugLogging( true );
-                GoogleUserMessagingPlatform.SetDebugMode( AdImplementation.UMPDevice, true );
+                GoogleUserMessagingPlatform.SetDebugMode( AdImplementation.UMPTestDevice, true );
             }
             GoogleUserMessagingPlatform.Initialize();
             
@@ -84,17 +84,25 @@ namespace com.binouze
             
             MobileAds.SetiOSAppPauseOnBackground(true);
 
+            // Get target children type for AdMob configuration
+            var targetChildren = AdImplementation.TargetChildrenType switch
+            {
+                TargetChildren.TRUE      => TagForChildDirectedTreatment.True,
+                TargetChildren.FALSE     => TagForChildDirectedTreatment.False,
+                _                        => TagForChildDirectedTreatment.Unspecified,
+            };
+            
             if( AdImplementation.IsDebug )
             {
                 var deviceIds = new List<string>
                 {
                     AdRequest.TestDeviceSimulator,
-                    AdImplementation.AdMobDevice
+                    AdImplementation.AdMobTestDevice
                 };
 
                 // Configure TagForChildDirectedTreatment and test device IDs.
                 var requestConfiguration = new RequestConfiguration.Builder()
-                                          .SetTagForChildDirectedTreatment(TagForChildDirectedTreatment.False)
+                                          .SetTagForChildDirectedTreatment(targetChildren)
                                           .SetTestDeviceIds(deviceIds).build();
                 MobileAds.SetRequestConfiguration(requestConfiguration);
             }
@@ -102,7 +110,7 @@ namespace com.binouze
             {
                 // Configure TagForChildDirectedTreatment and test device IDs.
                 var requestConfiguration = new RequestConfiguration.Builder()
-                                          .SetTagForChildDirectedTreatment(TagForChildDirectedTreatment.False).build();
+                                          .SetTagForChildDirectedTreatment(targetChildren).build();
                 MobileAds.SetRequestConfiguration(requestConfiguration);
             }
 

@@ -2,7 +2,7 @@ using System;
 
 namespace com.binouze
 {
-    public interface IAdImplementation
+    internal interface IAdImplementation
     {
         public void SetUnitIds( string rewardedId, string interstitialId );
         public void Initialize();

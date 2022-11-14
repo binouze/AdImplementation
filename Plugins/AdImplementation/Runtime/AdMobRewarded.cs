@@ -140,8 +140,6 @@ namespace com.binouze
         
         private void AdFailedLoad( object sender, AdFailedToLoadEventArgs adFailedToLoadEventArgs )
         {
-            Log( $"[AdMobRewarded] AdFailedLoad {sender} {adFailedToLoadEventArgs.LoadAdError}" );
-
             var loadAdError = adFailedToLoadEventArgs.LoadAdError;
 
             // Gets the domain from which the error came.
@@ -162,7 +160,7 @@ namespace com.binouze
             // Gets the cause of the error, if available.
             var underlyingError = loadAdError.GetCause();
 
-            Log($"[AdMobRewarded] AdFailedLoad -> \n domain: {domain}\ncode: {code}\nmessage: {message}\nunderlyingError: {underlyingError}\n\n{adFailedToLoadEventArgs.LoadAdError}");
+            Log($"[AdMobRewarded] AdFailedLoad -> \n\tdomain: {domain}\n\tcode: {code}\n\tmessage: {message}\n\tunderlyingError: {underlyingError}\n\n{adFailedToLoadEventArgs.LoadAdError}");
 
             var erreur = AdMobErrorCodeHelper.GetErrorCodeFromInteger( code );
             switch( erreur )
@@ -185,7 +183,6 @@ namespace com.binouze
                 case AdMobErrorCode.INVALID_ARGUMENT:
                 case AdMobErrorCode.INVALID_RESPONSE:
                     // dans ces cas la on attend un moment et on resetup
-                    // par defaut, on reload dans 20secondes
                     DelayCall(ResetupAd, 20_000);
                     break;
                 

@@ -12,6 +12,6 @@
   },
   "dependencies":
   {
-    "com.binouze.googleusermessagingplatform": "0.1.0"
+    "com.binouze.googleusermessagingplatform": "1.0.0"
   }
 }

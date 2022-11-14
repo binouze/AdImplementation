@@ -66,6 +66,7 @@ namespace com.binouze
                 GoogleUserMessagingPlatform.SetDebugLogging( true );
                 GoogleUserMessagingPlatform.SetDebugMode( AdImplementation.UMPTestDevice, true );
             }
+            GoogleUserMessagingPlatform.SetTargetChildren( AdImplementation.TargetChildrenType == TargetChildren.TRUE );
             GoogleUserMessagingPlatform.Initialize();
             
             //GoogleUserMessagingPlatform.SetOnStatusChangedListener( MajConsentStatus );
@@ -87,9 +88,9 @@ namespace com.binouze
             // Get target children type for AdMob configuration
             var targetChildren = AdImplementation.TargetChildrenType switch
             {
-                TargetChildren.TRUE      => TagForChildDirectedTreatment.True,
-                TargetChildren.FALSE     => TagForChildDirectedTreatment.False,
-                _                        => TagForChildDirectedTreatment.Unspecified,
+                TargetChildren.TRUE  => TagForChildDirectedTreatment.True,
+                TargetChildren.FALSE => TagForChildDirectedTreatment.False,
+                _                    => TagForChildDirectedTreatment.Unspecified,
             };
             
             if( AdImplementation.IsDebug )
@@ -103,14 +104,16 @@ namespace com.binouze
                 // Configure TagForChildDirectedTreatment and test device IDs.
                 var requestConfiguration = new RequestConfiguration.Builder()
                                           .SetTagForChildDirectedTreatment(targetChildren)
-                                          .SetTestDeviceIds(deviceIds).build();
+                                          .SetTestDeviceIds(deviceIds)
+                                          .build();
                 MobileAds.SetRequestConfiguration(requestConfiguration);
             }
             else
             {
                 // Configure TagForChildDirectedTreatment and test device IDs.
                 var requestConfiguration = new RequestConfiguration.Builder()
-                                          .SetTagForChildDirectedTreatment(targetChildren).build();
+                                          .SetTagForChildDirectedTreatment(targetChildren)
+                                          .build();
                 MobileAds.SetRequestConfiguration(requestConfiguration);
             }
 
@@ -229,7 +232,7 @@ namespace com.binouze
         {
             if( valueEvent?.AdValue != null )
             {
-                Log( $"OnImpressionDatas responseInfos {responseInfos}" );
+                Log( $"OnImpressionDatas rewarded: {rewarded} - AdValue: {valueEvent.AdValue} - responseInfos: {responseInfos}" );
                 var datas = ImpressionDatasFromAdMobDatas( valueEvent.AdValue, responseInfos, rewarded );
                 AdImplementation.OnImpressionDatas?.Invoke( datas );
             }

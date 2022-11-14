@@ -157,6 +157,8 @@ namespace com.binouze
             // Gets the cause of the error, if available.
             var underlyingError = loadAdError.GetCause();
 
+            Log($"[AdMobRewarded] AdFailedLoad - domain: {domain}\ncode: {code}\nmessage: {message}\nunderlyingError: {underlyingError}");
+            
             // All of this information is available via the error's toString() method.
             Log("[AdMobRewarded] AdFailedLoad - Load error string: " + loadAdError);
 

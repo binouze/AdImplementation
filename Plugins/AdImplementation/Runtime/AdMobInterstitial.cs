@@ -155,7 +155,6 @@ namespace com.binouze
 
             // Gets the cause of the error, if available.
             var underlyingError = loadAdError.GetCause();
-
             
             Log($"[AdMobInterstitial] AdFailedLoad - domain: {domain}\ncode: {code}\nmessage: {message}\nunderlyingError: {underlyingError}");
             
@@ -166,39 +165,42 @@ namespace com.binouze
             var responseInfo = loadAdError.GetResponseInfo();
             Log("[AdMobInterstitial] AdFailedLoad - Response info: " + responseInfo);
            
-            //TODO1 trouver les cas ou il faut faire un resetup plutot qu'un reload
-            
-            // par defaut, on reload dans 20secondes
-            DelayCall(ReloadAd, 30_000);
-            
-            /*switch( adFailedToLoadEventArgs.LoadAdError )
+            // gerer l'erreur
+            var erreur = AdMobErrorCodeHelper.GetErrorCodeFromInteger( code );
+            switch( erreur )
             {
-                // when it is not connected or initialized, let it break out and try again.
-                case LoadAdError:
-                case LoadError.NetworkError:
-                case LoadError.MissingMandatoryMemberValues:
-                case LoadError.Unknown:
-                    Debug.Log("[AdsInterstitial] Detected a not connected or unitialized type of error during ad load call. Invoking TryInitServices in 20 secs");
-                    DelayCall(Resetup, 20_000);
-                    break;
- 
-                // it is connected.
-                case LoadError.TooManyLoadRequests:
-                    Debug.Log("[AdsInterstitial] Detected Too many ad load requests type error during ad load. Canceling all invoke calls, and trying to load ad again after period of 20 seconds");
+                case AdMobErrorCode.AD_ALREADY_USED:
+                case AdMobErrorCode.TIMEOUT:
+                case AdMobErrorCode.NO_FILL:
+                case AdMobErrorCode.MEDIATION_NO_FILL:
+                    // dans ces cas la on recheck plus tard si une ad est dispo
                     DelayCall(ReloadAd, 20_000);
                     break;
- 
-                case LoadError.NoFill:
-                    Debug.Log("[AdsInterstitial] Detected No-Fill, trying a load call in 20 seconds");
-                    DelayCall(ReloadAd, 20_000);
+                
+                case AdMobErrorCode.INVALID_REQUEST:
+                case AdMobErrorCode.NETWORK_ERROR:
+                case AdMobErrorCode.SERVER_ERROR:
+                case AdMobErrorCode.MEDIATION_DATA_ERROR:
+                case AdMobErrorCode.MEDIATION_ADAPTER_ERROR:
+                case AdMobErrorCode.MEDIATION_INVALID_AD:
+                case AdMobErrorCode.INTERNAL_ERROR:
+                case AdMobErrorCode.INVALID_ARGUMENT:
+                case AdMobErrorCode.INVALID_RESPONSE:
+                    // dans ces cas la on attend un moment et on resetup
+                    // par defaut, on reload dans 20secondes
+                    DelayCall(ResetupAd, 20_000);
                     break;
-
-                case LoadError.AdUnitLoading:
-                case LoadError.AdUnitShowing:
+                
+                case AdMobErrorCode.OS_NOT_SUPPORTED:
+                case AdMobErrorCode.APP_ID_MISSING:
+                    // bah la y'a pas besoin de reessayer ...
+                    break;
+                
                 default:
-                    Debug.Log("[AdsInterstitial] Detected default condition of 2 possible AdUnit Showing Or ad Unit loading, returning");
-                    return;
-            }*/
+                    // par defaut, on reload dans 20secondes
+                    DelayCall(ReloadAd, 20_000);
+                    break;
+            }
         }
         
         private static void AdShown( object sender, EventArgs eventArgs )

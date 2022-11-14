@@ -162,15 +162,7 @@ namespace com.binouze
             // Gets the cause of the error, if available.
             var underlyingError = loadAdError.GetCause();
 
-            Log($"[AdMobRewarded] AdFailedLoad - domain: {domain}\ncode: {code}\nmessage: {message}\nunderlyingError: {underlyingError}");
-            
-            // All of this information is available via the error's toString() method.
-            Log("[AdMobRewarded] AdFailedLoad - Load error string: " + loadAdError);
-
-            // Get response information, which may include results of mediation requests.
-            var responseInfo = loadAdError.GetResponseInfo();
-            Log("[AdMobRewarded] AdFailedLoad - Response info: " + responseInfo);
-
+            Log($"[AdMobRewarded] AdFailedLoad -> \n domain: {domain}\ncode: {code}\nmessage: {message}\nunderlyingError: {underlyingError}\n\n{adFailedToLoadEventArgs.LoadAdError}");
 
             var erreur = AdMobErrorCodeHelper.GetErrorCodeFromInteger( code );
             switch( erreur )
@@ -251,7 +243,6 @@ namespace com.binouze
         
         private void AdPaidEvent( object sender, AdValueEventArgs args )
         {
-            // TODO: Send the impression-level ad revenue information to your
             // preferred analytics server directly within this callback.
             var responseInfo = ad.GetResponseInfo();
             
@@ -260,7 +251,6 @@ namespace com.binouze
             var valueMicros  = adValue.Value;
             var currencyCode = adValue.CurrencyCode;
             var precision    = adValue.Precision;
-
             
             var responseId   = responseInfo.GetResponseId();
 
@@ -279,7 +269,7 @@ namespace com.binouze
             var mediationABTestVariant = extras["mediation_ab_test_variant"];
             */
             
-            OnImpressionDatas( args, responseInfo, false );
+            OnImpressionDatas( args, responseInfo, true );
         }
     }
 }

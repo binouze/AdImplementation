@@ -22,7 +22,7 @@ namespace com.binouze
         public static void Log( string str )
         {
             if( LogEnabled )
-                Debug.Log( str );
+                Debug.Log( $"[AdImplementation] {str}" );
         }
 
         public static TargetChildren TargetChildrenType { get; private set; } = TargetChildren.FALSE;

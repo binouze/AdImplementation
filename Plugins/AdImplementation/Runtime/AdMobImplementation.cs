@@ -51,9 +51,15 @@ namespace com.binouze
         {
             if( !AdSupported )
                 return;
-            
+
             if( IsInit )
+            {
+                // resetup les placements
+                if( IsInitComplete )
+                    SetupPlacements();
+                
                 return;
+            }
             IsInit = true;
 
             if( AdImplementation.IsDebug )
@@ -103,7 +109,7 @@ namespace com.binouze
 
             MobileAds.Initialize( initStatus =>
             {
-                Log( $"[AdMobImplementation] Initialize Complete: {initStatus}" );
+                Log( $"Initialize Complete: {initStatus}" );
                 var map = initStatus.getAdapterStatusMap();
                 CheckAdapterInitialization( map );
             } );
@@ -114,7 +120,7 @@ namespace com.binouze
             var cnt = 0;
             while( !IsInitComplete )
             {
-                Log( "[AdMobImplementation] CheckAdapterInitialization" );
+                Log( "CheckAdapterInitialization" );
                 
                 var ok = true;
                 foreach( var (className, status) in map )
@@ -123,12 +129,12 @@ namespace com.binouze
                     {
                         case AdapterState.NotReady:
                             // The adapter initialization did not complete.
-                            Log($"[AdMobImplementation] Adapter NOT READY: {className}");
+                            Log($"Adapter NOT READY: {className}");
                             break;
                         
                         case AdapterState.Ready:
                             // The adapter was successfully initialized.
-                            Log($"[AdMobImplementation] Adapter READY: {className}");
+                            Log($"Adapter READY: {className}");
                             break;
                         
                         default:
@@ -142,12 +148,7 @@ namespace com.binouze
                 {
                     // si il y a des soucis de config des adaptateurs externe au bout de 50 tours, tampis on s'en passera
                     ok = true;
-                    
-                    AdInterstitial = new AdMobInterstitial();
-                    AdInterstitial.SetupAd( AdInterUnit );
-
-                    AdRewarded = new AdMobRewarded();
-                    AdRewarded.SetupAd( AdRewarUnit );
+                    SetupPlacements();
                 }
                 
                 IsInitComplete = ok;
@@ -156,6 +157,18 @@ namespace com.binouze
             }
             
             // a priori ici on est bon
+        }
+
+        private void SetupPlacements()
+        {
+            AdInterstitial?.Dispose();
+            AdRewarded?.Dispose();
+            
+            AdInterstitial = new AdMobInterstitial();
+            AdInterstitial.SetupAd( AdInterUnit );
+
+            AdRewarded = new AdMobRewarded();
+            AdRewarded.SetupAd( AdRewarUnit );
         }
         
         #endregion
@@ -207,7 +220,7 @@ namespace com.binouze
         {
             if( valueEvent?.AdValue != null )
             {
-                Log( $"[AdMobImplementation] OnImpressionDatas responseInfos {responseInfos}" );
+                Log( $"OnImpressionDatas responseInfos {responseInfos}" );
                 var datas = ImpressionDatasFromAdMobDatas( valueEvent.AdValue, responseInfos, rewarded );
                 AdImplementation.OnImpressionDatas?.Invoke( datas );
             }

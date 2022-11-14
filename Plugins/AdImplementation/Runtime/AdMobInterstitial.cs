@@ -2,8 +2,6 @@
 using System.Threading;
 using GoogleMobileAds.Api;
 
-using static com.binouze.AdMobImplementation;
-
 namespace com.binouze
 {
     public class AdMobInterstitial
@@ -17,9 +15,9 @@ namespace com.binouze
         private string         adUnit;
         private int            NbRetryPlay;
 
-        private void Resetup()
+        private static void Log( string str )
         {
-            SetupAd( adUnit );
+            AdMobImplementation.Log( $"[AdMobInterstitial] {str}" );
         }
         
         /// <summary>
@@ -105,12 +103,12 @@ namespace com.binouze
         private void ResetupAd()
         {
             CancelDelayedCall();
-            Resetup();
+            SetupAd( adUnit );
         }
         private void LoadAd()
         {
             Log( $"[AdMobInterstitial] LoadAd {AdAvailable}" );
-            ad.LoadAd( CreateAdRequest() );
+            ad.LoadAd( AdMobImplementation.CreateAdRequest() );
         }
 
         private void AdLoaded( object sender, EventArgs e )
@@ -253,7 +251,7 @@ namespace com.binouze
             var mediationABTestVariant = extras["mediation_ab_test_variant"];
             */
             
-            OnImpressionDatas( args, responseInfo, false );
+            AdMobImplementation.OnImpressionDatas( args, responseInfo, false );
         }
     }
 }

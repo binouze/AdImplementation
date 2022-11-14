@@ -1,30 +1,33 @@
-﻿using System;
+using System;
 using System.Threading;
 using GoogleMobileAds.Api;
 
 namespace com.binouze
 {
-    public class AdMobRewarded
+    public class AdMobAd
     {
         /// <summary>
         /// true si une pub est dispo
         /// </summary>
         public bool AdAvailable => ad?.IsLoaded() ?? false;
         
-        private RewardedAd ad;
-        private string     adUnit;
-        private int        NbRetryPlay;
+        private IAdMobAd ad;
+        private string   adUnit;
+        private int      NbRetryPlay;
+        private bool     Rewarded;
 
-        private static void Log( string str )
+        private void Log( string str )
         {
-            AdMobImplementation.Log( $"[AdMobRewarded] {str}" );
+            var type = Rewarded ? "Rewarded" : "Interstitial";
+            AdMobImplementation.Log( $"[AdMobRewarded<{type}>] {str}" );
         }
 
         /// <summary>
         /// DO NOT USE
         /// </summary>
         /// <param name="adUnitId"></param>
-        public void SetupAd( string adUnitId )
+        /// <param name="isRewarded"></param>
+        public void SetupAd( string adUnitId, bool isRewarded )
         {
             Log( $"SetupAd {adUnitId}" );
 
@@ -32,8 +35,9 @@ namespace com.binouze
             Dispose();
 
             //Create
-            ad     = new RewardedAd( adUnitId );
-            adUnit = adUnitId;
+            ad       = isRewarded ? AdRewarded.Create( adUnitId ) : AdInterstitial.Create( adUnitId );
+            adUnit   = adUnitId;
+            Rewarded = isRewarded;
             
             //Subscribe to events
             ad.OnAdClosed              += AdClosed;
@@ -104,7 +108,7 @@ namespace com.binouze
         private void ResetupAd()
         {
             CancelDelayedCall();
-            SetupAd( adUnit );
+            SetupAd( adUnit, Rewarded );
         }
         private void LoadAd()
         {
@@ -115,12 +119,15 @@ namespace com.binouze
         private void AdLoaded( object sender, EventArgs e )
         {
             Log( $"AdLoaded {sender} {e}" );
-            
-            // Create and pass the SSV options to the rewarded ad.
-            var options = new ServerSideVerificationOptions.Builder()
-                         .SetUserId( AdImplementation.UserId )
-                         .Build();
-            ad.SetServerSideVerificationOptions(options);
+
+            if( Rewarded )
+            {
+                // Create and pass the SSV options to the rewarded ad.
+                var options = new ServerSideVerificationOptions.Builder()
+                             .SetUserId( AdImplementation.UserId )
+                             .Build();
+                ad.SetServerSideVerificationOptions(options);
+            }
         }
 
         private CancellationTokenSource AsyncCancellationToken;
@@ -197,7 +204,7 @@ namespace com.binouze
             }
         }
         
-        private static void AdShown( object sender, EventArgs eventArgs )
+        private void AdShown( object sender, EventArgs eventArgs )
         {
             Log( "AdShown" );
         }
@@ -265,7 +272,222 @@ namespace com.binouze
             var mediationABTestVariant = extras["mediation_ab_test_variant"];
             */
             
-            AdMobImplementation.OnImpressionDatas( args, responseInfo, true );
+            AdMobImplementation.OnImpressionDatas( args, responseInfo, Rewarded );
         }
+    }
+    
+    // ADMOB VIDEO INTERFACE
+    public interface IAdMobAd
+    {
+        public event EventHandler<EventArgs>               OnAdLoaded;
+        public event EventHandler<AdFailedToLoadEventArgs> OnAdFailedToLoad;
+        public event EventHandler<EventArgs>               OnAdOpening;
+        public event EventHandler<EventArgs>               OnAdClosed;
+        public event EventHandler<AdErrorEventArgs>        OnAdFailedToShow;
+        public event EventHandler<EventArgs>               OnAdDidRecordImpression;
+        public event EventHandler<Reward>                  OnUserEarnedReward;
+        public event EventHandler<AdValueEventArgs>        OnPaidEvent;
+
+        public void         LoadAd(AdRequest request);
+        public bool         IsLoaded();
+        public void         Show();
+        public void         SetServerSideVerificationOptions( ServerSideVerificationOptions serverSideVerificationOptions );
+        public Reward       GetRewardItem();
+        public void         Destroy();
+        public ResponseInfo GetResponseInfo();
+    }
+    
+    // IADMOBAD IMPLEMENTATION OF REWARDED AD
+    public class AdRewarded : Factory<AdRewarded, string>, IAdMobAd
+    {
+        [Obsolete( FactoryMessage, true)]
+        public AdRewarded() { }
+        
+        private RewardedAd ad;
+        private string     adUnitId;
+        
+        protected override void Initialize( string adUnitID )
+        {
+            ad = new RewardedAd( adUnitID );
+            
+            ad.OnAdLoaded += ((sender, args) =>
+            {
+                OnAdLoaded?.Invoke( sender, args );
+            });
+            
+            ad.OnAdFailedToLoad += ((sender, args) =>
+            {
+                OnAdFailedToLoad?.Invoke(sender,args);
+            });
+            
+            ad.OnAdOpening += ((sender, args) =>
+            {
+                OnAdOpening?.Invoke(sender, args);
+            });
+            
+            ad.OnAdClosed += ((sender, args) =>
+            {
+                OnAdClosed?.Invoke(sender, args);
+            });
+            
+            ad.OnAdFailedToShow += ((sender, args) =>
+            {
+                OnAdFailedToShow?.Invoke(sender, args);
+            });
+            
+            ad.OnAdDidRecordImpression += ((sender, args) =>
+            {
+                OnAdDidRecordImpression?.Invoke(sender, args);
+            });
+            
+            ad.OnUserEarnedReward += ((sender, args) =>
+            {
+                OnUserEarnedReward?.Invoke(sender, args);
+            });
+            
+            ad.OnPaidEvent += ((sender, args) =>
+            {
+                OnPaidEvent?.Invoke(sender, args);
+            });
+        }
+        
+        public event EventHandler<EventArgs>               OnAdLoaded;
+        public event EventHandler<AdFailedToLoadEventArgs> OnAdFailedToLoad;
+        public event EventHandler<EventArgs>               OnAdOpening;
+        public event EventHandler<EventArgs>               OnAdClosed;
+        public event EventHandler<AdErrorEventArgs>        OnAdFailedToShow;
+        public event EventHandler<EventArgs>               OnAdDidRecordImpression;
+        public event EventHandler<Reward>                  OnUserEarnedReward;
+        public event EventHandler<AdValueEventArgs>        OnPaidEvent;
+        
+        public void LoadAd( AdRequest request )
+        {
+            ad.LoadAd( request );
+        }
+
+        public bool IsLoaded() => ad.IsLoaded();
+
+        public void Show()
+        {
+            ad.Show();
+        }
+
+        public void SetServerSideVerificationOptions( ServerSideVerificationOptions serverSideVerificationOptions )
+        {
+            ad.SetServerSideVerificationOptions( serverSideVerificationOptions );
+        }
+
+        public Reward GetRewardItem() => ad.GetRewardItem();
+
+        public void Destroy()
+        {
+            ad.Destroy();
+            ad = null;
+        }
+
+        public ResponseInfo GetResponseInfo() => ad.GetResponseInfo();
+    }
+    
+    // IADMOBAD IMPLEMENTATION OF INTERSTITIALS AD
+    public class AdInterstitial : Factory<AdInterstitial, string>, IAdMobAd
+    {
+        [Obsolete( FactoryMessage, true)]
+        public AdInterstitial() { }
+        
+        private InterstitialAd ad;
+        
+        protected override void Initialize( string adUnitID )
+        {
+            ad = new InterstitialAd( adUnitID );
+            
+            ad.OnAdLoaded += ((sender, args) =>
+            {
+                OnAdLoaded?.Invoke( sender, args );
+            });
+            
+            ad.OnAdFailedToLoad += ((sender, args) =>
+            {
+                OnAdFailedToLoad?.Invoke(sender,args);
+            });
+            
+            ad.OnAdOpening += ((sender, args) =>
+            {
+                OnAdOpening?.Invoke(sender, args);
+            });
+            
+            ad.OnAdClosed += ((sender, args) =>
+            {
+                OnAdClosed?.Invoke(sender, args);
+            });
+            
+            ad.OnAdFailedToShow += ((sender, args) =>
+            {
+                OnAdFailedToShow?.Invoke(sender, args);
+            });
+            
+            ad.OnAdDidRecordImpression += ((sender, args) =>
+            {
+                OnAdDidRecordImpression?.Invoke(sender, args);
+            });
+
+            ad.OnPaidEvent += ((sender, args) =>
+            {
+                OnPaidEvent?.Invoke(sender, args);
+            });
+        }
+        
+        public event EventHandler<EventArgs>               OnAdLoaded;
+        public event EventHandler<AdFailedToLoadEventArgs> OnAdFailedToLoad;
+        public event EventHandler<EventArgs>               OnAdOpening;
+        public event EventHandler<EventArgs>               OnAdClosed;
+        public event EventHandler<AdErrorEventArgs>        OnAdFailedToShow;
+        public event EventHandler<EventArgs>               OnAdDidRecordImpression;
+        public event EventHandler<Reward>                  OnUserEarnedReward;
+        public event EventHandler<AdValueEventArgs>        OnPaidEvent;
+        
+        public void LoadAd( AdRequest request )
+        {
+            ad.LoadAd( request );
+        }
+
+        public bool IsLoaded() => ad.IsLoaded();
+
+        public void Show()
+        {
+            ad.Show();
+        }
+
+        public void SetServerSideVerificationOptions( ServerSideVerificationOptions serverSideVerificationOptions )
+        {
+            //NOT AVAILABLE ON INTERSTITIALS VIDEOS
+        }
+
+        public Reward GetRewardItem() => null;
+
+        public void Destroy()
+        {
+            ad.Destroy();
+            ad = null;
+        }
+
+        public ResponseInfo GetResponseInfo() => ad.GetResponseInfo();
+    }
+    
+    
+    // FACTORY ABSTRACT CLASS
+    public abstract class Factory<TSelf, TParameter> where TSelf : Factory<TSelf, TParameter>, new()
+    {
+        protected const string FactoryMessage = "Use YourClass.Create(...) instead";
+        public static TSelf Create(TParameter parameter)
+        {
+            var me = new TSelf();
+            me.Initialize( parameter );
+            return me;
+        }
+
+        [Obsolete( FactoryMessage, true)]
+        protected Factory() { }
+
+        protected virtual void Initialize(TParameter parameter) { }
     }
 }

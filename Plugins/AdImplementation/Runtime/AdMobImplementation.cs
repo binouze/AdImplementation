@@ -14,14 +14,11 @@ namespace com.binouze
         private static bool IsInit;
         private bool IsInitComplete;
 
-        private AdMobRewarded     _rewardedAd;
-        private AdMobInterstitial _interstitialAd;
-        
         private static bool         AdPlaying;
         private static Action<bool> OnAdPlayComplete;
 
-        private static AdMobInterstitial AdInterstitial; 
-        private static AdMobRewarded     AdRewarded; 
+        private static AdMobAd AdInterstitial; 
+        private static AdMobAd AdRewarded; 
         
         /// <summary>
         /// true si on est ok pour lancer une pub rewarded
@@ -168,11 +165,11 @@ namespace com.binouze
             AdInterstitial?.Dispose();
             AdRewarded?.Dispose();
             
-            AdInterstitial = new AdMobInterstitial();
-            AdInterstitial.SetupAd( AdInterUnit );
+            AdInterstitial = new AdMobAd();
+            AdInterstitial.SetupAd( AdInterUnit, false );
 
-            AdRewarded = new AdMobRewarded();
-            AdRewarded.SetupAd( AdRewarUnit );
+            AdRewarded = new AdMobAd();
+            AdRewarded.SetupAd( AdRewarUnit, true );
         }
         
         #endregion

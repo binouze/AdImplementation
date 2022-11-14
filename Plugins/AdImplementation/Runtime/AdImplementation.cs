@@ -81,6 +81,9 @@ namespace com.binouze
         }
         
         [UsedImplicitly]
+        public static bool IsAdSupported() => implementation.IsAdSupported();
+
+        [UsedImplicitly]
         public static void Initialize()
         {
             implementation.Initialize();

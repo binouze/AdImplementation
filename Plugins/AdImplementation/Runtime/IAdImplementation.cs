@@ -9,7 +9,8 @@ namespace com.binouze
         
         public bool HasRewardedAvailable();
         public bool HasInterstitialAvailable();
-
+        public bool IsAdSupported();
+        
         public void ShowInterstitial( Action<bool> OnComplete );
         public void ShowRewarded( Action<bool>     OnComplete );
     }

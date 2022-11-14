@@ -28,7 +28,10 @@ namespace com.binouze
         /// true si on est ok pour lancer une pub interstitial
         /// </summary>
         public bool HasInterstitialAvailable() => IsInitComplete && !AdPlaying && (AdInterstitial?.AdAvailable ?? false);
-        
+        /// <summary>
+        /// true si la configuration actuelle supporte les pubs
+        /// </summary>
+        public bool IsAdSupported() => AdSupported;
         
         #region INITIALISATION
         

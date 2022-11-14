@@ -57,7 +57,7 @@ namespace com.binouze
                 _  => AdMobErrorCode.INTERNAL_ERROR
             };
             #else
-            return AdMobErrorCode.INVALID_REQUEST;
+            return AdMobErrorCode.OS_NOT_SUPPORTED;
             #endif
         }
     }

@@ -102,6 +102,11 @@ namespace com.binouze
             CancelDelayedCall();
             LoadAd();
         }
+        private void ResetupAd()
+        {
+            CancelDelayedCall();
+            Resetup();
+        }
         private void LoadAd()
         {
             Log( $"[AdMobInterstitial] LoadAd {AdAvailable}" );
@@ -158,8 +163,10 @@ namespace com.binouze
             var responseInfo = loadAdError.GetResponseInfo();
             Log("[AdMobInterstitial] AdFailedLoad - Response info: " + responseInfo);
            
+            //TODO1 trouver les cas ou il faut faire un resetup plutot qu'un reload
+            
             // par defaut, on reload dans 20secondes
-            DelayCall(ReloadAd, 20_000);
+            DelayCall(ReloadAd, 30_000);
             
             /*switch( adFailedToLoadEventArgs.LoadAdError )
             {

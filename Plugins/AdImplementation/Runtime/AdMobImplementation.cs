@@ -7,8 +7,6 @@ namespace com.binouze
 {
     public class AdMobImplementation : IAdImplementation
     {
-        private const bool DEBUG = true;
-        
         private string AdRewarUnit = "testRewarded";
         private string AdInterUnit = "testInter";
         private bool   AdSupported;
@@ -212,27 +210,15 @@ namespace com.binouze
                 Log( $"[AdMobImplementation] OnImpressionDatas responseInfos {responseInfos}" );
                 var datas = ImpressionDatasFromAdMobDatas( valueEvent.AdValue, responseInfos, rewarded );
                 AdImplementation.OnImpressionDatas?.Invoke( datas );
-                
-                
-                // envoyer l'event chez nous
-                /*var action = new PHP_Ads_Video
-                {
-                    impression_revenue = valueEvent.AdValue.Value/1000000f,
-                    revenue_precision  = valueEvent.AdValue.Precision.ToString(),
-                    rewarded           = rewarded,
-                    revenue_currency   = valueEvent.AdValue.CurrencyCode
-                };
-                ControllerExternalData.SendAction( action );
-                
-                AttributionProvider.SendAdmobImpression( valueEvent.AdValue, responseInfos );*/
             }
         }
         
         public static AdRequest CreateAdRequest()
         {
             // Set app-level configurations
-            AdColonyAppOptions.SetUserId(AdImplementation.UserId);
-            AdColonyAppOptions.SetTestMode(DEBUG);
+            if( !string.IsNullOrEmpty( AdImplementation.UserId ) )
+                AdColonyAppOptions.SetUserId(AdImplementation.UserId);
+            AdColonyAppOptions.SetTestMode(AdImplementation.IsDebug);
             
             // Set ad request parameters
             //var extras = new AdColonyMediationExtras();

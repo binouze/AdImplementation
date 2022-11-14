@@ -62,6 +62,8 @@ namespace com.binouze
             }
             IsInit = true;
 
+            Log( $"Initialize debug:{AdImplementation.IsDebug}" );
+            
             if( AdImplementation.IsDebug )
             {
                 GoogleUserMessagingPlatform.SetDebugLogging( true );
@@ -161,6 +163,8 @@ namespace com.binouze
 
         private void SetupPlacements()
         {
+            Log( "(re)SetupPlacements" );
+            
             AdInterstitial?.Dispose();
             AdRewarded?.Dispose();
             

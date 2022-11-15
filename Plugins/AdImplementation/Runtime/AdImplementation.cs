@@ -38,6 +38,20 @@ namespace com.binouze
         {
             OnImpressionDatas = onImpressionDatas;
         }
+        
+        internal static Action OnAdOpen { get; private set; }
+        [UsedImplicitly]
+        public static void SetOnAdOpen( Action onAdOpen )
+        {
+            OnAdOpen = onAdOpen;
+        }
+        
+        internal static Action OnAdClose { get; private set; }
+        [UsedImplicitly]
+        public static void SetOnAdClose( Action onAdClose )
+        {
+            OnAdClose = onAdClose;
+        }
 
         public static string AdMobTestDevice { get; private set; } = string.Empty;
         [UsedImplicitly]

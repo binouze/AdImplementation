@@ -207,6 +207,7 @@ namespace com.binouze
         private void AdShown( object sender, EventArgs eventArgs )
         {
             Log( "AdShown" );
+            AdImplementation.OnAdOpen?.Invoke();
         }
         
         private void AdClosed( object sender, EventArgs e )
@@ -214,6 +215,7 @@ namespace com.binouze
             Log( "AdClosed" );
             CallOnComplete( false );
             ReloadAd();
+            AdImplementation.OnAdClose?.Invoke();
         }
         
         private void AdDidRecordImpression( object sender, EventArgs e )

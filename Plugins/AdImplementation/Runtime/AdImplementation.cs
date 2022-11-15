@@ -137,5 +137,10 @@ namespace com.binouze
         [UsedImplicitly] public string AdSourceName;
         [UsedImplicitly] public string AdPlacementName;
         [UsedImplicitly] public string AdGroupName;
+
+        public override string ToString()
+        {
+            return $"[ImpressionDatas] {nameof( ImpressionRevenue )}: {ImpressionRevenue}, {nameof( Precision )}: {Precision}, {nameof( Rewarded )}: {Rewarded}, {nameof( CurrencyCode )}: {CurrencyCode}, {nameof( AdSourceName )}: {AdSourceName}, {nameof( AdPlacementName )}: {AdPlacementName}, {nameof( AdGroupName )}: {AdGroupName}";
+        }
     }
 }

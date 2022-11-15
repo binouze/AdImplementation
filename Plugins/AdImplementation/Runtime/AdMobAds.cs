@@ -120,7 +120,7 @@ namespace com.binouze
         {
             Log( $"AdLoaded {sender} {e}" );
 
-            if( Rewarded )
+            if( Rewarded && !string.IsNullOrEmpty(AdImplementation.UserId) )
             {
                 // Create and pass the SSV options to the rewarded ad.
                 var options = new ServerSideVerificationOptions.Builder()

@@ -8,12 +8,6 @@ required for displaying ads.
     package="com.google.unity.ads"
     android:versionName="1.0"
     android:versionCode="1">
-  <queries>
-    <package android:name="com.android.vending" />
-    <package android:name="com.amazon.venezia" />
-    <package android:name="com.sec.android.app.samsungapps" />
-    <package android:name="com.huawei.appmarket" />
-  </queries>
   <application>
     <uses-library android:required="false" android:name="org.apache.http.legacy"/>
   </application>

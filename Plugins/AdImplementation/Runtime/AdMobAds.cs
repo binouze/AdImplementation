@@ -19,7 +19,7 @@ namespace com.binouze
         private void Log( string str )
         {
             var type = Rewarded ? "Rewarded" : "Interstitial";
-            AdMobImplementation.Log( $"[AdMobRewarded<{type}>] {str}" );
+            AdMobImplementation.Log( $"[AdMobAd<{type}>] {str}" );
         }
 
         /// <summary>
@@ -217,9 +217,18 @@ namespace com.binouze
         private void AdClosed( object sender, EventArgs e )
         {
             Log( "AdClosed" );
-            CallOnComplete( false );
+            // sur les video rewarded on recois le close avant le reward event donc on delaye un peu
+            DelayCall( DoAdClosed, 2_000 );
+            // on charge la video suiovante
             ReloadAd();
+            // et on previens le callback global
             AdImplementation.OnAdClose?.Invoke();
+        }
+
+        private void DoAdClosed()
+        {
+            Log( "DoAdClosed" );
+            CallOnComplete( false );
         }
         
         private void AdDidRecordImpression( object sender, EventArgs e )

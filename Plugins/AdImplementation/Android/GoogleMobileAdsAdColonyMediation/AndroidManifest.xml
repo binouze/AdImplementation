@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.google.unity.mediation.adcolony.support">
-
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.google.unity.mediation.adcolony.support">
+    <queries>
+      <package android:name="com.android.vending" />
+      <package android:name="com.amazon.venezia" />
+      <package android:name="com.sec.android.app.samsungapps" />
+      <package android:name="com.huawei.appmarket" />
+    </queries>
     <!-- For optimal performance, AdColony recommends adding the following OPTIONAL permissions. -->
-    <!-- <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> -->
-    <!-- <uses-permission android:name="android.permission.VIBRATE" /> -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
 </manifest>

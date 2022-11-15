@@ -112,8 +112,12 @@ namespace com.binouze
         }
         private void LoadAd()
         {
-            Log( $"LoadAd {AdAvailable}" );
-            ad.LoadAd( AdMobImplementation.CreateAdRequest() );
+            Log( $"LoadAd AdAvailable:{AdAvailable} - AdActive:{AdImplementation.IsActive}" );
+            
+            if( AdImplementation.IsActive )
+                ad.LoadAd( AdMobImplementation.CreateAdRequest() );
+            else
+                DelayCall( ReloadAd, 60_000 );
         }
 
         private void AdLoaded( object sender, EventArgs e )

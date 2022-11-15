@@ -80,6 +80,13 @@ namespace com.binouze
         {
             IsDebug = isDebug;
         }
+
+        public static bool IsActive { get; private set; } = true;
+        [UsedImplicitly]
+        public static void SetIsActive( bool isActive )
+        {
+            IsActive = isActive;
+        }
         
         public static string UserId { get; private set; } = string.Empty;
         [UsedImplicitly]

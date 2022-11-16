@@ -13,7 +13,5 @@ namespace com.binouze
         
         public void ShowInterstitial( Action<bool> OnComplete );
         public void ShowRewarded( Action<bool>     OnComplete );
-
-        public void MajGDPRConsent();
     }
 }

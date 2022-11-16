@@ -73,6 +73,7 @@ namespace com.binouze
                 GoogleUserMessagingPlatform.SetDebugMode( AdImplementation.UMPTestDevice, true );
             }
             GoogleUserMessagingPlatform.SetTargetChildren( AdImplementation.TargetChildrenType == TargetChildren.TRUE );
+            GoogleUserMessagingPlatform.SetOnStatusChangedListener( MajGDPRConsent );
             GoogleUserMessagingPlatform.Initialize();
             
             //GoogleUserMessagingPlatform.SetOnStatusChangedListener( MajConsentStatus );
@@ -283,22 +284,24 @@ namespace com.binouze
         }
         
         
-        public void MajGDPRConsent()
+        private static void MajGDPRConsent( ConsentStatus status )
         {
+            var ok = GoogleUserMessagingPlatform.CanShowAds();
+            
             // ADCOLONY SPECIFIC
             AdColonyAppOptions.SetGDPRRequired(true);
-            AdColonyAppOptions.SetGDPRConsentString("1");
+            AdColonyAppOptions.SetGDPRConsentString(ok ? "1" : "0");
             
             // APPLOVIN SPECIFIC
-            AppLovin.SetHasUserConsent(true);
+            AppLovin.SetHasUserConsent(ok);
             AppLovin.SetIsAgeRestrictedUser(false);
             
             // UNITYADS SPECIFIC
-            UnityAds.SetConsentMetaData("gdpr.consent",    true);
-            UnityAds.SetConsentMetaData("privacy.consent", true);
+            UnityAds.SetConsentMetaData("gdpr.consent",    ok);
+            UnityAds.SetConsentMetaData("privacy.consent", ok);
             
             // VUNGLE SPECIFIC
-            Vungle.UpdateConsentStatus(VungleConsent.ACCEPTED);
+            Vungle.UpdateConsentStatus(ok ? VungleConsent.ACCEPTED : VungleConsent.DENIED);
         }
 
         public static void Log( string str )

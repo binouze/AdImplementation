@@ -126,34 +126,16 @@ namespace com.binouze
             }
             
             OnAdOpen?.Invoke();
-            GoogleUserMessagingPlatform.ShowFormIfRequired( shown =>
+            GoogleUserMessagingPlatform.ShowFormIfRequired( _ =>
             {
-                DoShowInterstitialAfterConsent( shown, OnComplete );
-            } );
-        }
-        private static async void DoShowInterstitialAfterConsent( bool hadConsentForm, Action<bool> OnComplete )
-        {
-            if( hadConsentForm )
-            {
-                implementation.MajGDPRConsent();
-                /*implementation.Initialize();
-                
-                await AdsAsyncUtils.Delay( 1000 );
-                
-                if( !HasInterstitialAvailable )
+                implementation.ShowInterstitial( ok =>
                 {
-                    OnComplete?.Invoke( false );
-                    return;
-                }*/
-            }
-                
-            implementation.ShowInterstitial( ok =>
-            {
-                OnAdClose?.Invoke();
-                OnComplete?.Invoke( ok );
+                    OnAdClose?.Invoke();
+                    OnComplete?.Invoke( ok );
+                } );
             } );
         }
-        
+
         [UsedImplicitly]
         public static void ShowRewarded( Action<bool> OnComplete )
         {
@@ -164,37 +146,15 @@ namespace com.binouze
             }
             
             OnAdOpen?.Invoke();
-            GoogleUserMessagingPlatform.ShowFormIfRequired( shown =>
+            GoogleUserMessagingPlatform.ShowFormIfRequired( _ =>
             {
-                DoShowRewardedAfterConsent( shown, OnComplete );
-            } );
-        }
-        private static async void DoShowRewardedAfterConsent( bool hadConsentForm, Action<bool> OnComplete )
-        {
-            if( hadConsentForm )
-            {
-                implementation.MajGDPRConsent();
-                /*implementation.Initialize();
-
-                await AdsAsyncUtils.Delay( 1000 );
-                
-                if( !HasRewardedAvailable )
+                implementation.ShowRewarded( ok =>
                 {
-                    OnComplete?.Invoke( false );
-                    return;
-                }*/
-            }
-                
-            implementation.ShowRewarded( ok =>
-            {
-                OnAdClose?.Invoke();
-                OnComplete?.Invoke( ok );
+                    OnAdClose?.Invoke();
+                    OnComplete?.Invoke( ok );
+                } );
             } );
         }
-
-
-
-        
     }
     
     public class ImpressionDatas

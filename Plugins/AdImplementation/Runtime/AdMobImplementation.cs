@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using GoogleMobileAds.Api;
 using GoogleMobileAds.Api.Mediation.AdColony;
+using GoogleMobileAds.Api.Mediation.AppLovin;
+using GoogleMobileAds.Api.Mediation.UnityAds;
+using GoogleMobileAds.Api.Mediation.Vungle;
 
 namespace com.binouze
 {
@@ -277,6 +280,25 @@ namespace com.binouze
                 AdPlacementName   = placementName,
                 AdGroupName       = mediationGroupName
             };
+        }
+        
+        
+        public void MajGDPRConsent()
+        {
+            // ADCOLONY SPECIFIC
+            AdColonyAppOptions.SetGDPRRequired(true);
+            AdColonyAppOptions.SetGDPRConsentString("1");
+            
+            // APPLOVIN SPECIFIC
+            AppLovin.SetHasUserConsent(true);
+            AppLovin.SetIsAgeRestrictedUser(false);
+            
+            // UNITYADS SPECIFIC
+            UnityAds.SetConsentMetaData("gdpr.consent",    true);
+            UnityAds.SetConsentMetaData("privacy.consent", true);
+            
+            // VUNGLE SPECIFIC
+            Vungle.UpdateConsentStatus(VungleConsent.ACCEPTED);
         }
 
         public static void Log( string str )

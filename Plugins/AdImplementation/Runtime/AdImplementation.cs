@@ -135,7 +135,8 @@ namespace com.binouze
         {
             if( hadConsentForm )
             {
-                implementation.Initialize();
+                implementation.MajGDPRConsent();
+                /*implementation.Initialize();
                 
                 await AdsAsyncUtils.Delay( 1000 );
                 
@@ -143,7 +144,7 @@ namespace com.binouze
                 {
                     OnComplete?.Invoke( false );
                     return;
-                }
+                }*/
             }
                 
             implementation.ShowInterstitial( ok =>
@@ -172,15 +173,16 @@ namespace com.binouze
         {
             if( hadConsentForm )
             {
-                implementation.Initialize();
-                
+                implementation.MajGDPRConsent();
+                /*implementation.Initialize();
+
                 await AdsAsyncUtils.Delay( 1000 );
                 
                 if( !HasRewardedAvailable )
                 {
                     OnComplete?.Invoke( false );
                     return;
-                }
+                }*/
             }
                 
             implementation.ShowRewarded( ok =>
@@ -189,6 +191,10 @@ namespace com.binouze
                 OnComplete?.Invoke( ok );
             } );
         }
+
+
+
+        
     }
     
     public class ImpressionDatas

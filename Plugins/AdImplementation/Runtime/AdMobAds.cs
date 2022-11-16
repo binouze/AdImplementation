@@ -245,12 +245,12 @@ namespace com.binouze
         {
             Log( $"AdFailedShow {adErrorEventArgs.AdError}" );
             
-            if( NbRetryPlay++ < 5 )
+            /*if( NbRetryPlay++ < 5 )
             {
                 Log( $"AdFailedShow -> retry {NbRetryPlay}/5" );
                 ShowAd( OnAdComplete );
             }
-            else
+            else*/
             {
                 CallOnComplete( false );
             }

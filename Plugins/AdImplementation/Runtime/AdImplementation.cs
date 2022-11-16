@@ -38,15 +38,15 @@ namespace com.binouze
         {
             OnImpressionDatas = onImpressionDatas;
         }
-        
-        internal static Action OnAdOpen { get; private set; }
+
+        private static Action OnAdOpen;
         [UsedImplicitly]
         public static void SetOnAdOpen( Action onAdOpen )
         {
             OnAdOpen = onAdOpen;
         }
-        
-        internal static Action OnAdClose { get; private set; }
+
+        private static Action OnAdClose;
         [UsedImplicitly]
         public static void SetOnAdClose( Action onAdClose )
         {
@@ -119,18 +119,74 @@ namespace com.binouze
         [UsedImplicitly]
         public static void ShowInterstitial( Action<bool> OnComplete )
         {
-            GoogleUserMessagingPlatform.ShowFormIfRequired( () =>
+            if( !HasInterstitialAvailable )
             {
-                implementation.ShowInterstitial(OnComplete);
+                OnComplete?.Invoke( false );
+                return;
+            }
+            
+            OnAdOpen?.Invoke();
+            GoogleUserMessagingPlatform.ShowFormIfRequired( shown =>
+            {
+                DoShowInterstitialAfterConsent( shown, OnComplete );
+            } );
+        }
+        private static async void DoShowInterstitialAfterConsent( bool hadConsentForm, Action<bool> OnComplete )
+        {
+            if( hadConsentForm )
+            {
+                implementation.Initialize();
+                
+                await AdsAsyncUtils.Delay( 1000 );
+                
+                if( !HasInterstitialAvailable )
+                {
+                    OnComplete?.Invoke( false );
+                    return;
+                }
+            }
+                
+            implementation.ShowInterstitial( ok =>
+            {
+                OnAdClose?.Invoke();
+                OnComplete?.Invoke( ok );
             } );
         }
         
         [UsedImplicitly]
         public static void ShowRewarded( Action<bool> OnComplete )
         {
-            GoogleUserMessagingPlatform.ShowFormIfRequired( () =>
+            if( !HasRewardedAvailable )
             {
-                implementation.ShowRewarded(OnComplete);
+                OnComplete?.Invoke( false );
+                return;
+            }
+            
+            OnAdOpen?.Invoke();
+            GoogleUserMessagingPlatform.ShowFormIfRequired( shown =>
+            {
+                DoShowRewardedAfterConsent( shown, OnComplete );
+            } );
+        }
+        private static async void DoShowRewardedAfterConsent( bool hadConsentForm, Action<bool> OnComplete )
+        {
+            if( hadConsentForm )
+            {
+                implementation.Initialize();
+                
+                await AdsAsyncUtils.Delay( 1000 );
+                
+                if( !HasRewardedAvailable )
+                {
+                    OnComplete?.Invoke( false );
+                    return;
+                }
+            }
+                
+            implementation.ShowRewarded( ok =>
+            {
+                OnAdClose?.Invoke();
+                OnComplete?.Invoke( ok );
             } );
         }
     }

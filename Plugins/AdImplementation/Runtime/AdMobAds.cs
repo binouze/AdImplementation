@@ -211,7 +211,6 @@ namespace com.binouze
         private void AdShown( object sender, EventArgs eventArgs )
         {
             Log( "AdShown" );
-            AdImplementation.OnAdOpen?.Invoke();
         }
         
         private void AdClosed( object sender, EventArgs e )
@@ -221,8 +220,6 @@ namespace com.binouze
             DelayCall( DoAdClosed, 2_000 );
             // on charge la video suiovante
             ReloadAd();
-            // et on previens le callback global
-            AdImplementation.OnAdClose?.Invoke();
         }
 
         private void DoAdClosed()

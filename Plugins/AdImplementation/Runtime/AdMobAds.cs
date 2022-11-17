@@ -217,10 +217,10 @@ namespace com.binouze
         private void AdClosed( object sender, EventArgs e )
         {
             Log( "AdClosed" );
+            // on charge la video suivante
+            ReloadAd();
             // sur les video rewarded on recois le close avant le reward event donc on delaye un peu
             DelayCall( DoAdClosed, 2_000 );
-            // on charge la video suiovante
-            ReloadAd();
         }
 
         private void DoAdClosed()

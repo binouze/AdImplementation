@@ -286,10 +286,11 @@ namespace com.binouze
         
         private static void MajGDPRConsent( ConsentStatus status )
         {
-            var ok = GoogleUserMessagingPlatform.CanShowAds();
+            var gdprRequired = GoogleUserMessagingPlatform.IsGDPRRequired();
+            var ok           = !gdprRequired || GoogleUserMessagingPlatform.CanShowAds();
             
             // ADCOLONY SPECIFIC
-            AdColonyAppOptions.SetGDPRRequired(true);
+            AdColonyAppOptions.SetGDPRRequired(gdprRequired);
             AdColonyAppOptions.SetGDPRConsentString(ok ? "1" : "0");
             
             // APPLOVIN SPECIFIC

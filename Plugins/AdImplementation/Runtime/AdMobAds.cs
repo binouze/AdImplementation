@@ -18,7 +18,7 @@ namespace com.binouze
 
         private void Log( string str )
         {
-            var type = Rewarded ? "Rewarded" : "Interstitial";
+            var type = Rewarded ? "Rewarded" : "Intersti";
             AdMobImplementation.Log( $"[AdMobAd<{type}>] {str}" );
         }
 

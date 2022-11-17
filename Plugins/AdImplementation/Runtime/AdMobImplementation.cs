@@ -302,6 +302,9 @@ namespace com.binouze
             
             // VUNGLE SPECIFIC
             Vungle.UpdateConsentStatus(ok ? VungleConsent.ACCEPTED : VungleConsent.DENIED);
+
+
+            Log( $"MajGDPRConsent canShowAds:{ok}" );
         }
 
         public static void Log( string str )

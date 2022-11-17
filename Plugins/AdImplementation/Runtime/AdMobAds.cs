@@ -13,7 +13,7 @@ namespace com.binouze
         
         private IAdMobAd ad;
         private string   adUnit;
-        private int      NbRetryPlay;
+        private int      NbFailPlay;
         private bool     Rewarded;
 
         private void Log( string str )
@@ -37,8 +37,9 @@ namespace com.binouze
             Dispose();
 
             //Create
-            ad       = isRewarded ? AdRewarded.Create( adUnitId ) : AdInterstitial.Create( adUnitId );
-            adUnit   = adUnitId;
+            ad         = isRewarded ? AdRewarded.Create( adUnitId ) : AdInterstitial.Create( adUnitId );
+            adUnit     = adUnitId;
+            NbFailPlay = 0;
             
             //Subscribe to events
             ad.OnAdClosed              += AdClosed;
@@ -76,10 +77,7 @@ namespace com.binouze
             
             OnAdComplete?.Invoke( status );
             OnAdComplete = null;
-            
-            if( status )
-                NbRetryPlay = 0;
-            
+
             CancelDelayedCall();
         }
         
@@ -103,11 +101,15 @@ namespace com.binouze
 
         private void ReloadAd()
         {
+            Log( "ReloadAd" );
+            
             CancelDelayedCall();
             LoadAd();
         }
         private void ResetupAd()
         {
+            Log( "ResetupAd" );
+            
             CancelDelayedCall();
             SetupAd( adUnit, Rewarded );
         }
@@ -123,7 +125,7 @@ namespace com.binouze
 
         private void AdLoaded( object sender, EventArgs e )
         {
-            Log( $"AdLoaded sender:{sender} event:{e} loaded:{ad.IsLoaded()}" );
+            Log( "AdLoaded" );
 
             if( Rewarded && !string.IsNullOrEmpty(AdImplementation.UserId) )
             {
@@ -169,7 +171,7 @@ namespace com.binouze
             var message = loadAdError.GetMessage();
 
             // Gets the cause of the error, if available.
-            var underlyingError = loadAdError.GetCause();
+            //var underlyingError = loadAdError.GetCause();
 
             try
             {
@@ -177,8 +179,8 @@ namespace com.binouze
                 Log( $"             -> domain: {domain}" );
                 Log( $"             -> code: {code}" );
                 Log( $"             -> message: {message}" );
-                Log( $"             -> underlyingError: {underlyingError}" );
                 Log( $"             -> error: {loadAdError}" );
+                //Log( $"             -> underlyingError: {underlyingError}" );
             }
             catch( Exception )
             {
@@ -225,15 +227,21 @@ namespace com.binouze
         private void AdShown( object sender, EventArgs eventArgs )
         {
             Log( "AdShown" );
+            NbFailPlay = 0;
         }
         
         private void AdClosed( object sender, EventArgs e )
         {
             Log( "AdClosed" );
+            
             // on charge la video suivante
             ReloadAd();
+            
             // sur les video rewarded on recois le close avant le reward event donc on delaye un peu
-            DelayCall( DoAdClosed, 2_000 );
+            if( Rewarded )
+                DelayCall( DoAdClosed, 2_000 );
+            else
+                DoAdClosed();
         }
 
         private void DoAdClosed()
@@ -257,16 +265,14 @@ namespace com.binouze
         
         private void AdFailedShow( object sender, AdErrorEventArgs adErrorEventArgs )
         {
-            Log( $"AdFailedShow {adErrorEventArgs.AdError}" );
+            Log( $"AdFailedShow NbFailPlay:{NbFailPlay} - Error:{adErrorEventArgs.AdError}" );
             
-            /*if( NbRetryPlay++ < 5 )
+            CallOnComplete( false );
+
+            if( ++NbFailPlay > 5 )
             {
-                Log( $"AdFailedShow -> retry {NbRetryPlay}/5" );
-                ShowAd( OnAdComplete );
-            }
-            else*/
-            {
-                CallOnComplete( false );
+                Log( " -> TOO MUCH FAIL... RESETUP" );
+                ResetupAd();
             }
         }
         

@@ -122,7 +122,7 @@ namespace com.binouze
 
         private void AdLoaded( object sender, EventArgs e )
         {
-            Log( $"AdLoaded {sender} {e}" );
+            Log( $"AdLoaded sender:{sender} event:{e} loaded:{ad.IsLoaded()}" );
 
             if( Rewarded && !string.IsNullOrEmpty(AdImplementation.UserId) )
             {

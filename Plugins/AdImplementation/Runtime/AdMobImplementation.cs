@@ -26,11 +26,21 @@ namespace com.binouze
         /// <summary>
         /// true si on est ok pour lancer une pub rewarded
         /// </summary>
-        public bool HasRewardedAvailable() => IsInitComplete && !AdPlaying && (AdRewarded?.AdAvailable ?? false);
+        public bool HasRewardedAvailable()
+        {
+            Log( $"HasRewardedAvailable: IsInitComplete:{IsInitComplete} - AdPlaying:{AdPlaying} - AdAvailable:{(AdRewarded?.AdAvailable ?? false)}" );
+            return IsInitComplete && !AdPlaying && (AdRewarded?.AdAvailable ?? false);
+        }
+
         /// <summary>
         /// true si on est ok pour lancer une pub interstitial
         /// </summary>
-        public bool HasInterstitialAvailable() => IsInitComplete && !AdPlaying && (AdInterstitial?.AdAvailable ?? false);
+        public bool HasInterstitialAvailable()
+        {
+            Log( $"HasInterstitialAvailable: IsInitComplete:{IsInitComplete} - AdPlaying:{AdPlaying} - AdAvailable:{(AdInterstitial?.AdAvailable ?? false)}" );
+            return IsInitComplete && !AdPlaying && (AdInterstitial?.AdAvailable ?? false);
+        }
+
         /// <summary>
         /// true si la configuration actuelle supporte les pubs
         /// </summary>
@@ -198,6 +208,8 @@ namespace com.binouze
         /// <param name="OnComplete"></param>
         public void ShowInterstitial( Action<bool> OnComplete )
         {
+            Log( "ShowInterstitial" );
+            
             if( HasInterstitialAvailable() )
             {
                 AdPlaying        = true;
@@ -216,6 +228,8 @@ namespace com.binouze
         /// <param name="OnComplete"></param>
         public void ShowRewarded( Action<bool> OnComplete )
         {
+            Log( "ShowRewarded" );
+            
             if( HasRewardedAvailable() )
             {
                 AdPlaying        = true;
@@ -230,6 +244,8 @@ namespace com.binouze
 
         private static void AdComplete( bool ok )
         {
+            Log( $"AdComplete ok: {ok}" );
+            
             AdPlaying = false;
             OnAdPlayComplete?.Invoke( ok );
             OnAdPlayComplete = null;

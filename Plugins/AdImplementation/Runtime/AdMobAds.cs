@@ -132,8 +132,11 @@ namespace com.binouze
                 // Create and pass the SSV options to the rewarded ad.
                 var options = new ServerSideVerificationOptions.Builder()
                              .SetUserId( AdImplementation.UserId )
+                             .SetCustomData( AdImplementation.UserId )
                              .Build();
                 ad.SetServerSideVerificationOptions(options);
+                
+                Log( $"Adding user ID for SSV: {AdImplementation.UserId}" );
             }
         }
 

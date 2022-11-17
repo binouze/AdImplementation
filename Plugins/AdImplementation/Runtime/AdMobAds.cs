@@ -29,6 +29,8 @@ namespace com.binouze
         /// <param name="isRewarded"></param>
         public void SetupAd( string adUnitId, bool isRewarded )
         {
+            Rewarded = isRewarded;
+            
             Log( $"SetupAd {adUnitId}" );
 
             // au cas ou
@@ -37,7 +39,6 @@ namespace com.binouze
             //Create
             ad       = isRewarded ? AdRewarded.Create( adUnitId ) : AdInterstitial.Create( adUnitId );
             adUnit   = adUnitId;
-            Rewarded = isRewarded;
             
             //Subscribe to events
             ad.OnAdClosed              += AdClosed;

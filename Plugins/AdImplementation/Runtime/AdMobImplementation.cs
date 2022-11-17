@@ -198,6 +198,8 @@ namespace com.binouze
 
             AdRewarded = new AdMobAd();
             AdRewarded.SetupAd( AdRewarUnit, true );
+
+            AdPlaying = false;
         }
         
         #endregion

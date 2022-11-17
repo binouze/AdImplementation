@@ -171,7 +171,20 @@ namespace com.binouze
             // Gets the cause of the error, if available.
             var underlyingError = loadAdError.GetCause();
 
-            Log($"AdFailedLoad -> \n\tdomain: {domain}\n\tcode: {code}\n\tmessage: {message}\n\tunderlyingError: {underlyingError}\n\n{adFailedToLoadEventArgs.LoadAdError}");
+            try
+            {
+                Log( "AdFailedLoad" );
+                Log( $"             -> domain: {domain}" );
+                Log( $"             -> code: {code}" );
+                Log( $"             -> message: {message}" );
+                Log( $"             -> underlyingError: {underlyingError}" );
+                Log( $"             -> error: {loadAdError}" );
+            }
+            catch( Exception )
+            {
+                Log( "--> ERROR CATCHED DURING LOG" );
+            }
+            
 
             var erreur = AdMobErrorCodeHelper.GetErrorCodeFromInteger( code );
             switch( erreur )

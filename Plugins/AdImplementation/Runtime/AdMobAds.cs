@@ -1,6 +1,5 @@
 using System;
 using System.Threading;
-using System.Threading.Tasks;
 using GoogleMobileAds.Api;
 
 namespace com.binouze
@@ -103,7 +102,7 @@ namespace com.binouze
         private void ReloadAd()
         {
             Log( "ReloadAd" );
-            
+            //ResetupAd();
             CancelDelayedCall();
             LoadAd();
         }
@@ -231,13 +230,10 @@ namespace com.binouze
             NbFailPlay = 0;
         }
         
-        private async void AdClosed( object sender, EventArgs e )
+        private void AdClosed( object sender, EventArgs e )
         {
             Log( "AdClosed" );
 
-            await Task.Delay( 2000 );
-            ResetupAd();
-            
             // on charge la video suivante
             // apparement parfois si on appelle ca direct ca crash l'app Android
             // donc on force l'appel sur le main thresd

@@ -13,7 +13,6 @@ namespace com.binouze
         
         private IAdMobAd ad;
         private string   adUnit;
-        private int      NbFailPlay;
         private bool     Rewarded;
 
         private void Log( string str )
@@ -39,7 +38,6 @@ namespace com.binouze
             //Create
             ad         = isRewarded ? AdRewarded.Create( adUnitId ) : AdInterstitial.Create( adUnitId );
             adUnit     = adUnitId;
-            NbFailPlay = 0;
             
             //Subscribe to events
             ad.OnAdClosed              += AdClosed;
@@ -229,7 +227,6 @@ namespace com.binouze
         private void AdShown( object sender, EventArgs eventArgs )
         {
             Log( "AdShown" );
-            NbFailPlay = 0;
         }
         
         private void AdClosed( object sender, EventArgs e )
@@ -269,15 +266,10 @@ namespace com.binouze
         
         private void AdFailedShow( object sender, AdErrorEventArgs adErrorEventArgs )
         {
-            Log( $"AdFailedShow NbFailPlay:{NbFailPlay} - Error:{adErrorEventArgs.AdError}" );
+            Log( $"AdFailedShow Error:{adErrorEventArgs.AdError}" );
             
+            ResetupAd();
             CallOnComplete( false );
-
-            if( ++NbFailPlay > 5 )
-            {
-                Log( " -> TOO MUCH FAIL... RESETUP" );
-                ResetupAd();
-            }
         }
         
         private void AdPaidEvent( object sender, AdValueEventArgs args )

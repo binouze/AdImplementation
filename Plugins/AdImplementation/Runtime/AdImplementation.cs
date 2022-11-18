@@ -66,6 +66,13 @@ namespace com.binouze
         {
             UMPTestDevice = umpDevice;
         }
+        
+        public static bool UMPResetForm { get; private set; }
+        [UsedImplicitly]
+        public static void SetResetForm( bool _UMPResetForm )
+        {
+            UMPResetForm = _UMPResetForm;
+        }
 
         private static bool LogEnabled;
         [UsedImplicitly]

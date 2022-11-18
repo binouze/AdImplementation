@@ -80,7 +80,7 @@ namespace com.binouze
             if( AdImplementation.IsDebug )
             {
                 GoogleUserMessagingPlatform.SetDebugLogging( true );
-                GoogleUserMessagingPlatform.SetDebugMode( AdImplementation.UMPTestDevice, true );
+                GoogleUserMessagingPlatform.SetDebugMode( AdImplementation.UMPTestDevice, AdImplementation.UMPResetForm );
             }
             GoogleUserMessagingPlatform.SetTargetChildren( AdImplementation.TargetChildrenType == TargetChildren.TRUE );
             GoogleUserMessagingPlatform.SetOnStatusChangedListener( MajGDPRConsent );

@@ -235,7 +235,9 @@ namespace com.binouze
             Log( "AdClosed" );
             
             // on charge la video suivante
-            AdsAsyncUtils.DelayCall( ReloadAd, 10_000 );
+            // apparement parfois si on appelle ca direct ca crash l'app Android
+            // donc on force l'appel sur le main thresd
+            AdsAsyncUtils.CallOnMainThread( ReloadAd );
             
             // sur les video rewarded on recois le close avant le reward event donc on delaye un peu
             if( Rewarded )

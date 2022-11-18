@@ -125,13 +125,14 @@ namespace com.binouze
 
         private void AdLoaded( object sender, EventArgs e )
         {
-            Log( "AdLoaded" );
+            Log( $"AdLoaded {ad.GetResponseInfo()}" );
 
             if( Rewarded && !string.IsNullOrEmpty(AdImplementation.UserId) )
             {
                 // Create and pass the SSV options to the rewarded ad.
                 var options = new ServerSideVerificationOptions.Builder()
                              .SetUserId( AdImplementation.UserId )
+                             .SetCustomData( "CUSTOMDATAS" )
                              .Build();
                 ad.SetServerSideVerificationOptions(options);
                 

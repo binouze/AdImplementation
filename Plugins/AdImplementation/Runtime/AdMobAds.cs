@@ -100,9 +100,9 @@ namespace com.binouze
         private void ReloadAd()
         {
             Log( "ReloadAd" );
-            //ResetupAd();
-            CancelDelayedCall();
-            LoadAd();
+            ResetupAd();
+            /*CancelDelayedCall();
+            LoadAd();*/
         }
         private void ResetupAd()
         {

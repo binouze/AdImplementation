@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 using GoogleMobileAds.Api;
 
 namespace com.binouze
@@ -230,9 +231,12 @@ namespace com.binouze
             NbFailPlay = 0;
         }
         
-        private void AdClosed( object sender, EventArgs e )
+        private async void AdClosed( object sender, EventArgs e )
         {
             Log( "AdClosed" );
+
+            await Task.Delay( 2000 );
+            ReloadAd();
             
             // on charge la video suivante
             // apparement parfois si on appelle ca direct ca crash l'app Android

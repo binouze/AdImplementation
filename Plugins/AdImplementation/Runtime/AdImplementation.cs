@@ -1,6 +1,7 @@
 using System;
+using System.Diagnostics;
 using JetBrains.Annotations;
-using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace com.binouze
 {
@@ -19,6 +20,7 @@ namespace com.binouze
             implementation = new AdMobImplementation();
         }
 
+        [Conditional( "IS_DEBUG")]
         internal static void Log( string str )
         {
             if( LogEnabled )

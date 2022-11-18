@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Threading;
 using GoogleMobileAds.Api;
 
@@ -15,10 +16,10 @@ namespace com.binouze
         private string   adUnit;
         private bool     Rewarded;
 
+        [Conditional( "IS_DEBUG")]
         private void Log( string str )
         {
-            var type = Rewarded ? "Rewarded" : "Intersti";
-            AdMobImplementation.Log( $"[AdMobAd<{type}>] {str}" );
+            AdMobImplementation.Log( $"[AdMobAd<{(Rewarded ? "Rewarded" : "Intersti")}>] {str}" );
         }
 
         /// <summary>
@@ -123,8 +124,7 @@ namespace com.binouze
 
         private void AdLoaded( object sender, EventArgs e )
         {
-            var infos = ad.GetResponseInfo();
-            Log( $"AdLoaded {infos.GetMediationAdapterClassName()} {infos}" );
+            Log( $"AdLoaded {ad.GetResponseInfo()}" );
 
             if( Rewarded && !string.IsNullOrEmpty(AdImplementation.UserId) )
             {
@@ -154,10 +154,7 @@ namespace com.binouze
         private void AdFailedLoad( object sender, AdFailedToLoadEventArgs adFailedToLoadEventArgs )
         {
             var loadAdError = adFailedToLoadEventArgs.LoadAdError;
-
-            // Gets the domain from which the error came.
-            var domain = loadAdError.GetDomain();
-
+            
             // Gets the error code. See
             // https://developers.google.com/android/reference/com/google/android/gms/ads/AdRequest
             // and https://developers.google.com/admob/ios/api/reference/Enums/GADErrorCode
@@ -168,19 +165,17 @@ namespace com.binouze
             // For example "Account not approved yet". See
             // https://support.google.com/admob/answer/9905175 for explanations of
             // common errors.
-            var message = loadAdError.GetMessage();
-
+            
             // Gets the cause of the error, if available.
             //var underlyingError = loadAdError.GetCause();
 
             try
             {
                 Log( "AdFailedLoad" );
-                Log( $"             -> domain: {domain}" );
-                Log( $"             -> code: {code}" );
-                Log( $"             -> message: {message}" );
-                Log( $"             -> error: {loadAdError}" );
-                //Log( $"             -> underlyingError: {underlyingError}" );
+                Log( $"             -> domain:  {loadAdError.GetDomain()}" );
+                Log( $"             -> code:    {code}" );
+                Log( $"             -> message: {loadAdError.GetMessage()}" );
+                Log( $"             -> error:   {loadAdError}" );
             }
             catch( Exception )
             {
@@ -258,16 +253,13 @@ namespace com.binouze
 
         private void UserEarnedReward( object sender, Reward args )
         {
-            var type   = args.Type;
-            var amount = args.Amount;
-            Log( $"UserEarnedReward event received for {amount} {type}" );
+            Log( $"UserEarnedReward event received for {args.Amount} {args.Type}" );
             CallOnComplete( true );
         }
         
         private void AdFailedShow( object sender, AdErrorEventArgs adErrorEventArgs )
         {
             Log( $"AdFailedShow Error:{adErrorEventArgs.AdError}" );
-            
             CallOnComplete( false );
             ResetupAd();
         }

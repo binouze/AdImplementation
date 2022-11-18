@@ -268,8 +268,8 @@ namespace com.binouze
         {
             Log( $"AdFailedShow Error:{adErrorEventArgs.AdError}" );
             
-            ResetupAd();
             CallOnComplete( false );
+            ResetupAd();
         }
         
         private void AdPaidEvent( object sender, AdValueEventArgs args )

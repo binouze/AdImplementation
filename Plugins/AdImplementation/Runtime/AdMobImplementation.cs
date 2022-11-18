@@ -316,8 +316,8 @@ namespace com.binouze
             AppLovin.SetIsAgeRestrictedUser(false);
             
             // UNITYADS SPECIFIC
-            UnityAds.SetConsentMetaData("gdpr.consent",    ok);
-            UnityAds.SetConsentMetaData("privacy.consent", ok);
+            /*UnityAds.SetConsentMetaData("gdpr.consent",    ok);
+            UnityAds.SetConsentMetaData("privacy.consent", ok);*/
             
             // VUNGLE SPECIFIC
             Vungle.UpdateConsentStatus(ok ? VungleConsent.ACCEPTED : VungleConsent.DENIED);

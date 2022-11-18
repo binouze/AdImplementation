@@ -125,7 +125,8 @@ namespace com.binouze
 
         private void AdLoaded( object sender, EventArgs e )
         {
-            Log( $"AdLoaded {ad.GetResponseInfo()}" );
+            var infos = ad.GetResponseInfo();
+            Log( $"AdLoaded {infos.GetMediationAdapterClassName()} {infos}" );
 
             if( Rewarded && !string.IsNullOrEmpty(AdImplementation.UserId) )
             {

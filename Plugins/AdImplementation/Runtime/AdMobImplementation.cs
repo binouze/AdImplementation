@@ -258,7 +258,7 @@ namespace com.binouze
             if( valueEvent?.AdValue != null )
             {
                 var datas = ImpressionDatasFromAdMobDatas( valueEvent.AdValue, responseInfos, rewarded );
-                Log( $"OnImpressionDatas rewarded: {rewarded} - AdValue: {valueEvent.AdValue} - responseInfos: {responseInfos} - datas:{datas}" );
+                Log( $"OnImpressionDatas rewarded: {rewarded} - datas:{datas} - AdValue: {valueEvent.AdValue} - responseInfos: {responseInfos}" );
                 AdImplementation.OnImpressionDatas?.Invoke( datas );
             }
         }

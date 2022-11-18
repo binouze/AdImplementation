@@ -410,7 +410,15 @@ namespace com.binouze
         public void Destroy()
         {
             ad.Destroy();
-            ad = null;
+            OnAdLoaded              = null;
+            OnAdFailedToLoad        = null;
+            OnAdOpening             = null;
+            OnAdClosed              = null;
+            OnAdFailedToShow        = null;
+            OnAdDidRecordImpression = null;
+            OnUserEarnedReward      = null;
+            OnPaidEvent             = null;
+            ad                      = null;
         }
 
         public ResponseInfo GetResponseInfo() => ad.GetResponseInfo();

@@ -140,17 +140,15 @@ namespace com.binouze
         }
 
         private CancellationTokenSource AsyncCancellationToken;
-        private async void DelayCall( Action a, int ms )
+        private void DelayCall( Action a, int ms )
         {
             AsyncCancellationToken?.Cancel();
             AsyncCancellationToken?.Dispose();
             AsyncCancellationToken = new CancellationTokenSource();
             
-            var ok = await AdsAsyncUtils.Delay( ms, AsyncCancellationToken.Token );
-            if( !ok )
-                return;
+            AdsAsyncUtils.DelayCall( a, ms, AsyncCancellationToken.Token );
             
-            a?.Invoke();
+            //AdsAsyncUtils.Delay( ms, AsyncCancellationToken.Token );
         }
         
         private void AdFailedLoad( object sender, AdFailedToLoadEventArgs adFailedToLoadEventArgs )

@@ -236,7 +236,7 @@ namespace com.binouze
             Log( "AdClosed" );
 
             await Task.Delay( 2000 );
-            ReloadAd();
+            ResetupAd();
             
             // on charge la video suivante
             // apparement parfois si on appelle ca direct ca crash l'app Android

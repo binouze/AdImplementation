@@ -237,7 +237,7 @@ namespace com.binouze
             Log( "AdClosed" );
             
             // on charge la video suivante
-            ReloadAd();
+            AdsAsyncUtils.DelayCall( ReloadAd, 10_000 );
             
             // sur les video rewarded on recois le close avant le reward event donc on delaye un peu
             if( Rewarded )

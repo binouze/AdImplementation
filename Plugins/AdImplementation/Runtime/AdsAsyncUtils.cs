@@ -47,5 +47,11 @@ namespace com.binouze
 
             return true;
         }
+        
+        public static async void DelayCall( Action a, int ms )
+        {
+            await Delay( ms );
+            a?.Invoke();
+        }
     }
 }

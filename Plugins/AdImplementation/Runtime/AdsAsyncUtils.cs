@@ -81,7 +81,7 @@ namespace com.binouze
             }
         }
         
-        private void _Enqueue( Action action )
+        private static void _Enqueue( Action action )
         {
             lock( ActionsToCallOnMainThread )
             {
@@ -91,11 +91,11 @@ namespace com.binouze
 
         public static void CallOnMainThread( Action action )
         {
-            GetInstance()?._Enqueue( action );
+            _Enqueue( action );
         }
         
         private static AdsAsyncUtils _instance;
-        private static AdsAsyncUtils GetInstance()
+        internal static void SetInstance()
         {
             if( _instance == null ) 
             {
@@ -113,7 +113,6 @@ namespace com.binouze
                     _instance = go.AddComponent<AdsAsyncUtils>();                   
                 }
             }
-            return _instance;
         }
     }
 }

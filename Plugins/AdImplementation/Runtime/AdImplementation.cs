@@ -107,6 +107,7 @@ namespace com.binouze
         [UsedImplicitly]
         public static void Initialize()
         {
+            AdsAsyncUtils.SetInstance();
             implementation.Initialize();
         }
         
@@ -130,8 +131,11 @@ namespace com.binouze
             {
                 implementation.ShowInterstitial( ok =>
                 {
-                    OnAdClose?.Invoke();
-                    OnComplete?.Invoke( ok );
+                    AdsAsyncUtils.CallOnMainThread( () =>
+                    {
+                        OnAdClose?.Invoke();
+                        OnComplete?.Invoke( ok );
+                    });
                 } );
             } );
         }
@@ -150,8 +154,11 @@ namespace com.binouze
             {
                 implementation.ShowRewarded( ok =>
                 {
-                    OnAdClose?.Invoke();
-                    OnComplete?.Invoke( ok );
+                    AdsAsyncUtils.CallOnMainThread( () =>
+                    {
+                        OnAdClose?.Invoke();
+                        OnComplete?.Invoke( ok );
+                    } );
                 } );
             } );
         }

@@ -62,14 +62,14 @@ namespace com.binouze
         
         public static string UMPTestDevice { get; private set; } = string.Empty;
         [UsedImplicitly]
-        public static void SetTestDeviceUMP( string umpDevice )
+        public static void SetUMPTestDevice( string umpDevice )
         {
             UMPTestDevice = umpDevice;
         }
         
         public static bool UMPResetForm { get; private set; }
         [UsedImplicitly]
-        public static void SetResetForm( bool _UMPResetForm )
+        public static void SetUMPResetForm( bool _UMPResetForm )
         {
             UMPResetForm = _UMPResetForm;
         }

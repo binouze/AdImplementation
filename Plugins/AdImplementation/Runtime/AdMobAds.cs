@@ -87,6 +87,8 @@ namespace com.binouze
             
             if( AdAvailable )
             {
+                Log( $"Playing {(ad.GetResponseInfo()?.GetMediationAdapterClassName() ?? "NULL")}" );
+                
                 OnAdComplete = onComplete;
                 ad.Show();
             }

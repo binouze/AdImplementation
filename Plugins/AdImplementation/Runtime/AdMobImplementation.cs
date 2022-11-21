@@ -77,28 +77,14 @@ namespace com.binouze
 
             Log( $"Initialize debug:{AdImplementation.IsDebug}" );
             
-            if( AdImplementation.IsDebug )
-            {
-                GoogleUserMessagingPlatform.SetDebugLogging( true );
+            // INIT GOOGLE USER MESSAGING PLATFORM
+            GoogleUserMessagingPlatform.SetDebugLogging( true );
+            if( !string.IsNullOrEmpty(AdImplementation.UMPTestDevice) )
                 GoogleUserMessagingPlatform.SetDebugMode( AdImplementation.UMPTestDevice, AdImplementation.UMPResetForm );
-            }
             GoogleUserMessagingPlatform.SetTargetChildren( AdImplementation.TargetChildrenType == TargetChildren.TRUE );
             GoogleUserMessagingPlatform.SetOnStatusChangedListener( MajGDPRConsent );
             GoogleUserMessagingPlatform.Initialize();
             
-            //GoogleUserMessagingPlatform.SetOnStatusChangedListener( MajConsentStatus );
-            //GoogleUserMessagingPlatform.Initialize();
-            // ADCOLONY SPECIFIC
-            //AdColonyAppOptions.SetGDPRRequired(true);
-            //AdColonyAppOptions.SetGDPRConsentString("1");
-            // APPLOVIN SPECIFIC
-            //AppLovin.SetHasUserConsent(true);
-            //AppLovin.SetIsAgeRestrictedUser(false);
-            // UNITYADS SPECIFIC
-            //UnityAds.SetConsentMetaData("gdpr.consent",    true);
-            //UnityAds.SetConsentMetaData("privacy.consent", true);
-            // VUNGLE SPECIFIC
-            //Vungle.UpdateConsentStatus(VungleConsent.ACCEPTED);
             
             MobileAds.SetiOSAppPauseOnBackground(true);
 

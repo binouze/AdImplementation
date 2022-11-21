@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using GoogleMobileAds.Api;
 using GoogleMobileAds.Api.Mediation.AdColony;
 using GoogleMobileAds.Api.Mediation.AppLovin;
@@ -327,7 +326,6 @@ namespace com.binouze
             Log( $"MajGDPRConsent gdprRequired:{gdprRequired} - canShowAds:{ok}" );
         }
 
-        [Conditional("IS_DEBUG")]
         public static void Log( string str )
         {
             AdImplementation.Log( $"[AdMobImplementation] {str}" );

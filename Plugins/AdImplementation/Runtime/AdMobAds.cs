@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Threading;
 using GoogleMobileAds.Api;
 
@@ -16,7 +15,6 @@ namespace com.binouze
         private string   adUnit;
         private bool     Rewarded;
 
-        [Conditional( "IS_DEBUG")]
         private void Log( string str )
         {
             AdMobImplementation.Log( $"[AdMobAd<{(Rewarded ? "Rewarded" : "Intersti")}>] {str}" );
@@ -97,14 +95,7 @@ namespace com.binouze
                 onComplete?.Invoke( false );
             }
         }
-
-        private void ReloadAd()
-        {
-            Log( "ReloadAd" );
-            ResetupAd();
-            /*CancelDelayedCall();
-            LoadAd();*/
-        }
+        
         private void ResetupAd()
         {
             Log( "ResetupAd" );
@@ -119,12 +110,13 @@ namespace com.binouze
             if( AdImplementation.IsActive )
                 ad.LoadAd( AdMobImplementation.CreateAdRequest() );
             else
-                DelayCall( ReloadAd, 60_000 );
+                DelayCall( ResetupAd, 60_000 );
         }
 
         private void AdLoaded( object sender, EventArgs e )
         {
-            Log( $"AdLoaded {ad.GetResponseInfo()}" );
+            var info = ad.GetResponseInfo();
+            Log( $"AdLoaded {info.GetMediationAdapterClassName()} - {info}" );
 
             if( Rewarded && !string.IsNullOrEmpty(AdImplementation.UserId) )
             {
@@ -147,8 +139,6 @@ namespace com.binouze
             AsyncCancellationToken = new CancellationTokenSource();
             
             AdsAsyncUtils.DelayCall( a, ms, AsyncCancellationToken.Token );
-            
-            //AdsAsyncUtils.Delay( ms, AsyncCancellationToken.Token );
         }
         
         private void AdFailedLoad( object sender, AdFailedToLoadEventArgs adFailedToLoadEventArgs )
@@ -188,12 +178,6 @@ namespace com.binouze
             {
                 case AdMobErrorCode.AD_ALREADY_USED:
                 case AdMobErrorCode.TIMEOUT:
-                case AdMobErrorCode.NO_FILL:
-                case AdMobErrorCode.MEDIATION_NO_FILL:
-                    // dans ces cas la on recheck plus tard si une ad est dispo
-                    DelayCall(ReloadAd, 20_000);
-                    break;
-                
                 case AdMobErrorCode.INVALID_REQUEST:
                 case AdMobErrorCode.NETWORK_ERROR:
                 case AdMobErrorCode.SERVER_ERROR:
@@ -204,7 +188,7 @@ namespace com.binouze
                 case AdMobErrorCode.INVALID_ARGUMENT:
                 case AdMobErrorCode.INVALID_RESPONSE:
                     // dans ces cas la on attend un moment et on resetup
-                    DelayCall(ResetupAd, 20_000);
+                    DelayCall(ResetupAd, 5_000);
                     break;
                 
                 case AdMobErrorCode.OS_NOT_SUPPORTED:
@@ -212,9 +196,11 @@ namespace com.binouze
                     // bah la y'a pas besoin de reessayer ...
                     break;
                 
+                case AdMobErrorCode.NO_FILL:
+                case AdMobErrorCode.MEDIATION_NO_FILL:
                 default:
                     // par defaut, on reload dans 20secondes
-                    DelayCall(ReloadAd, 20_000);
+                    DelayCall(ResetupAd, 30_000);
                     break;
             }
         }
@@ -231,7 +217,7 @@ namespace com.binouze
             // on charge la video suivante
             // apparement parfois si on appelle ca direct ca crash l'app Android
             // donc on force l'appel sur le main thresd
-            AdsAsyncUtils.CallOnMainThread( ReloadAd );
+            AdsAsyncUtils.CallOnMainThread( ResetupAd );
             
             // sur les video rewarded on recois le close avant le reward event donc on delaye un peu
             if( Rewarded )

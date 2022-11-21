@@ -28,17 +28,25 @@ namespace com.binouze
         public void SetupAd( string adUnitId, bool isRewarded )
         {
             Rewarded = isRewarded;
+            adUnit   = adUnitId;
             
             Log( $"SetupAd {adUnitId}" );
 
             // au cas ou
             Dispose();
 
-            //Create
-            ad         = isRewarded ? AdRewarded.Create( adUnitId ) : AdInterstitial.Create( adUnitId );
-            adUnit     = adUnitId;
+            // no adUnitID, no ad
+            if( string.IsNullOrEmpty( adUnitId ) )
+            {
+                // be sure ad is null so AdAvailable returns false
+                ad = null;
+                return;
+            }
             
-            //Subscribe to events
+            // Create
+            ad = isRewarded ? AdRewarded.Create( adUnitId ) : AdInterstitial.Create( adUnitId );
+            
+            // Subscribe to events
             ad.OnAdClosed              += AdClosed;
             ad.OnAdLoaded              += AdLoaded;
             ad.OnAdFailedToLoad        += AdFailedLoad;

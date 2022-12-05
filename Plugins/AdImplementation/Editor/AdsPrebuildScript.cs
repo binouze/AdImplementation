@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace com.binouze.Editor
 {
-    public class AdsPrebuildScript : MonoBehaviour, IPreprocessBuildWithReport
+    public class AdsPrebuildScript : IPreprocessBuildWithReport
     {
         public const string BASE_FOLDER = "Packages/com.binouze.adimplementation/Plugins/AdImplementation/";
         

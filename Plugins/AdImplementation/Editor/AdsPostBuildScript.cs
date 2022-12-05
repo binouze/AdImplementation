@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace com.binouze.Editor
 {
-    public class AdsPostBuildScript : MonoBehaviour, IPostprocessBuildWithReport
+    public class AdsPostBuildScript : IPostprocessBuildWithReport
     {
         /// <summary>
         ///   <para>Returns the relative callback order for callbacks.  Callbacks with lower values are called before ones with higher values.</para>

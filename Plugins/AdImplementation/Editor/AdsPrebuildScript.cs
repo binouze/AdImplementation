@@ -14,12 +14,11 @@ namespace com.binouze.Editor
         public void OnPreprocessBuild(BuildReport report)
         {
             Debug.Log("AdsPrebuildScript.OnPreprocessBuild for target " + report.summary.platform + " at path " + report.summary.outputPath);
-
-            // copier les fichiers necessaires avant compilation
+            // copier les fichiers necessaires avant la compilation
             CopyAssetsIntoProject();
         }
         
-        [MenuItem( "Assets/Google Mobile Ads/Copy Necesssary Files")]
+        [MenuItem( "Assets/AdMost/Copy Necesssary Files")]
         private static void CopyAssetsIntoProject()
         {
             if( !AssetDatabase.IsValidFolder("Assets/AdImplementation") )
@@ -40,7 +39,7 @@ namespace com.binouze.Editor
 
             if( !AssetDatabase.IsValidFolder(BASE_FOLDER + "AdImplementation") )
             {
-                Debug.LogError($"FOLDER {BASE_FOLDER}GoogleMobileAds NOT FOUND");
+                Debug.LogError($"FOLDER {BASE_FOLDER}AdImplementation NOT FOUND");
                 return;
             }
 
@@ -49,9 +48,9 @@ namespace com.binouze.Editor
                 Debug.LogError($"FOLDER {BASE_FOLDER}Editor NOT FOUND");
                 return;
             }
-            // Copy GoogleMobileAdsSKAdNetworkItems.xml into project
-            AssetDatabase.CopyAsset( BASE_FOLDER+"Editor/SKAdNetworkItems.txt",
-                "Assets/AdImplementation/Editor/SKAdNetworkItems.txt" );
+            
+            // Copy SKAdNetworkItems.txt into project
+            AssetDatabase.CopyAsset( BASE_FOLDER+"Editor/SKAdNetworkItems.txt", "Assets/AdImplementation/Editor/SKAdNetworkItems.txt" );
         }
     }
 }

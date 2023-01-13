@@ -1,3 +1,5 @@
+#if ADMOBADS
+
 namespace com.binouze
 {
     internal enum AdMobErrorCode
@@ -62,3 +64,4 @@ namespace com.binouze
         }
     }
 }
+#endif

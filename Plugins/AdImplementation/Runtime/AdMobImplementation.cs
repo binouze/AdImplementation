@@ -1,3 +1,5 @@
+#if ADMOBADS
+
 using System;
 using System.Collections.Generic;
 using GoogleMobileAds.Api;
@@ -318,3 +320,4 @@ namespace com.binouze
         }
     }
 }
+#endif

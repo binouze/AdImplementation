@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.amr.definition"
+          xmlns:tools="http://schemas.android.com/tools">
+    <!-- Androidx+ multidex, put inside application tag : android:name="androidx.multidex.MultiDexApplication" -->
+    <application android:networkSecurityConfig="@xml/admost_network_security_config_ext">
+
+        <!-- ADMOB -->
+        <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="ADMOB_APP_ID"/>
+		
+        <!-- APPLOVIN -->
+        <meta-data android:name="applovin.sdk.key" android:value="YOUR_APPLOVIN_SDK_KEY_HERE" />
+
+    </application>
+
+</manifest>

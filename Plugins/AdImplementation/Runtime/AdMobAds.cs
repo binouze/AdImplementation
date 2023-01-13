@@ -1,3 +1,4 @@
+#if ADMOBADS
 using System;
 using System.Threading;
 using GoogleMobileAds.Api;
@@ -523,3 +524,4 @@ namespace com.binouze
         protected virtual void Initialize(TParameter parameter) { }
     }
 }
+#endif

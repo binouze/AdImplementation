@@ -4,7 +4,7 @@ namespace com.binouze
 {
     internal interface IAdImplementation
     {
-        public void SetUnitIds( string rewardedId, string interstitialId );
+        public void SetIds( string appID, string rewardedId, string interstitialId );
         public void Initialize();
         
         public bool HasRewardedAvailable();

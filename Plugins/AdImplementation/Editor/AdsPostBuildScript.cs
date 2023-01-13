@@ -1,3 +1,5 @@
+#define UNITY_IOS
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,6 +19,8 @@ namespace com.binouze.Editor
         /// </summary>
         public int callbackOrder { get; } = 1;
 
+        public static string SKADNETWORKS_RELATIVE_PATH = "AdImplementation/Editor/SKAdNetworkItems.txt";
+        
         /// <summary>
         ///   <para>Implement this function to receive a callback after the build is complete.</para>
         /// </summary>
@@ -53,7 +57,17 @@ namespace com.binouze.Editor
             // AdColony needs Motion Sensor
             plist.root.SetString( "NSMotionUsageDescription", "Interactive ad controls" );
 
+            if( plist.root.values.ContainsKey( "SKAdNetworkItems" ) )
+                plist.root.values.Remove( "SKAdNetworkItems" );
+            
             File.WriteAllText(plistPath, plist.WriteToString());
+            
+            // Appending the SKADNETWORKS into the plist file
+            var path = Path.Combine(Application.dataPath, SKADNETWORKS_RELATIVE_PATH);
+            using Stream input  = File.OpenRead(path);
+            using Stream output = new FileStream(plistPath, FileMode.Append, FileAccess.Write, FileShare.None);
+            input.CopyTo(output); // Using .NET 4
+            
             #endif
         }
 

@@ -22,14 +22,14 @@ namespace com.binouze.Editor
         [MenuItem( "Assets/Google Mobile Ads/Copy Necesssary Files")]
         private static void CopyAssetsIntoProject()
         {
-            if( !AssetDatabase.IsValidFolder("Assets/GoogleMobileAds") )
+            if( !AssetDatabase.IsValidFolder("Assets/AdImplementation") )
             {
-                AssetDatabase.CreateFolder("Assets", "GoogleMobileAds");
+                AssetDatabase.CreateFolder("Assets", "AdImplementation");
             }
             
-            if( !AssetDatabase.IsValidFolder("Assets/GoogleMobileAds/Editor") )
+            if( !AssetDatabase.IsValidFolder("Assets/AdImplementation/Editor") )
             {
-                AssetDatabase.CreateFolder("Assets/GoogleMobileAds", "Editor");
+                AssetDatabase.CreateFolder("Assets/AdImplementation", "Editor");
             }
 
             if( !AssetDatabase.IsValidFolder(BASE_FOLDER) )
@@ -38,14 +38,11 @@ namespace com.binouze.Editor
                 return;
             }
 
-            if( !AssetDatabase.IsValidFolder(BASE_FOLDER + "GoogleMobileAds") )
+            if( !AssetDatabase.IsValidFolder(BASE_FOLDER + "AdImplementation") )
             {
                 Debug.LogError($"FOLDER {BASE_FOLDER}GoogleMobileAds NOT FOUND");
                 return;
             }
-            // Copy link.xml into project
-            AssetDatabase.CopyAsset( BASE_FOLDER+"GoogleMobileAds/link.xml",
-                "Assets/GoogleMobileAds/link.xml" );
 
             if( !AssetDatabase.IsValidFolder(BASE_FOLDER + "Editor") )
             {
@@ -53,8 +50,8 @@ namespace com.binouze.Editor
                 return;
             }
             // Copy GoogleMobileAdsSKAdNetworkItems.xml into project
-            AssetDatabase.CopyAsset( BASE_FOLDER+"Editor/GoogleMobileAdsSKAdNetworkItems.xml",
-                "Assets/GoogleMobileAds/Editor/GoogleMobileAdsSKAdNetworkItems.xml" );
+            AssetDatabase.CopyAsset( BASE_FOLDER+"Editor/SKAdNetworkItems.txt",
+                "Assets/AdImplementation/Editor/SKAdNetworkItems.txt" );
         }
     }
 }

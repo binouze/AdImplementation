@@ -240,6 +240,7 @@ namespace com.binouze
             
             AsyncCancellationTokenInterstitial?.Cancel();
             AsyncCancellationTokenInterstitial?.Dispose();
+            AsyncCancellationTokenInterstitial = null;
             
             AMRSDK.loadInterstitial();
         }
@@ -327,7 +328,7 @@ namespace com.binouze
         private CancellationTokenSource AsyncCancellationTokenRewarded;
         private void ReloadRewardedDelayed( int ms )
         {
-            Log( $"ReloadInterstitialDelayed {ms}" );
+            Log( $"ReloadRewardedDelayed {ms}" );
             
             AsyncCancellationTokenRewarded?.Cancel();
             AsyncCancellationTokenRewarded?.Dispose();
@@ -342,6 +343,7 @@ namespace com.binouze
             
             AsyncCancellationTokenRewarded?.Cancel();
             AsyncCancellationTokenRewarded?.Dispose();
+            AsyncCancellationTokenRewarded = null;
             
             AMRSDK.loadRewardedVideo();
         }

@@ -184,7 +184,7 @@ namespace com.binouze
         }
         
         [UsedImplicitly]
-        public static void ShowGdprForm( Action complete )
+        public static void ShowGdprForm( Action complete = null )
         {
             Log( $"ShowGdprForm" );
             if( ShowGDPRPopup != null )

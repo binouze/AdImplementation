@@ -59,7 +59,11 @@ AdImplementation.SetUserID( USER_ID );
 //-----
 
 // Set a function to call and handle results of the GDPR form
-AdImplementation.SetGDPRFormFunction( ShowMyGDPRForm );
+AdImplementation.SetGDPRFormFunction( ShowPopupGDPR );
+private void ShowPopupGDPR( Action<bool> OnComplete )
+{
+    // show a popup that call OnComplete function with the response
+}
 
 // MANDATORY
 //-----------

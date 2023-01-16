@@ -35,6 +35,21 @@ namespace com.binouze
             IsDebug = isDebug;
         }
 
+
+        private static bool IsGDRPForced;
+        [UsedImplicitly]
+        public static void SetForceGDRP( bool force )
+        {
+            IsGDRPForced = force;
+        }
+
+        private static bool IsGDRPReset;
+        [UsedImplicitly]
+        public static void SetResetGDRP( bool reset )
+        {
+            IsGDRPReset = reset;
+        }
+
         public static Action<ImpressionDatas> OnImpressionDatas { get; private set; }
         [UsedImplicitly]
         public static void SetImpressionDataHandler( Action<ImpressionDatas> onImpressionDatas )
@@ -115,8 +130,20 @@ namespace com.binouze
         private static void privacyConsentRequired(string consentType)
         {
             Debug.Log("ADMOST - privacyConsentRequired : " + consentType);
-            ConsentResponse = GetGDPRStatus();
-            ConsentType     = consentType;// Possible consentType values: "CCPA" , "GDPR" , "None"
+
+            // en mode debug on test si on doit forcer le GDPR consent et le reset des infos GDPR
+            if( IsDebug )
+            {
+                if( IsGDRPReset )
+                    SetGDPRStatus( "UNKNOWN" );
+                
+                if( IsGDRPForced )
+                    consentType = "GDPR";
+            }
+
+            ConsentResponse = GetGDPRStatus(); // Possible ConsentResponse values: "OK" , "NON" , "UNKNOWN"
+            ConsentType     = consentType;     // Possible consentType values: "CCPA" , "GDPR" , "None"
+            
             implementation.Initialize();
         }
 
@@ -234,9 +261,12 @@ namespace com.binouze
             }
         }
 
-        private static void SetGDPRStatus(string status)
+        private static void SetGDPRStatus( string status )
         {
             Log( $"SetGDPRStatus {status}" );
+
+            if( status != "OK" && status != "NON" )
+                status = "UNKNOWN";
             
             // on sauve en player prefs
             PlayerPrefs.SetString( "admostgdpr", status );

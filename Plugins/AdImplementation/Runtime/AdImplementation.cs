@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Threading;
 using AMR;
 using JetBrains.Annotations;
 using UnityEngine;
@@ -109,11 +110,14 @@ namespace com.binouze
         [UsedImplicitly]
         public static bool IsAdSupported() => implementation.IsAdSupported();
 
-        private static bool IsInIt;
-        
+        private static bool                    IsInIt;
+        private static bool                    IsInIt2;
+        private static CancellationTokenSource Init2Cancellation;
         [UsedImplicitly]
         public static void Initialize()
         {
+            Log( $"Initialize {IsInIt}" );
+            
             if( IsInIt )
                 return;
             IsInIt = true;
@@ -121,6 +125,10 @@ namespace com.binouze
             AdsAsyncUtils.SetInstance();
             // recuperer le type de consentement necessaire avant initialisation, on en aura besoin a l'init
             AMRSDK.setPrivacyConsentRequired( privacyConsentRequired );
+
+            // on met un delai maximum de 10 secondes sur la recuperation du status GDPR, sinon on passe en mode GDPR
+            Init2Cancellation = new CancellationTokenSource();
+            AdsAsyncUtils.DelayCall( () => privacyConsentRequired("GDPR"), 10_000 );
         }
 
         public static string ConsentType     { get; private set; }
@@ -129,8 +137,12 @@ namespace com.binouze
         // The function below will be called just once when you subscribe the callback function as shown above
         private static void privacyConsentRequired(string consentType)
         {
-            Debug.Log("ADMOST - privacyConsentRequired : " + consentType);
+            Log( "$ADMOST - privacyConsentRequired : {consentType}" );
 
+            Init2Cancellation?.Cancel();
+            Init2Cancellation?.Dispose();
+            Init2Cancellation = null;
+            
             // en mode debug on test si on doit forcer le GDPR consent et le reset des infos GDPR
             if( IsDebug )
             {
@@ -141,8 +153,12 @@ namespace com.binouze
                     consentType = "GDPR";
             }
 
-            ConsentResponse = GetGDPRStatus(); // Possible ConsentResponse values: "OK" , "NON" , "UNKNOWN"
-            ConsentType     = consentType;     // Possible consentType values: "CCPA" , "GDPR" , "None"
+            ConsentResponse = GetGDPRStatus(); // Possible ConsentResponse values: "OK" ,   "NON" ,  "UNKNOWN"
+            ConsentType     = consentType;     // Possible consentType values:     "CCPA" , "GDPR" , "None"
+            
+            if( IsInIt2 )
+                return;
+            IsInIt2 = true;
             
             implementation.Initialize();
         }

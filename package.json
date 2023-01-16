@@ -2,7 +2,7 @@
   "name": "com.binouze.adimplementation",
   "version": "1.1.0",
   "unity": "2021.3",
-  "displayName": "AdImplementation",
+  "displayName": "AdImplementation::AdMost",
   "description": "Custom implementation of Video Ads using AdMost mediation.",
   "changelogUrl": "https://github.com/binouze/AdImplementation/releases",
   "documentationUrl": "https://github.com/binouze/AdImplementation",

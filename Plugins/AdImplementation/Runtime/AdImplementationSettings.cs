@@ -1,34 +1,41 @@
-using System.IO;
-using UnityEditor;
 using UnityEngine;
 
 namespace com.binouze
 {
     public class AdImplementationSettings : ScriptableObject
     {
-        private const string AdImplementationSettingsResDir        = "Assets/AdImplementation/Resources";
-        private const string AdImplementationSettingsFile          = "AdImplementationSettings";
-        private const string AdImplementationSettingsFileExtension = ".asset";
+        public const string AdImplementationSettingsFile          = "AdImplementationSettings";
+        public const string AdImplementationSettingsResDir        = "Assets/AdImplementation/Resources";
+        public const string AdImplementationSettingsFileExtension = ".asset";
 
-        internal static AdImplementationSettings LoadInstance()
+        public static AdImplementationSettings LoadInstance()
         {
             // Read from resources.
             var instance = Resources.Load<AdImplementationSettings>(AdImplementationSettingsFile);
+            
             // Create instance if null.
-            if( instance == null )
+            /*if( instance == null )
             {
                 Directory.CreateDirectory(AdImplementationSettingsResDir);
                 instance = CreateInstance<AdImplementationSettings>();
-                var assetPath = Path.Combine(
-                    AdImplementationSettingsResDir,
-                    AdImplementationSettingsFile + AdImplementationSettingsFileExtension);
+                var assetPath = Path.Combine( AdImplementationSettingsResDir, AdImplementationSettingsFile + AdImplementationSettingsFileExtension);
                 AssetDatabase.CreateAsset(instance, assetPath);
                 AssetDatabase.SaveAssets();
-            }
+            }*/
 
             return instance;
         }
 
+        public bool IsValide()
+        {
+            return
+                !string.IsNullOrEmpty( _AndroidAppId )   &&
+                !string.IsNullOrEmpty( _IOSAppId )       &&
+                !string.IsNullOrEmpty( _AppLovinSDKKey ) &&
+                !string.IsNullOrEmpty( _AndroidAdmobId ) &&
+                !string.IsNullOrEmpty( _IOSAdmobId );
+        }
+        
         [SerializeField]
         private string _AndroidAppId = string.Empty;
 

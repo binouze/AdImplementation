@@ -1,9 +1,7 @@
 {
     "name": "AdImplementation.Runtime",
     "rootNamespace": "",
-    "references": [
-        "com.binouze.GoogleUserMessagingPlatform"
-    ],
+    "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

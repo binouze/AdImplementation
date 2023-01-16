@@ -14,6 +14,13 @@ namespace com.binouze.Editor
         public void OnPreprocessBuild(BuildReport report)
         {
             Debug.Log("AdsPrebuildScript.OnPreprocessBuild for target " + report.summary.platform + " at path " + report.summary.outputPath);
+            // creer les settings
+            var settings = AdImplementationSettingsEditor.LoadSettingsInstance();
+            if( settings == null || !settings.IsValide() )
+            {
+                Debug.LogError( "AdMost settings not valid please check AdIntegration/Settings..." );
+            }
+            
             // copier les fichiers necessaires avant la compilation
             CopyAssetsIntoProject();
         }

@@ -1,3 +1,4 @@
+using System.IO;
 using com.binouze.Editor;
 using UnityEditor;
 using UnityEngine;
@@ -14,11 +15,26 @@ namespace com.binouze
 
         private SerializedProperty _admobIdAndroid;
         private SerializedProperty _admobIdiOS;
+
+        public static AdImplementationSettings LoadSettingsInstance()
+        {
+            var instance = AdImplementationSettings.LoadInstance();
+            // Create instance if null.
+            if( instance == null )
+            {
+                Directory.CreateDirectory(AdImplementationSettings.AdImplementationSettingsResDir);
+                instance = CreateInstance<AdImplementationSettings>();
+                var assetPath = Path.Combine( AdImplementationSettings.AdImplementationSettingsResDir, AdImplementationSettings.AdImplementationSettingsFile + AdImplementationSettings.AdImplementationSettingsFileExtension);
+                AssetDatabase.CreateAsset(instance, assetPath);
+                AssetDatabase.SaveAssets();
+            }
+            return instance;
+        }
         
         [MenuItem("AdImplementation/Settings...")]
         public static void OpenInspector()
         {
-            Selection.activeObject = AdImplementationSettings.LoadInstance();
+            Selection.activeObject = LoadSettingsInstance();
         }
 
         public void OnEnable()
@@ -46,13 +62,14 @@ namespace com.binouze
             // -- ADMOST
             
             EditorGUILayout.LabelField("Ad Most APP IDs", EditorStyles.boldLabel);
-            EditorGUILayout.HelpBox( "enter your AdMost applications ids here", MessageType.Info);
+            //EditorGUILayout.HelpBox( "enter your AdMost applications ids here", MessageType.Info);
             
             EditorGUI.indentLevel++;
             EditorGUILayout.PropertyField(_appIdAndroid, new GUIContent("Android"));
             EditorGUILayout.PropertyField(_appIdiOS,     new GUIContent("iOS"));
             EditorGUI.indentLevel--;
             
+            EditorGUILayout.Separator();
             EditorGUILayout.Separator();
 
             
@@ -65,18 +82,20 @@ namespace com.binouze
             EditorGUI.indentLevel--;
             
             EditorGUILayout.Separator();
+            EditorGUILayout.Separator();
             
             
             // -- ADMOB --
 
             EditorGUILayout.LabelField("Google AdMob App IDs", EditorStyles.boldLabel);
-            EditorGUILayout.HelpBox( "Google Mobile Ads App ID will look similar to this sample ID: ca-app-pub-3940256099942544~3347511713", MessageType.Info);
+            //EditorGUILayout.HelpBox( "Google Mobile Ads App ID will look similar to this sample ID: ca-app-pub-3940256099942544~3347511713", MessageType.Info);
             
             EditorGUI.indentLevel++;
             EditorGUILayout.PropertyField(_admobIdAndroid, new GUIContent("Android"));
             EditorGUILayout.PropertyField(_admobIdiOS,     new GUIContent("iOS"));
             EditorGUI.indentLevel--;
             
+            EditorGUILayout.Separator();
             EditorGUILayout.Separator();
 
             

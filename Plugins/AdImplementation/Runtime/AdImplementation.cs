@@ -78,9 +78,17 @@ namespace com.binouze
         }
 
         [UsedImplicitly]
-        public static void SetIds( string appID, string rewardedId, string interstitialId )
+        public static void SetIds( /*string appID,*/ string rewardedId, string interstitialId )
         {
-            implementation.SetIds( appID, rewardedId, interstitialId );
+            #if UNITY_ANDROID 
+            var appid = AdImplementationSettings.LoadInstance().AndroidAppId;
+            #elif UNITY_IOS
+            var appid = AdImplementationSettings.LoadInstance().IOSAppId;
+            #else
+            var appid = "0";
+            #endif
+            
+            implementation.SetIds( appid, rewardedId, interstitialId );
         }
 
         [UsedImplicitly]

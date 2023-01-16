@@ -91,13 +91,16 @@ namespace com.binouze
             config.SubjectToCCPA = AdImplementation.ConsentResponse == "CCPA" ? "1" : "0";
             config.IsUserChild   = "0";
             
-            // en mode debug, on active le test suite pour les rewarded et les intersticielles
-            if( AdImplementation.IsDebug )
-                AMRSDK.startTestSuite(new [] {AdInterUnit,AdRewarUnit});
-
             AMRSDK.startWithConfig(config, OnSDKDidInitialize);
         }
 
+        public void OpenTestSuite()
+        {
+            // en mode debug, on active le test suite pour les rewarded et les intersticielles
+            if( AdImplementation.IsDebug )
+                AMRSDK.startTestSuite(new [] {AdInterUnit,AdRewarUnit});
+        }
+        
         private void OnSDKDidInitialize( bool success, string error )
         {
             if( !success )

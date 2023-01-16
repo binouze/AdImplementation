@@ -108,6 +108,13 @@ namespace com.binouze
         }
 
         [UsedImplicitly]
+        public static void OpenTestSuite()
+        {
+            if( implementation is AdMostImplementation admost )
+                admost.OpenTestSuite();
+        }
+        
+        [UsedImplicitly]
         public static bool IsAdSupported() => implementation.IsAdSupported();
 
         private static bool                    IsInIt;

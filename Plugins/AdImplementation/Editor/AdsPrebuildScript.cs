@@ -18,8 +18,8 @@ namespace com.binouze.Editor
             CopyAssetsIntoProject();
         }
         
-        [MenuItem( "Assets/AdImplementation/Copy Necesssary Files")]
-        private static void CopyAssetsIntoProject()
+        [MenuItem( "AdImplementation/Run Pre-Build Script")]
+        public static void CopyAssetsIntoProject()
         {
             if( !AssetDatabase.IsValidFolder("Assets/AdImplementation") )
             {
@@ -34,12 +34,6 @@ namespace com.binouze.Editor
             if( !AssetDatabase.IsValidFolder(BASE_FOLDER) )
             {
                 Debug.LogError($"FOLDER {BASE_FOLDER} NOT FOUND");
-                return;
-            }
-
-            if( !AssetDatabase.IsValidFolder(BASE_FOLDER + "AdImplementation") )
-            {
-                Debug.LogError($"FOLDER {BASE_FOLDER}AdImplementation NOT FOUND");
                 return;
             }
 

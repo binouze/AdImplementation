@@ -1,39 +1,48 @@
-//#define UNITY_IOS
-
+#if UNITY_IOS || true
 using System;
-using System.Collections.Generic;
 using System.IO;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
-#if UNITY_IOS
 using UnityEditor.iOS.Xcode;
-#endif
 using UnityEngine;
 
-namespace com.binouze.Editor
+namespace com.binouze
 {
-    public class AdsPostBuildScript : IPostprocessBuildWithReport
+    public class AdsPostProcessIOS : IPostprocessBuildWithReport
     {
+        private const string SKADNETWORKS_RELATIVE_PATH = "AdImplementation/Editor/SKAdNetworkItems.txt";
+        
         /// <summary>
         ///   <para>Returns the relative callback order for callbacks.  Callbacks with lower values are called before ones with higher values.</para>
         /// </summary>
         public int callbackOrder { get; } = 1;
-
-        public static string SKADNETWORKS_RELATIVE_PATH = "AdImplementation/Editor/SKAdNetworkItems.txt";
         
-        /// <summary>
-        ///   <para>Implement this function to receive a callback after the build is complete.</para>
-        /// </summary>
-        /// <param name="report">A BuildReport containing information about the build, such as the target platform and output path.</param>
         public void OnPostprocessBuild( BuildReport report )
         {
-            #if UNITY_IOS
-            
-            var plistPath = Path.Combine(report.summary.outputPath, "Info.plist");
+            var        plistPath = Path.Combine(report.summary.outputPath, "Info.plist");
             var plist     = new PlistDocument();
             plist.ReadFromFile(plistPath);
 
-
+            var instance = AdImplementationSettings.LoadInstance();
+            
+            // AD MOB
+            
+            var admobId  = instance.IOSAdmobId;
+            if( !string.IsNullOrEmpty( admobId ) )
+            {
+                plist.root.SetString("GADApplicationIdentifier", admobId);
+            }
+            
+            // APP LOVIN
+            
+            var appLovinSDKKey = instance.AppLovinSDKKey;
+            if( !string.IsNullOrEmpty( appLovinSDKKey ) )
+            {
+                plist.root.SetString("AppLovinSdkKey", appLovinSDKKey);
+            }
+            
+            // AD COLONY
+            
             // AdColony needs ATS configuration
             if( !plist.root.values.ContainsKey( "NSAppTransportSecurity" ) )
                 plist.root.CreateDict( "NSAppTransportSecurity" );
@@ -43,7 +52,6 @@ namespace com.binouze.Editor
             NSAppTransportSecurityDic.SetBoolean( "NSAllowsLocalNetworking",            true );
             NSAppTransportSecurityDic.SetBoolean( "NSAllowsArbitraryLoadsInWebContent", true );
             
-
             // AdColony needs these query scheme
             if( !plist.root.values.ContainsKey( "LSApplicationQueriesSchemes" ) )
                 plist.root.CreateArray( "LSApplicationQueriesSchemes" );
@@ -57,6 +65,22 @@ namespace com.binouze.Editor
             // AdColony needs Motion Sensor
             plist.root.SetString( "NSMotionUsageDescription", "Interactive ad controls" );
 
+            // -- ADMOST NSExceptionDomains
+
+            if( !NSAppTransportSecurityDic.values.TryGetValue( "NSExceptionDomains", out var NSExceptionDomainsElem ) )
+                NSExceptionDomainsElem = NSAppTransportSecurityDic.CreateDict( "NSExceptionDomains" );
+            var NSExceptionDomainsDic = NSExceptionDomainsElem.AsDict();
+            
+            if( !NSExceptionDomainsDic.values.TryGetValue( "admost.com", out var admostexeption ) )
+                admostexeption = NSExceptionDomainsDic.CreateDict( "admost.com" );
+            var admostexeptionDic = admostexeption.AsDict();
+            
+            admostexeptionDic.SetBoolean( "NSExceptionAllowsInsecureHTTPLoads", true );
+            admostexeptionDic.SetBoolean( "NSIncludesSubdomains",               true );
+            
+            // - SKADNETWORK ITEMS
+            
+            // adding SKAdNetworkItems
             if( plist.root.values.ContainsKey( "SKAdNetworkItems" ) )
                 plist.root.values.Remove( "SKAdNetworkItems" );
             
@@ -67,11 +91,8 @@ namespace com.binouze.Editor
             using Stream input  = File.OpenRead(path);
             using Stream output = new FileStream(plistPath, FileMode.Append, FileAccess.Write, FileShare.None);
             input.CopyTo(output); // Using .NET 4
-            
-            #endif
         }
-
-        #if UNITY_IOS
+        
         private static void AddKeyIfNotExistsInPlistArray( PlistElementArray plistArray, string id )
         {
             if( !PlistElementArrayContainsString( plistArray, id ) )
@@ -95,6 +116,6 @@ namespace com.binouze.Editor
 
             return false;
         }
-        #endif
     }
 }
+#endif

@@ -18,7 +18,7 @@ namespace com.binouze.Editor
             CopyAssetsIntoProject();
         }
         
-        [MenuItem( "Assets/AdMost/Copy Necesssary Files")]
+        [MenuItem( "Assets/AdImplementation/Copy Necesssary Files")]
         private static void CopyAssetsIntoProject()
         {
             if( !AssetDatabase.IsValidFolder("Assets/AdImplementation") )
@@ -51,6 +51,11 @@ namespace com.binouze.Editor
             
             // Copy SKAdNetworkItems.txt into project
             AssetDatabase.CopyAsset( BASE_FOLDER+"Editor/SKAdNetworkItems.txt", "Assets/AdImplementation/Editor/SKAdNetworkItems.txt" );
+            
+            
+            #if UNITY_ANDROID
+            AdsPreProcessAndroid.PreprocessAndroid();
+            #endif
         }
     }
 }

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using AMR;
 using UnityEngine;
@@ -40,14 +39,14 @@ namespace com.binouze
         /// <summary>
         /// true si la configuration actuelle supporte les pubs
         /// </summary>
-        public bool IsAdSupported() => AdSupported;
+        public bool IsAdSupported() => AdSupported && IsInitComplete;
         
         #region INITIALISATION
-        
-        
+
         /// <summary>
         /// definir les ids des emplacement pubs
         /// </summary>
+        /// <param name="appID"></param>
         /// <param name="rewardedId"></param>
         /// <param name="interstitialId"></param>
         public void SetIds( string appID , string rewardedId, string interstitialId )
@@ -87,12 +86,15 @@ namespace com.binouze
             config.RewardedVideoIdAndroid = AdRewarUnit;
             #endif
 
+            config.UserConsent   = AdImplementation.ConsentResponse == "OK"   ? "1" : "0";
+            config.SubjectToGDPR = AdImplementation.ConsentType     == "GDPR" ? "1" : "0";
+            config.SubjectToCCPA = AdImplementation.ConsentResponse == "CCPA" ? "1" : "0";
+            config.IsUserChild   = "0";
+            
             // en mode debug, on active le test suite pour les rewarded et les intersticielles
             if( AdImplementation.IsDebug )
-            {
                 AMRSDK.startTestSuite(new [] {AdInterUnit,AdRewarUnit});
-            }
-            
+
             AMRSDK.startWithConfig(config, OnSDKDidInitialize);
         }
 

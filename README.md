@@ -1,7 +1,8 @@
 # AdImplementation
 
-Simple ad implementation using Admob mediation
+Simple ad implementation using AdMost
  - Included Adapters:
+   - AdMob
    - UnityAds
    - AdColony
    - AppLovin
@@ -24,26 +25,12 @@ Simple ad implementation using Admob mediation
     AdImplementation.SetIsDebug( true );
     // enable logging on debug builds (FALSE BY DEFAULT)
     AdImplementation.SetLogEnabled( true );
-
-    #if UNITY_IOS
-        // set the test device ID for Google User Messaging Platform 
-        AdImplementation.SetTestDeviceUMP( "xxx" );
-        // set the test device ID for Google AdMob
-        AdImplementation.SetTestDeviceAdMob( "xxx" );
-    #elif UNITY_ANDROID
-        // set the test device ID for Google User Messaging Platform 
-        AdImplementation.SetTestDeviceUMP( "xxx" );
-        // set the test device ID for Google AdMob
-        AdImplementation.SetTestDeviceAdMob("xxx");
-    #endif
 #endif
      
      
 // OPTIONNAL 
 //-----------
 
-// Optionaly Set if app is targeted for children (default FALSE)
-AdImplementation.SetTargetChildrenType( TargetChildren.FALSE );
 // Optionaly set a global handler for adOpen
 AdImplementation.SetOnAdOpen( () => 
 {
@@ -59,16 +46,26 @@ AdImplementation.SetImpressionDataHandler( data =>
 {
     Debug.Log( $"IMPRESSION DATA RECEIVED {data}" );
 });
+// Optionaly set an handler for ad clicked event  
+AdImplementation.SetOnAdClicked( network, rewarded => 
+{
+    Debug.Log( $"AD CLICKED {network} {rewarded}" );
+});
 // Optionnaly set a UserID for the current User
 // used for server side validation of rewarded ads
 AdImplementation.SetUserID( USER_ID );
 
+// GDPR
+//-----
+
+// Set a function to call and handle results of the GDPR form
+AdImplementation.SetGDPRFormFunction( ShowMyGDPRForm );
 
 // MANDATORY
 //-----------
 
-// Set the placement Ids
-AdImplementation.SetUnitIds( adRewardId, adInterstitialId );
+// Set the Ids
+AdImplementation.SetIds( appID, adRewardId, adInterstitialId );
 // Start the initialisation
 AdImplementation.Initialize(); 
 
@@ -100,18 +97,3 @@ if( AdImplementation.HasInterstitialAvailable )
 }
 
 ```
-
-### UPDATE NOTES FOR MYSELF:
-
-```csharp
-
-// Apres mise a jour du package GoogleAdMob:
-//  - Verifier GoogleMobileAds/Editor/ManifestProcessor.cs et fixer les url du fichier manifest
-
-private const string MANIFEST_RELATIVE_PATH = "Plugins/Android/AndroidManifest.xml";
-
-```
-
-### TODO:
-
- - handle multiple rewarded and interstitial placements 

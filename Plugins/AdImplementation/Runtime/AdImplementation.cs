@@ -1,17 +1,12 @@
 using System;
+using System.IO;
 using AMR;
 using JetBrains.Annotations;
+using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 namespace com.binouze
 {
-    public enum TargetChildren
-    {
-        TRUE,
-        FALSE,
-        UNDEFINED
-    }
-    
     public static class AdImplementation
     {
         private static readonly IAdImplementation implementation;
@@ -39,14 +34,7 @@ namespace com.binouze
         {
             IsDebug = isDebug;
         }
-        
-        public static TargetChildren TargetChildrenType { get; private set; } = TargetChildren.FALSE;
-        [UsedImplicitly]
-        public static void SetTargetChildrenType( TargetChildren targetChildrenType )
-        {
-            TargetChildrenType = targetChildrenType;
-        }
-        
+
         public static Action<ImpressionDatas> OnImpressionDatas { get; private set; }
         [UsedImplicitly]
         public static void SetImpressionDataHandler( Action<ImpressionDatas> onImpressionDatas )
@@ -75,20 +63,13 @@ namespace com.binouze
             OnAdClicked = onAdClicked;
         }
 
-        public static string TestDevice { get; private set; } = string.Empty;
+        private static Action<Action<bool>> ShowGDPRPopup;
         [UsedImplicitly]
-        public static void SetTestDeviceAdMob( string testDevice )
+        public static void SetGDPRFormFunction( Action<Action<bool>> showGDPRPopup )
         {
-            TestDevice = testDevice;
+            ShowGDPRPopup = showGDPRPopup;
         }
-        
-        public static bool IsActive { get; private set; } = true;
-        [UsedImplicitly]
-        public static void SetIsActive( bool isActive )
-        {
-            IsActive = isActive;
-        }
-        
+
         public static string UserId { get; private set; } = string.Empty;
         [UsedImplicitly]
         public static void SetUserID( string userId )
@@ -97,62 +78,53 @@ namespace com.binouze
         }
 
         [UsedImplicitly]
-        public static void SetUnitIds( string appID, string rewardedId, string interstitialId )
+        public static void SetIds( string appID, string rewardedId, string interstitialId )
         {
             implementation.SetIds( appID, rewardedId, interstitialId );
         }
 
-        private static bool IsReady;
-        
         [UsedImplicitly]
-        public static bool IsAdSupported() => IsReady;
+        public static bool IsAdSupported() => implementation.IsAdSupported();
 
+        private static bool IsInIt;
+        
         [UsedImplicitly]
         public static void Initialize()
         {
-            if( IsReady )
+            if( IsInIt )
                 return;
+            IsInIt = true;
             
             AdsAsyncUtils.SetInstance();
-            implementation.Initialize();
-            
-            AMRSDK.setPrivacyConsentRequired(privacyConsentRequired);
+            // recuperer le type de consentement necessaire avant initialisation, on en aura besoin a l'init
+            AMRSDK.setPrivacyConsentRequired( privacyConsentRequired );
         }
 
-        private static string ConsentType;
+        public static string ConsentType     { get; private set; }
+        public static string ConsentResponse { get; private set; }
+
         // The function below will be called just once when you subscribe the callback function as shown above
-        public static void privacyConsentRequired(string consentType)
+        private static void privacyConsentRequired(string consentType)
         {
             Debug.Log("ADMOST - privacyConsentRequired : " + consentType);
-            ConsentType = consentType;
+            ConsentResponse = GetGDPRStatus();
+            ConsentType     = consentType;// Possible consentType values: "CCPA" , "GDPR" , "None"
+            implementation.Initialize();
         }
 
-        private static void OnSDKDidInitialize( bool success, string error )
-        {
-            if( !success )
-            {
-                Debug.Log( $"[AdImplementation] FAil iniitialize SDK {error}" );
-                Debug.LogException( new Exception("[AdImplementation] FAil iniitialize SDK") );
-            }
-            else
-            {
-                IsReady = true;
-                
-                AMRSDK.loadInterstitial();
-                AMRSDK.loadRewardedVideo();
-                
-            }
-        }
+        private static bool MustAskGDPR => ConsentType != "None" && ConsentResponse != "OK" && ConsentResponse != "NON";
         
         [UsedImplicitly]
-        public static bool HasRewardedAvailable => IsReady && implementation.HasRewardedAvailable();
+        public static bool HasRewardedAvailable => implementation.HasRewardedAvailable();
         
         [UsedImplicitly]
-        public static bool HasInterstitialAvailable => IsReady && implementation.HasInterstitialAvailable();
+        public static bool HasInterstitialAvailable => implementation.HasInterstitialAvailable();
         
         [UsedImplicitly]
         public static void ShowInterstitial( Action<bool> OnComplete )
         {
+            Log( $"ShowInterstitial {HasInterstitialAvailable}" );
+            
             if( !HasInterstitialAvailable )
             {
                 OnComplete?.Invoke( false );
@@ -160,7 +132,7 @@ namespace com.binouze
             }
             
             OnAdOpen?.Invoke();
-            GoogleUserMessagingPlatform.ShowFormIfRequired( _ =>
+            ShowGdprIfRequired( () =>
             {
                 implementation.ShowInterstitial( ok =>
                 {
@@ -176,6 +148,8 @@ namespace com.binouze
         [UsedImplicitly]
         public static void ShowRewarded( Action<bool> OnComplete )
         {
+            Log( $"ShowRewarded {HasRewardedAvailable}" );
+        
             if( !HasRewardedAvailable )
             {
                 OnComplete?.Invoke( false );
@@ -183,7 +157,7 @@ namespace com.binouze
             }
             
             OnAdOpen?.Invoke();
-            GoogleUserMessagingPlatform.ShowFormIfRequired( _ =>
+            ShowGdprIfRequired( () =>
             {
                 implementation.ShowRewarded( ok =>
                 {
@@ -194,6 +168,72 @@ namespace com.binouze
                     } );
                 } );
             } );
+        }
+
+        private static void ShowGdprIfRequired( Action complete )
+        {
+            Log( $"ShowGdprIfRequired {MustAskGDPR}" );
+            
+            if( MustAskGDPR )
+            {
+                if( ShowGDPRPopup != null )
+                {
+                    Log( "Show GDPR Form" );
+                    
+                    ShowGDPRPopup?.Invoke( reponse =>
+                    {
+                        Log( $"GDPR Form response {reponse}" );
+                        
+                        SetGDPRStatus( reponse ? "OK" : "NON" );
+                        complete?.Invoke();
+                    } );
+                }
+                else
+                {
+                    complete?.Invoke();
+                }
+            }
+
+            complete?.Invoke();
+        }
+
+
+        private static string GetGDPRStatus()
+        {
+            try
+            {
+                // on essaye de lire sur le disque en premier
+                var path   = Application.persistentDataPath;
+                var result = File.ReadAllText( Path.Combine( path, "admostgdpr" ) );
+                Log( $"GetGDPRStatus From File {result}" );
+                return result;
+            }
+            catch( Exception e )
+            {
+                // si on y arrive pas, on lit en playerprefs
+                var respref = PlayerPrefs.GetString( "admostgdpr", "UNKNOWN" );
+                Log( $"GetGDPRStatus From PlayerPref {respref} {e.Message}" );
+                return respref;
+            }
+        }
+
+        private static void SetGDPRStatus(string status)
+        {
+            Log( $"SetGDPRStatus {status}" );
+            
+            // on sauve en player prefs
+            PlayerPrefs.SetString( "admostgdpr", status );
+            
+            try
+            {
+                // on essaye d'ecrire sur le disque
+                var path = Application.persistentDataPath;
+                File.WriteAllText( Path.Combine( path, "admostgdpr" ), status );
+            }
+            catch( Exception e )
+            {
+                Log( $"Error writing status to file {status} {e.Message}" );
+            }
         }
     }
     

@@ -116,7 +116,7 @@ namespace com.binouze
 
         [UsedImplicitly]
         public static bool IsGDPRFormRequired() => ConsentType != "None";
-        
+
         [UsedImplicitly]
         public static bool HasRewardedAvailable => implementation.HasRewardedAvailable();
         
@@ -178,26 +178,32 @@ namespace com.binouze
             Log( $"ShowGdprIfRequired {MustAskGDPR}" );
             
             if( MustAskGDPR )
+                ShowGdprForm( complete );
+            else
+                complete?.Invoke();
+        }
+        
+        [UsedImplicitly]
+        public static void ShowGdprForm( Action complete )
+        {
+            Log( $"ShowGdprForm" );
+            if( ShowGDPRPopup != null )
             {
-                if( ShowGDPRPopup != null )
+                Log( "Show GDPR Form" );
+                
+                ShowGDPRPopup?.Invoke( reponse =>
                 {
-                    Log( "Show GDPR Form" );
+                    Log( $"GDPR Form response {reponse}" );
                     
-                    ShowGDPRPopup?.Invoke( reponse =>
-                    {
-                        Log( $"GDPR Form response {reponse}" );
-                        
-                        SetGDPRStatus( reponse ? "OK" : "NON" );
-                        complete?.Invoke();
-                    } );
-                }
-                else
-                {
+                    SetGDPRStatus( reponse ? "OK" : "NON" );
                     complete?.Invoke();
-                }
+                } );
             }
-
-            complete?.Invoke();
+            else
+            {
+                Debug.LogError( "NO FORM TO SHOW, PLEASE CONFIGURE THE PLUGIN" );
+                complete?.Invoke();
+            }
         }
 
 

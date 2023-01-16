@@ -137,7 +137,7 @@ namespace com.binouze
         // The function below will be called just once when you subscribe the callback function as shown above
         private static void privacyConsentRequired(string consentType)
         {
-            Log( "$ADMOST - privacyConsentRequired : {consentType}" );
+            Log( $"ADMOST - privacyConsentRequired : {consentType}" );
 
             Init2Cancellation?.Cancel();
             Init2Cancellation?.Dispose();

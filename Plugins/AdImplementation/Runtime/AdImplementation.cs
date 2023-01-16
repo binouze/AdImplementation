@@ -113,6 +113,9 @@ namespace com.binouze
         }
 
         private static bool MustAskGDPR => ConsentType != "None" && ConsentResponse != "OK" && ConsentResponse != "NON";
+
+        [UsedImplicitly]
+        public static bool IsGDPRFormRequired() => ConsentType != "None";
         
         [UsedImplicitly]
         public static bool HasRewardedAvailable => implementation.HasRewardedAvailable();

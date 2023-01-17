@@ -8,13 +8,6 @@ using Debug = UnityEngine.Debug;
 
 namespace com.binouze
 {
-    public enum GDPRResponse
-    {
-        OK,
-        NON,
-        UNKNOWN
-    }
-    
     public static class AdImplementation
     {
         private static readonly IAdImplementation implementation;
@@ -86,9 +79,9 @@ namespace com.binouze
             OnAdClicked = onAdClicked;
         }
 
-        private static Action<Action<GDPRResponse>> ShowGDPRPopup;
+        private static Action<Action<bool>> ShowGDPRPopup;
         [UsedImplicitly]
-        public static void SetGDPRFormFunction( Action<Action<GDPRResponse>> showGDPRPopup )
+        public static void SetGDPRFormFunction( Action<Action<bool>> showGDPRPopup )
         {
             ShowGDPRPopup = showGDPRPopup;
         }
@@ -259,9 +252,9 @@ namespace com.binouze
                 
                 ShowGDPRPopup?.Invoke( reponse =>
                 {
-                    Log( $"GDPR Form response {reponse.ToString()}" );
+                    Log( $"GDPR Form response {reponse}" );
                     
-                    SetGDPRStatus( reponse.ToString() );
+                    SetGDPRStatus( reponse ? "OK" : "NON" );
                     complete?.Invoke();
                 } );
             }

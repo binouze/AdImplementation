@@ -225,6 +225,7 @@ namespace com.binouze
         
         // GESTION INTERSTITALS
 
+        private int                     NbFailInter;
         private CancellationTokenSource AsyncCancellationTokenInterstitial;
         private void ReloadInterstitialDelayed( int ms )
         {
@@ -255,6 +256,7 @@ namespace com.binouze
         /// <param name="ecpm"></param>
         private void OnInterstitialReady( string networkName, double ecpm )
         {
+            NbFailInter = 0;
             Log( $"OnInterstitialReady networkName:{networkName} ecpm:{ecpm}" );
         }
 
@@ -264,8 +266,13 @@ namespace com.binouze
         /// <param name="errorMessage"></param>
         private void OnInterstitialFail( string errorMessage )
         {
-            Log( $"OnInterstitialFail errorMessage:{errorMessage}" );
-            ReloadInterstitialDelayed( 60_000 );
+            var delay = ++NbFailInter * 5;
+            if( delay > 60 )
+                delay = 60;
+            delay *= 1000;
+            
+            Log( $"OnInterstitialFail delayretry:{delay} errorMessage:{errorMessage}" );
+            ReloadInterstitialDelayed( delay );
         }
 
         /// <summary>
@@ -328,6 +335,7 @@ namespace com.binouze
         
         // Rewarded
 
+        private int                     NbFailReward;
         private CancellationTokenSource AsyncCancellationTokenRewarded;
         private void ReloadRewardedDelayed( int ms )
         {
@@ -358,6 +366,7 @@ namespace com.binouze
         /// <param name="ecpm"></param>
         public void OnVideoReady( string networkName, double ecpm )
         {
+            NbFailReward = 0;
             Log( $"OnVideoReady networkName:{networkName} ecpm:{ecpm}" );
         }
 
@@ -368,8 +377,13 @@ namespace com.binouze
         /// <param name="errorMessage"></param>
         public void OnVideoFail( string errorMessage )
         {
-            Log( $"OnVideoFail errorMessage:{errorMessage}" );
-            ReloadRewardedDelayed( 60_000 );
+            var delay = ++NbFailInter * 5;
+            if( delay > 60 )
+                delay = 60;
+            delay *= 1000;
+            
+            Log( $"OnVideoFail delay:{delay} errorMessage:{errorMessage}" );
+            ReloadRewardedDelayed( delay );
         }
 
         /// <summary>

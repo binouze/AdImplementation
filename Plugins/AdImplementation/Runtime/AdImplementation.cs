@@ -91,6 +91,7 @@ namespace com.binouze
         public static void SetUserID( string userId )
         {
             UserId = userId;
+            implementation.SetUserID( userId );
         }
 
         [UsedImplicitly]
@@ -124,7 +125,7 @@ namespace com.binouze
         public static void Initialize()
         {
             Log( $"Initialize {IsInIt}" );
-            
+
             if( IsInIt )
                 return;
             IsInIt = true;

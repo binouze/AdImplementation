@@ -57,6 +57,12 @@ namespace com.binouze
             AdSupported = !string.IsNullOrEmpty( AppID ) && (!string.IsNullOrEmpty( AdRewarUnit ) || !string.IsNullOrEmpty( AdInterUnit ));
         }
 
+        public void SetUserID( string id )
+        {
+            if( IsInitComplete )
+                AMRSDK.setUserId( id );
+        }
+        
         public void Initialize()
         {
             if( !AdSupported )
@@ -64,9 +70,9 @@ namespace com.binouze
 
             if( IsInit )
             {
-                // resetup les placements
-                //if( IsInitComplete )
-                //    SetupPlacements();
+                // setting user id if defined
+                if( IsInitComplete && !string.IsNullOrEmpty(AdImplementation.UserId) )
+                    AMRSDK.setUserId(AdImplementation.UserId);
                 
                 return;
             }

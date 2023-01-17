@@ -6,6 +6,7 @@ namespace com.binouze
     {
         public void SetIds( string appID, string rewardedId, string interstitialId );
         public void Initialize();
+        public void SetUserID( string id );
         
         public bool HasRewardedAvailable();
         public bool HasInterstitialAvailable();

@@ -291,7 +291,9 @@ namespace com.binouze
 
             if( status != "OK" && status != "NON" )
                 status = "UNKNOWN";
-            
+
+            // on met a jour le status actuel
+            ConsentResponse = status;
             // on sauve en player prefs
             PlayerPrefs.SetString( "admostgdpr", status );
             

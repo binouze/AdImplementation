@@ -193,9 +193,9 @@ namespace com.binouze
                 return;
             }
             
-            OnAdOpen?.Invoke();
             ShowGdprIfRequired( () =>
             {
+                OnAdOpen?.Invoke();
                 implementation.ShowInterstitial( ok =>
                 {
                     AdsAsyncUtils.CallOnMainThread( () =>
@@ -218,9 +218,9 @@ namespace com.binouze
                 return;
             }
             
-            OnAdOpen?.Invoke();
             ShowGdprIfRequired( () =>
             {
+                OnAdOpen?.Invoke();
                 implementation.ShowRewarded( ok =>
                 {
                     AdsAsyncUtils.CallOnMainThread( () =>

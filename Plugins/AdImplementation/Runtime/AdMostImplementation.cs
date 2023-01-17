@@ -69,13 +69,7 @@ namespace com.binouze
                 return;
 
             if( IsInit )
-            {
-                // setting user id if defined
-                if( IsInitComplete && !string.IsNullOrEmpty(AdImplementation.UserId) )
-                    AMRSDK.setUserId(AdImplementation.UserId);
-                
                 return;
-            }
             IsInit = true;
 
             Log( $"Initialize debug:{AdImplementation.IsDebug}" );

@@ -86,7 +86,7 @@ namespace com.binouze
             config.RewardedVideoIdAndroid = AdRewarUnit;
             #endif
 
-            config.UserConsent   = AdImplementation.ConsentResponse == "OK"   ? "1" : "0";
+            config.UserConsent   = AdImplementation.IsDebug || AdImplementation.ConsentResponse == "OK" ? "1" : "0";
             config.SubjectToGDPR = AdImplementation.ConsentType     == "GDPR" ? "1" : "0";
             config.SubjectToCCPA = AdImplementation.ConsentResponse == "CCPA" ? "1" : "0";
             config.IsUserChild   = "0";

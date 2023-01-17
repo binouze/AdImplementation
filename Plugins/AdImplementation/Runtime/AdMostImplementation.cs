@@ -131,7 +131,7 @@ namespace com.binouze
                 AMRSDK.setOnRewardedVideoComplete(OnVideoComplete);
                 AMRSDK.setOnRewardedVideoStatusChange(OnVideoStatusChange);
                 
-                // setting user id if defined
+                // setting user id if it was defined before initialization complete
                 if( !string.IsNullOrEmpty(AdImplementation.UserId) )
                     AMRSDK.setUserId(AdImplementation.UserId);
                 

@@ -91,11 +91,17 @@ namespace com.binouze
 
             if( plistskad.root.values.TryGetValue( "SKAdNetworkItems", out var val_skad ) )
             {
-                var dic_skad = val_skad.AsDict();
-                var dic_skad_plist = plist.root.CreateDict( "SKAdNetworkItems" );
-                foreach( var value in dic_skad.values )
+                var skad_local = val_skad.AsArray();
+                var skad_plist = plist.root.CreateArray( "SKAdNetworkItems" );
+                foreach( var value in skad_local.values )
                 {
-                    dic_skad_plist.SetString( value.Key, value.Value.AsString() );
+                    var id_local = value.AsDict();
+                    var id_plist = skad_plist.AddDict();
+                    
+                    foreach( var v in id_local.values )
+                    {
+                        id_plist.SetString( v.Key, v.Value.AsString() );
+                    }
                 }
             }
             

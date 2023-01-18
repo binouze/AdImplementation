@@ -218,7 +218,7 @@ namespace com.binouze
 
         private static void Log( string str )
         {
-            AdImplementation.Log( $"[AdMobImplementation] {str}" );
+            AdImplementation.Log( $"[AdMostImplementation] {str}" );
         }
         
         

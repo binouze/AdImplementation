@@ -1,4 +1,4 @@
-#if UNITY_IOS
+#if UNITY_IOS || true
 using System;
 using System.IO;
 using UnityEditor.Build;
@@ -19,7 +19,7 @@ namespace com.binouze
         
         public void OnPostprocessBuild( BuildReport report )
         {
-            var        plistPath = Path.Combine(report.summary.outputPath, "Info.plist");
+            var plistPath = Path.Combine(report.summary.outputPath, "Info.plist");
             var plist     = new PlistDocument();
             plist.ReadFromFile(plistPath);
 
@@ -84,13 +84,28 @@ namespace com.binouze
             if( plist.root.values.ContainsKey( "SKAdNetworkItems" ) )
                 plist.root.values.Remove( "SKAdNetworkItems" );
             
+            
+            var pathskad  = Path.Combine(Application.dataPath, SKADNETWORKS_RELATIVE_PATH);
+            var plistskad = new PlistDocument();
+            plistskad.ReadFromFile(pathskad);
+
+            if( plistskad.root.values.TryGetValue( "SKAdNetworkItems", out var val_skad ) )
+            {
+                var dic_skad = val_skad.AsDict();
+                var dic_skad_plist = plist.root.CreateDict( "SKAdNetworkItems" );
+                foreach( var value in dic_skad.values )
+                {
+                    dic_skad_plist.SetString( value.Key, value.Value.AsString() );
+                }
+            }
+            
             File.WriteAllText(plistPath, plist.WriteToString());
             
             // Appending the SKADNETWORKS into the plist file
-            var path = Path.Combine(Application.dataPath, SKADNETWORKS_RELATIVE_PATH);
-            using Stream input  = File.OpenRead(path);
-            using Stream output = new FileStream(plistPath, FileMode.Append, FileAccess.Write, FileShare.None);
-            input.CopyTo(output); // Using .NET 4
+            //var path = Path.Combine(Application.dataPath, SKADNETWORKS_RELATIVE_PATH);
+            //using Stream input  = File.OpenRead(path);
+            //using Stream output = new FileStream(plistPath, FileMode.Append, FileAccess.Write, FileShare.None);
+            //input.CopyTo(output); // Using .NET 4
         }
         
         private static void AddKeyIfNotExistsInPlistArray( PlistElementArray plistArray, string id )

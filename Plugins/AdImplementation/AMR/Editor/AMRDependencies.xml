@@ -1,6 +1,12 @@
 <dependencies>
 	<iosPods>
 		<iosPod name="AMRSDK" version="~> 1.5" minTargetSdk="8.0"/>
+		<iosPod name="AMRAdapterAdcolony" version="~> 4.9" minTargetSdk="9.0"/>
+		<iosPod name="AMRAdapterAdmob" version="~> 9.13" minTargetSdk="11.0"/>
+		<iosPod name="AMRAdapterApplovin" version="~> 11.6" minTargetSdk="9.0"/>
+		<iosPod name="AMRAdapterChartboost" version="~> 9.1" minTargetSdk="10.0"/>
+		<iosPod name="AMRAdapterUnity" version="~> 4.4" minTargetSdk="9.0"/>
+		<iosPod name="AMRAdapterVungle" version="~> 6.12" minTargetSdk="10.0"/>
 
 	</iosPods>
 	<androidPackages>

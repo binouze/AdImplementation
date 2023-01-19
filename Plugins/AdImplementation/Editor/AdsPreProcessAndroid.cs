@@ -30,8 +30,8 @@ namespace com.binouze
 
             // -- TODO1 ADD android:name="androidx.multidex.MultiDexApplication" INSIDE APPLICATION TAG
             // set application android:name attribute
-            XNamespace androidnamespace = "android"; 
-            elemApplication.SetAttributeValue( androidnamespace+"name", "androidx.multidex.MultiDexApplicatio" );
+            //XNamespace androidnamespace = "android"; 
+            elemApplication.SetAttributeValue( /*androidnamespace+*/"android:name", "androidx.multidex.MultiDexApplicatio" );
 
 
             // -- ADMOB

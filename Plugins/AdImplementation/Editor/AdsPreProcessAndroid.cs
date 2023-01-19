@@ -27,7 +27,11 @@ namespace com.binouze
             var instance = AdImplementationSettings.LoadInstance();
 
             var metas = elemApplication.Descendants().Where( elem => elem.Name.LocalName.Equals( "meta-data" ) );
+
+            // set application android:name attribute
+            elemApplication.SetAttributeValue( "android:name", "android:name=\"androidx.multidex.MultiDexApplication\"" );
             
+
             // -- TODO1 ADD android:name="androidx.multidex.MultiDexApplication" INSIDE APPLICATION TAG
 
             // -- ADMOB

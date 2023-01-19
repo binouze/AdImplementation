@@ -28,6 +28,8 @@ namespace com.binouze
 
             var metas = elemApplication.Descendants().Where( elem => elem.Name.LocalName.Equals( "meta-data" ) );
             
+            // -- TODO1 ADD android:name="androidx.multidex.MultiDexApplication" INSIDE APPLICATION TAG
+
             // -- ADMOB
             
             var adMobAppId = instance.AndroidAdmobId;

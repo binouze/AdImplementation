@@ -377,7 +377,7 @@ namespace com.binouze
         /// <param name="errorMessage"></param>
         public void OnVideoFail( string errorMessage )
         {
-            var delay = ++NbFailInter * 5;
+            var delay = ++NbFailReward * 5;
             if( delay > 60 )
                 delay = 60;
             delay *= 1000;

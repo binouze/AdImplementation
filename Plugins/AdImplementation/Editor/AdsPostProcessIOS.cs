@@ -65,6 +65,10 @@ namespace com.binouze
             // AdColony needs Motion Sensor
             plist.root.SetString( "NSMotionUsageDescription", "Interactive ad controls" );
 
+            // Add default text for NSCalendarsUsageDescription
+            if( !plistParser.root.values.ContainsKey( "NSCalendarsUsageDescription" ) ) 
+                plistParser.root.SetString("NSCalendarsUsageDescription","Some ad content may access calendar.");
+
             // -- ADMOST NSExceptionDomains
 
             if( !NSAppTransportSecurityDic.values.TryGetValue( "NSExceptionDomains", out var NSExceptionDomainsElem ) )

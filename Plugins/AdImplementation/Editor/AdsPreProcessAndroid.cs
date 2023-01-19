@@ -28,10 +28,10 @@ namespace com.binouze
 
             var metas = elemApplication.Descendants().Where( elem => elem.Name.LocalName.Equals( "meta-data" ) );
 
-            // -- TODO1 ADD android:name="androidx.multidex.MultiDexApplication" INSIDE APPLICATION TAG
+            // -- ADD android:name="androidx.multidex.MultiDexApplication" attribute inside the application tag
             // set application android:name attribute
             //XNamespace androidnamespace = "http://schemas.android.com/apk/res/android"; 
-            elemApplication.SetAttributeValue( ns +"name", "androidx.multidex.MultiDexApplicatio" );
+            elemApplication.SetAttributeValue( ns +"name", "androidx.multidex.MultiDexApplication" );
 
 
             // -- ADMOB

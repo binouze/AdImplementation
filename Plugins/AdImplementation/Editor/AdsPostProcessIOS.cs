@@ -66,8 +66,8 @@ namespace com.binouze
             plist.root.SetString( "NSMotionUsageDescription", "Interactive ad controls" );
 
             // Add default text for NSCalendarsUsageDescription
-            if( !plistParser.root.values.ContainsKey( "NSCalendarsUsageDescription" ) ) 
-                plistParser.root.SetString("NSCalendarsUsageDescription","Some ad content may access calendar.");
+            if( !plist.root.values.ContainsKey( "NSCalendarsUsageDescription" ) ) 
+                plist.root.SetString("NSCalendarsUsageDescription","Some ad content may access calendar.");
 
             // -- ADMOST NSExceptionDomains
 

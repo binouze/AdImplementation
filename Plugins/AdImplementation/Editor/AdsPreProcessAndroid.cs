@@ -1,4 +1,4 @@
-#if UNITY_ANDROID || true
+#if UNITY_ANDROID
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;

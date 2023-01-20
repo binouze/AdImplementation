@@ -181,7 +181,7 @@ namespace com.binouze
             AMRSDK.startWithConfig( config, OnSDKDidInitialize );
             
             // si il y avait des infos de visionnage en attente d'envoi, on les envoi
-            if( !InterstitialAdInfo.Sent )
+            if( !InterstitialAdInfo.Sent && InterstitialAdInfo.Started )
             {
                 Log( $"Sending waiting InterstitialAdInfo:{InterstitialAdInfo}" );
                 
@@ -189,7 +189,7 @@ namespace com.binouze
                 InterstitialAdInfo.Sent = true;
                 InterstitialAdInfo.Save();
             }
-            if( !RewardAdInfo.Sent )
+            if( !RewardAdInfo.Sent && InterstitialAdInfo.Started )
             {
                 Log( $"Sending waiting RewardAdInfo:{RewardAdInfo}" );
                 
@@ -366,6 +366,8 @@ namespace com.binouze
         private static void OnInterstitialShow()
         {
             Log( "OnInterstitialShow" );
+            
+            InterstitialAdInfo.Start();
         }
 
         /// <summary>
@@ -404,6 +406,7 @@ namespace com.binouze
         {
             Log( "OnInterstitialDismiss" );
             ReloadInterstitial();
+            InterstitialAdInfo.Complete = true;
             AdComplete( true );
         }
 
@@ -489,6 +492,7 @@ namespace com.binouze
         private static void OnVideoShow()
         {
             Log( "OnVideoShow" );
+            RewardAdInfo.Start();
         }
 
         /// <summary>
@@ -576,6 +580,7 @@ namespace com.binouze
         public bool   Sent;
         // ReSharper disable once MemberCanBePrivate.Global
         public bool   Rewarded;
+        public bool   Started;
         
         
         /// <summary>
@@ -626,7 +631,7 @@ namespace com.binouze
                 Type     = rewarded ? "Rewarded" : "Banner",
                 UserID   = AdImplementation.UserId,
                 Rewarded = rewarded,
-                Sent     = true
+                Started  = false
             };
         }
         
@@ -640,13 +645,27 @@ namespace com.binouze
             NbClicks        = 0;
             UserID          = AdImplementation.UserId;
             Sent            = false;
+            Started         = false;
             
             Save();
         }
 
+        public void Start()
+        {
+            Started = true;
+            Save();
+        }
+        
         public override string ToString()
         {
-            return $"AdViewInfo::{nameof( Network )}: {Network}, {nameof( Complete )}: {Complete}, {nameof( NbClicks )}: {NbClicks}, {nameof( Type )}: {Type}, {nameof( eCPM )}: {eCPM}, {nameof( Revenus )}: {Revenus}, {nameof( RevenusCurrency )}: {RevenusCurrency}, {nameof( UserID )}: {UserID}";
+            return $"AdViewInfo::{nameof( Network )}: {Network}, "     +
+                   $"{nameof( Complete )}: {Complete}, "               +
+                   $"{nameof( NbClicks )}: {NbClicks}, "               +
+                   $"{nameof( Type )}: {Type}, "                       +
+                   $"{nameof( eCPM )}: {eCPM}, "                       +
+                   $"{nameof( Revenus )}: {Revenus}, "                 +
+                   $"{nameof( RevenusCurrency )}: {RevenusCurrency}, " +
+                   $"{nameof( UserID )}: {UserID}";
         }
     }
 }

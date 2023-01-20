@@ -234,13 +234,17 @@ namespace com.binouze
 //
 //  █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████            
 
-        private static void AdComplete( bool ok )
+        private static void AdComplete( bool ok, bool rewarded = false )
         {
-            Log( $"AdComplete ok: {ok}" );
+            var adinfo = rewarded ? RewardAdInfo : InterstitialAdInfo;
+            Log( $"AdComplete ok: {ok}, adinfo:{adinfo}" );
             
             AdPlaying = false;
             OnAdPlayComplete?.Invoke( ok );
             OnAdPlayComplete = null;
+
+            // send info statistic about this ad
+            AdImplementation.OnAdViewInfo?.Invoke( rewarded ? RewardAdInfo : InterstitialAdInfo );
         }
 
         private static ImpressionDatas ImpressionDatasFromAdMostDatas( AMRAd ad, bool rewarded )
@@ -375,9 +379,6 @@ namespace com.binouze
             Log( "OnInterstitialDismiss" );
             ReloadInterstitial();
             AdComplete( true );
-            
-            // send info statistic about this ad
-            AdImplementation.OnAdViewInfo?.Invoke( InterstitialAdInfo );
         }
 
         /// <summary>
@@ -470,7 +471,7 @@ namespace com.binouze
         private static void OnVideoFailToShow()
         {
             Log( "OnVideoFailToShow" );
-            AdComplete( false );
+            AdComplete( false, true );
         }
 
         /// <summary>
@@ -506,10 +507,7 @@ namespace com.binouze
         {
             Log( "OnVideoDismiss" );
             ReloadRewarded();
-            AdComplete( RewardedComplete );
-            
-            // send info statistic about this ad
-            AdImplementation.OnAdViewInfo?.Invoke( RewardAdInfo );
+            AdComplete( RewardedComplete, true );
         }
 
         /// <summary>
@@ -555,6 +553,11 @@ namespace com.binouze
             NbClicks        = 0;
             Type            = rewarded ? "rewarded" : "interstitial";
             UserID          = AdImplementation.UserId;
+        }
+
+        public override string ToString()
+        {
+            return $"AdViewInfo::{nameof( Network )}: {Network}, {nameof( Complete )}: {Complete}, {nameof( NbClicks )}: {NbClicks}, {nameof( Type )}: {Type}, {nameof( eCPM )}: {eCPM}, {nameof( Revenus )}: {Revenus}, {nameof( RevenusCurrency )}: {RevenusCurrency}, {nameof( UserID )}: {UserID}";
         }
     }
 }

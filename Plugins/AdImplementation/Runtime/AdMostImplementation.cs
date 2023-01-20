@@ -7,9 +7,21 @@ namespace com.binouze
 {
     public class AdMostImplementation : IAdImplementation
     {
-        private string AppID       = "testAPP";
-        private string AdRewarUnit = "testRewarded";
-        private string AdInterUnit = "testInter";
+        
+//  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████       
+//          
+//                       ██    ██  █████  ██████  ██  █████  ██████  ██      ███████ ███████ 
+//                       ██    ██ ██   ██ ██   ██ ██ ██   ██ ██   ██ ██      ██      ██      
+//                       ██    ██ ███████ ██████  ██ ███████ ██████  ██      █████   ███████ 
+//                        ██  ██  ██   ██ ██   ██ ██ ██   ██ ██   ██ ██      ██           ██ 
+//                         ████   ██   ██ ██   ██ ██ ██   ██ ██████  ███████ ███████ ███████ 
+//
+//  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████  
+
+
+        private string AppID;
+        private string AdRewarUnit;
+        private string AdInterUnit;
         private bool   AdSupported;
         
         private static bool IsInit;
@@ -18,6 +30,17 @@ namespace com.binouze
         private static bool         AdPlaying;
         private static Action<bool> OnAdPlayComplete;
 
+        
+//  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████       
+//   
+//    ██████  ██    ██ ██████  ██      ██  ██████         ███    ███ ███████ ████████ ██   ██  ██████  ██████  ███████ 
+//    ██   ██ ██    ██ ██   ██ ██      ██ ██              ████  ████ ██         ██    ██   ██ ██    ██ ██   ██ ██      
+//    ██████  ██    ██ ██████  ██      ██ ██              ██ ████ ██ █████      ██    ███████ ██    ██ ██   ██ ███████ 
+//    ██      ██    ██ ██   ██ ██      ██ ██              ██  ██  ██ ██         ██    ██   ██ ██    ██ ██   ██      ██ 
+//    ██       ██████  ██████  ███████ ██  ██████         ██      ██ ███████    ██    ██   ██  ██████  ██████  ███████ 
+//
+//  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████       
+        
         /// <summary>
         /// true si on est ok pour lancer une pub rewarded
         /// </summary>
@@ -37,12 +60,10 @@ namespace com.binouze
         }
 
         /// <summary>
-        /// true si la configuration actuelle supporte les pubs
+        /// true si la configuration actuelle supporte les pubs et que le SDK a bien ete initialise 
         /// </summary>
         public bool IsAdSupported() => AdSupported && IsInitComplete;
         
-        #region INITIALISATION
-
         /// <summary>
         /// definir les ids des emplacement pubs
         /// </summary>
@@ -57,12 +78,77 @@ namespace com.binouze
             AdSupported = !string.IsNullOrEmpty( AppID ) && (!string.IsNullOrEmpty( AdRewarUnit ) || !string.IsNullOrEmpty( AdInterUnit ));
         }
 
+        /// <summary>
+        /// definir le User ID du client
+        /// </summary>
+        /// <param name="id"></param>
         public void SetUserID( string id )
         {
             if( IsInitComplete )
                 AMRSDK.setUserId( id );
         }
         
+        /// <summary>
+        /// TEST ONLY: ouvrir ARM Test Suite
+        /// ne fonctionne que si l'IDFA du device a ete ajoute au dashboard AdMost
+        /// </summary>
+        public void OpenTestSuite()
+        {
+            AMRSDK.startTestSuite(new [] {AdInterUnit,AdRewarUnit});
+        }
+        
+        /// <summary>
+        /// Afficher une video interstitielle
+        /// </summary>
+        /// <param name="OnComplete"></param>
+        public void ShowInterstitial( Action<bool> OnComplete )
+        {
+            Log( "ShowInterstitial" );
+            
+            if( HasInterstitialAvailable() )
+            {
+                AdPlaying        = true;
+                OnAdPlayComplete = OnComplete;
+                AMRSDK.showInterstitial();
+            }
+            else
+            {
+                OnComplete?.Invoke( false );
+            }
+        }
+        
+        /// <summary>
+        /// Afficher une video Rewarded
+        /// </summary>
+        /// <param name="OnComplete"></param>
+        public void ShowRewarded( Action<bool> OnComplete )
+        {
+            Log( "ShowRewarded" );
+            
+            if( HasRewardedAvailable() )
+            {
+                RewardedComplete = false; 
+                AdPlaying        = true;
+                OnAdPlayComplete = OnComplete;
+                AMRSDK.showRewardedVideo();
+            }
+            else
+            {
+                OnComplete?.Invoke( false );
+            }
+        }
+        
+//  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████       
+//   
+//            ██ ███    ██ ██ ████████ ██  █████  ██      ██ ███████  █████  ████████ ██  ██████  ███    ██ 
+//            ██ ████   ██ ██    ██    ██ ██   ██ ██      ██ ██      ██   ██    ██    ██ ██    ██ ████   ██ 
+//            ██ ██ ██  ██ ██    ██    ██ ███████ ██      ██ ███████ ███████    ██    ██ ██    ██ ██ ██  ██ 
+//            ██ ██  ██ ██ ██    ██    ██ ██   ██ ██      ██      ██ ██   ██    ██    ██ ██    ██ ██  ██ ██ 
+//            ██ ██   ████ ██    ██    ██ ██   ██ ███████ ██ ███████ ██   ██    ██    ██  ██████  ██   ████ 
+//
+//  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████       
+
+
         public void Initialize()
         {
             if( !AdSupported )
@@ -92,13 +178,6 @@ namespace com.binouze
             config.IsUserChild   = "0";
             
             AMRSDK.startWithConfig(config, OnSDKDidInitialize);
-        }
-
-        public void OpenTestSuite()
-        {
-            // en mode debug, on active le test suite pour les rewarded et les intersticielles
-            if( AdImplementation.IsDebug )
-                AMRSDK.startTestSuite(new [] {AdInterUnit,AdRewarUnit});
         }
         
         private void OnSDKDidInitialize( bool success, string error )
@@ -135,63 +214,25 @@ namespace com.binouze
                 if( !string.IsNullOrEmpty(AdImplementation.UserId) )
                     AMRSDK.setUserId(AdImplementation.UserId);
                 
-                PreloadAds();
-                
+                // preload Ads
+                AMRSDK.loadInterstitial();
+                AMRSDK.loadRewardedVideo();
+
+                AdPlaying      = false;
                 IsInitComplete = true;
             }
         }
 
-        private static void PreloadAds()
-        {
-            Log( "PreloadAds" );
-            
-            AMRSDK.loadInterstitial();
-            AMRSDK.loadRewardedVideo();
-
-            AdPlaying = false;
-        }
-
-        #endregion
         
-        /// <summary>
-        /// Afficher une video interstitielle
-        /// </summary>
-        /// <param name="OnComplete"></param>
-        public void ShowInterstitial( Action<bool> OnComplete )
-        {
-            Log( "ShowInterstitial" );
-            
-            if( HasInterstitialAvailable() )
-            {
-                AdPlaying        = true;
-                OnAdPlayComplete = OnComplete;
-                AMRSDK.showInterstitial();
-            }
-            else
-            {
-                OnComplete?.Invoke( false );
-            }
-        }
-        
-        /// <summary>
-        /// Afficher une video Rewarded
-        /// </summary>
-        /// <param name="OnComplete"></param>
-        public void ShowRewarded( Action<bool> OnComplete )
-        {
-            Log( "ShowRewarded" );
-            
-            if( HasRewardedAvailable() )
-            {
-                AdPlaying        = true;
-                OnAdPlayComplete = OnComplete;
-                AMRSDK.showRewardedVideo();
-            }
-            else
-            {
-                OnComplete?.Invoke( false );
-            }
-        }
+//  █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████     
+//        
+//  ██████  ██████  ██ ██    ██  █████  ████████ ███████         ███    ███ ███████ ████████ ██   ██  ██████  ██████  ███████ 
+//  ██   ██ ██   ██ ██ ██    ██ ██   ██    ██    ██              ████  ████ ██         ██    ██   ██ ██    ██ ██   ██ ██      
+//  ██████  ██████  ██ ██    ██ ███████    ██    █████           ██ ████ ██ █████      ██    ███████ ██    ██ ██   ██ ███████ 
+//  ██      ██   ██ ██  ██  ██  ██   ██    ██    ██              ██  ██  ██ ██         ██    ██   ██ ██    ██ ██   ██      ██ 
+//  ██      ██   ██ ██   ████   ██   ██    ██    ███████         ██      ██ ███████    ██    ██   ██  ██████  ██████  ███████ 
+//
+//  █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████            
 
         private static void AdComplete( bool ok )
         {
@@ -222,12 +263,21 @@ namespace com.binouze
         }
         
         
-        
-        // GESTION INTERSTITALS
+//  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████       
+//        
+//           ██ ███    ██ ████████ ███████ ██████  ███████ ████████ ██ ████████ ██  █████  ██      ███████ 
+//           ██ ████   ██    ██    ██      ██   ██ ██         ██    ██    ██    ██ ██   ██ ██      ██      
+//           ██ ██ ██  ██    ██    █████   ██████  ███████    ██    ██    ██    ██ ███████ ██      ███████ 
+//           ██ ██  ██ ██    ██    ██      ██   ██      ██    ██    ██    ██    ██ ██   ██ ██           ██ 
+//           ██ ██   ████    ██    ███████ ██   ██ ███████    ██    ██    ██    ██ ██   ██ ███████ ███████
+//
+//  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████       
 
-        private int                     NbFailInter;
-        private CancellationTokenSource AsyncCancellationTokenInterstitial;
-        private void ReloadInterstitialDelayed( int ms )
+
+        private static readonly AdViewInfo              InterstitialAdInfo = new ();
+        private static          int                     NbFailInter;
+        private static          CancellationTokenSource AsyncCancellationTokenInterstitial;
+        private static void ReloadInterstitialDelayed( int ms )
         {
             Log( $"ReloadInterstitialDelayed {ms}" );
             
@@ -238,7 +288,7 @@ namespace com.binouze
             AdsAsyncUtils.DelayCall( ReloadInterstitial, ms, AsyncCancellationTokenInterstitial.Token );
         }
         
-        private void ReloadInterstitial()
+        private static void ReloadInterstitial()
         {
             Log( "ReloadInterstitial" );
             
@@ -254,8 +304,9 @@ namespace com.binouze
         /// </summary>
         /// <param name="networkName"></param>
         /// <param name="ecpm"></param>
-        private void OnInterstitialReady( string networkName, double ecpm )
+        private static void OnInterstitialReady( string networkName, double ecpm )
         {
+            InterstitialAdInfo.Init( networkName, ecpm );
             NbFailInter = 0;
             Log( $"OnInterstitialReady networkName:{networkName} ecpm:{ecpm}" );
         }
@@ -264,7 +315,7 @@ namespace com.binouze
         /// It indicates that the interstitial ad received no-fill response from all of its placements. Therefore, the ad can not be shown. You may choose to try loading it again.
         /// </summary>
         /// <param name="errorMessage"></param>
-        private void OnInterstitialFail( string errorMessage )
+        private static void OnInterstitialFail( string errorMessage )
         {
             var delay = ++NbFailInter * 5;
             if( delay > 60 )
@@ -278,7 +329,7 @@ namespace com.binouze
         /// <summary>
         /// It indicates that the interstitial ad is failed to show.
         /// </summary>
-        private void OnInterstitialFailToShow()
+        private static void OnInterstitialFailToShow()
         {
             Log( "OnInterstitialFailToShow" );
             AdComplete( false );
@@ -287,7 +338,7 @@ namespace com.binouze
         /// <summary>
         /// It indicates that the loaded interstitial ad is shown to the user.
         /// </summary>
-        private void OnInterstitialShow()
+        private static void OnInterstitialShow()
         {
             Log( "OnInterstitialShow" );
         }
@@ -296,9 +347,12 @@ namespace com.binouze
         /// It indicates that the impression counted by the ad network and ad revenue paid.
         /// </summary>
         /// <param name="ad"></param>
-        private void OnInterstitialImpression( AMRAd ad )
+        private static void OnInterstitialImpression( AMRAd ad )
         {
-            Log( "OnInterstitialImpression" );
+            Log( $"OnInterstitialImpression ad:{ad.Network}-{ad.ZoneId}-{ad.Currency}-{ad.Revenue}" );
+            
+            InterstitialAdInfo.eCPM_paid         = ad.Revenue;
+            InterstitialAdInfo.eCPM_paidCurrency = ad.Currency;
             AdImplementation.OnImpressionDatas?.Invoke( ImpressionDatasFromAdMostDatas( ad, false ) );
         }
 
@@ -306,38 +360,52 @@ namespace com.binouze
         /// It indicates that the interstitial ad is clicked.
         /// </summary>
         /// <param name="networkName"></param>
-        private void OnInterstitialClick( string networkName )
+        private static void OnInterstitialClick( string networkName )
         {
             Log( $"OnInterstitialClick networkName:{networkName}" );
+            InterstitialAdInfo.NbClicks++;
             AdImplementation.OnAdClicked?.Invoke(networkName, false);
         }
 
         /// <summary>
         /// It indicates that the interstitial ad is closed by clicking cross button/back button
         /// </summary>
-        private void OnInterstitialDismiss()
+        private static void OnInterstitialDismiss()
         {
             Log( "OnInterstitialDismiss" );
             ReloadInterstitial();
-            AdComplete( false );
+            AdComplete( true );
+            
+            // send info statistic about this ad
+            AdImplementation.OnAdViewInfo?.Invoke( InterstitialAdInfo );
         }
 
         /// <summary>
         /// It indicates that the interstitial ad status changed. (ex: frequency capping finished)
         /// </summary>
         /// <param name="status"></param>
-        private void OnInterstitialStatusChange( int status )
+        private static void OnInterstitialStatusChange( int status )
         {
             Log( $"OnInterstitialStatusChange status:{status}" );
         }
         
         
-        
-        // Rewarded
+//  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████       
+//        
+//                        ██████  ███████ ██     ██  █████  ██████  ██████  ███████ ██████                              
+//                        ██   ██ ██      ██     ██ ██   ██ ██   ██ ██   ██ ██      ██   ██                             
+//                        ██████  █████   ██  █  ██ ███████ ██████  ██   ██ █████   ██   ██                             
+//                        ██   ██ ██      ██ ███ ██ ██   ██ ██   ██ ██   ██ ██      ██   ██                             
+//                        ██   ██ ███████  ███ ███  ██   ██ ██   ██ ██████  ███████ ██████      
+//
+//  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
 
-        private int                     NbFailReward;
-        private CancellationTokenSource AsyncCancellationTokenRewarded;
-        private void ReloadRewardedDelayed( int ms )
+
+        private static readonly AdViewInfo              RewardAdInfo = new ();
+        private static          bool                    RewardedComplete;
+        private static          int                     NbFailReward;
+        private static          CancellationTokenSource AsyncCancellationTokenRewarded;
+        private static void ReloadRewardedDelayed( int ms )
         {
             Log( $"ReloadRewardedDelayed {ms}" );
             
@@ -348,7 +416,7 @@ namespace com.binouze
             AdsAsyncUtils.DelayCall( ReloadRewarded, ms, AsyncCancellationTokenRewarded.Token );
         }
         
-        private void ReloadRewarded()
+        private static void ReloadRewarded()
         {
             Log( "ReloadRewarded" );
             
@@ -364,8 +432,9 @@ namespace com.binouze
         /// </summary>
         /// <param name="networkName"></param>
         /// <param name="ecpm"></param>
-        public void OnVideoReady( string networkName, double ecpm )
+        private static void OnVideoReady( string networkName, double ecpm )
         {
+            RewardAdInfo.Init( networkName, ecpm, true );
             NbFailReward = 0;
             Log( $"OnVideoReady networkName:{networkName} ecpm:{ecpm}" );
         }
@@ -375,7 +444,7 @@ namespace com.binouze
         /// Therefore, the ad can not be shown. You may choose to try loading it again.
         /// </summary>
         /// <param name="errorMessage"></param>
-        public void OnVideoFail( string errorMessage )
+        private static void OnVideoFail( string errorMessage )
         {
             var delay = ++NbFailReward * 5;
             if( delay > 60 )
@@ -390,7 +459,7 @@ namespace com.binouze
         /// It indicates that the loaded rewarded video ad is shown to the user.(Note: It does not mean that the user deserves a reward)
         /// It is immediately called after the loaded ad is shown to the user using AMR.AMRSDK.showRewardedVideo()
         /// </summary>
-        public void OnVideoShow()
+        private static void OnVideoShow()
         {
             Log( "OnVideoShow" );
         }
@@ -398,7 +467,7 @@ namespace com.binouze
         /// <summary>
         /// It indicates that the rewarded video ad is failed to show.
         /// </summary>
-        public void OnVideoFailToShow()
+        private static void OnVideoFailToShow()
         {
             Log( "OnVideoFailToShow" );
             AdComplete( false );
@@ -408,9 +477,12 @@ namespace com.binouze
         /// It indicates that the impression has been counted by the ad network and ad revenue got paid.
         /// </summary>
         /// <param name="ad"></param>
-        public void OnVideoImpression( AMRAd ad )
+        private static void OnVideoImpression( AMRAd ad )
         {
-            Log( $"OnVideoImpression ad:{ad}" );
+            Log( $"OnVideoImpression ad:{ad.Network}-{ad.ZoneId}-{ad.Currency}-{ad.Revenue}" );
+            
+            RewardAdInfo.eCPM_paid         = ad.Revenue;
+            RewardAdInfo.eCPM_paidCurrency = ad.Currency;
             AdImplementation.OnImpressionDatas?.Invoke( ImpressionDatasFromAdMostDatas( ad, true ) );
         }
 
@@ -418,9 +490,11 @@ namespace com.binouze
         /// It indicates that the rewarded video ad is clicked.
         /// </summary>
         /// <param name="networkName"></param>
-        public void OnVideoClick( string networkName )
+        private static void OnVideoClick( string networkName )
         {
             Log( $"OnVideoClick networkName:{networkName}" );
+            
+            RewardAdInfo.NbClicks++;
             AdImplementation.OnAdClicked?.Invoke(networkName, true);
         }
 
@@ -428,11 +502,14 @@ namespace com.binouze
         /// It indicates that the rewarded video ad is closed by clicking cross button/back button.
         /// It does not mean that the user deserves to receive a reward. You need to check whether OnVideoComplete callback is called or not.
         /// </summary>
-        public void OnVideoDismiss()
+        private static void OnVideoDismiss()
         {
             Log( "OnVideoDismiss" );
             ReloadRewarded();
-            AdComplete( false );
+            AdComplete( RewardedComplete );
+            
+            // send info statistic about this ad
+            AdImplementation.OnAdViewInfo?.Invoke( RewardAdInfo );
         }
 
         /// <summary>
@@ -440,19 +517,41 @@ namespace com.binouze
         /// to the user after OnVideoDismiss() callback is called by showing some animations for instance.
         /// Note: If OnVideoComplete callback is called for the ad, it is always called before OnVideoDismiss() callback.
         /// </summary>
-        public void OnVideoComplete()
+        private static void OnVideoComplete()
         {
             Log( "OnVideoComplete" );
-            AdComplete( true );
+            RewardedComplete      = true;
+            RewardAdInfo.Complete = true;
         }
 
         /// <summary>
         /// It indicates that rewarded video status changed. (ex: frequency capping finished)
         /// </summary>
         /// <param name="status"></param>
-        public void OnVideoStatusChange( int status )
+        private static void OnVideoStatusChange( int status )
         {
             Log( $"OnVideoStatusChange status:{status}" );
+        }
+    }
+
+    public class AdViewInfo
+    {
+        public string Network;
+        public bool   Complete;
+        public int    NbClicks;
+        public string Type;
+        public double eCPM;
+        public double eCPM_paid;
+        public string eCPM_paidCurrency;
+
+        public void Init( string network, double ecpm, bool rewarded = false)
+        {
+            Network   = network;
+            eCPM      = ecpm;
+            eCPM_paid = 0;
+            Complete  = false;
+            NbClicks  = 0;
+            Type      = rewarded ? "rewarded" : "interstitial";
         }
     }
 }

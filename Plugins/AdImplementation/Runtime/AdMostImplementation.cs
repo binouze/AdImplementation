@@ -180,15 +180,19 @@ namespace com.binouze
             
             AMRSDK.startWithConfig( config, OnSDKDidInitialize );
             
-            // si il y avait des infos de visiannage enb attente d'envoi, on les envoi
+            // si il y avait des infos de visionnage en attente d'envoi, on les envoi
             if( !InterstitialAdInfo.Sent )
             {
+                Log( $"Sending waiting InterstitialAdInfo:{InterstitialAdInfo}" );
+                
                 AdImplementation.OnAdViewInfo?.Invoke( InterstitialAdInfo );
                 InterstitialAdInfo.Sent = true;
                 InterstitialAdInfo.Save();
             }
             if( !RewardAdInfo.Sent )
             {
+                Log( $"Sending waiting RewardAdInfo:{RewardAdInfo}" );
+                
                 AdImplementation.OnAdViewInfo?.Invoke( RewardAdInfo );
                 RewardAdInfo.Sent = true;
                 RewardAdInfo.Save();

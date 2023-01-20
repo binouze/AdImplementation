@@ -633,7 +633,7 @@ namespace com.binouze
         public void Init( string network, double ecpm )
         {
             Network         = network;
-            eCPM            = ecpm;
+            eCPM            = ecpm / 100; // ecpm are in cents, on les met en dollars puisque on les envoi en float au serveur
             Revenus         = 0;
             RevenusCurrency = "USD";
             Complete        = false;

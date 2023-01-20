@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Threading;
 using AMR;
 using UnityEngine;
@@ -177,7 +178,21 @@ namespace com.binouze
             config.SubjectToCCPA = AdImplementation.ConsentResponse == "CCPA" ? "1" : "0";
             config.IsUserChild   = "0";
             
-            AMRSDK.startWithConfig(config, OnSDKDidInitialize);
+            AMRSDK.startWithConfig( config, OnSDKDidInitialize );
+            
+            // si il y avait des infos de visiannage enb attente d'envoi, on les envoi
+            if( !InterstitialAdInfo.Sent )
+            {
+                AdImplementation.OnAdViewInfo?.Invoke( InterstitialAdInfo );
+                InterstitialAdInfo.Sent = true;
+                InterstitialAdInfo.Save();
+            }
+            if( !RewardAdInfo.Sent )
+            {
+                AdImplementation.OnAdViewInfo?.Invoke( RewardAdInfo );
+                RewardAdInfo.Sent = true;
+                RewardAdInfo.Save();
+            }
         }
         
         private void OnSDKDidInitialize( bool success, string error )
@@ -244,7 +259,9 @@ namespace com.binouze
             OnAdPlayComplete = null;
 
             // send info statistic about this ad
-            AdImplementation.OnAdViewInfo?.Invoke( rewarded ? RewardAdInfo : InterstitialAdInfo );
+            AdImplementation.OnAdViewInfo?.Invoke( adinfo );
+            adinfo.Sent = true;
+            adinfo.Save();
         }
 
         private static ImpressionDatas ImpressionDatasFromAdMostDatas( AMRAd ad, bool rewarded )
@@ -278,7 +295,7 @@ namespace com.binouze
 //  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████       
 
 
-        private static readonly AdViewInfo              InterstitialAdInfo = new ();
+        private static readonly AdViewInfo              InterstitialAdInfo = AdViewInfo.Get( false );
         private static          int                     NbFailInter;
         private static          CancellationTokenSource AsyncCancellationTokenInterstitial;
         private static void ReloadInterstitialDelayed( int ms )
@@ -357,6 +374,8 @@ namespace com.binouze
             
             InterstitialAdInfo.Revenus         = ad.Revenue;
             InterstitialAdInfo.RevenusCurrency = ad.Currency;
+            InterstitialAdInfo.Save();
+            
             AdImplementation.OnImpressionDatas?.Invoke( ImpressionDatasFromAdMostDatas( ad, false ) );
         }
 
@@ -367,7 +386,10 @@ namespace com.binouze
         private static void OnInterstitialClick( string networkName )
         {
             Log( $"OnInterstitialClick networkName:{networkName}" );
+            
             InterstitialAdInfo.NbClicks++;
+            InterstitialAdInfo.Save();
+            
             AdImplementation.OnAdClicked?.Invoke(networkName, false);
         }
 
@@ -402,7 +424,7 @@ namespace com.binouze
 //  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
 
 
-        private static readonly AdViewInfo              RewardAdInfo = new ();
+        private static readonly AdViewInfo              RewardAdInfo = AdViewInfo.Get( true );
         private static          bool                    RewardedComplete;
         private static          int                     NbFailReward;
         private static          CancellationTokenSource AsyncCancellationTokenRewarded;
@@ -435,7 +457,7 @@ namespace com.binouze
         /// <param name="ecpm"></param>
         private static void OnVideoReady( string networkName, double ecpm )
         {
-            RewardAdInfo.Init( networkName, ecpm, true );
+            RewardAdInfo.Init( networkName, ecpm );
             NbFailReward = 0;
             Log( $"OnVideoReady networkName:{networkName} ecpm:{ecpm}" );
         }
@@ -484,6 +506,8 @@ namespace com.binouze
             
             RewardAdInfo.Revenus         = ad.Revenue;
             RewardAdInfo.RevenusCurrency = ad.Currency;
+            RewardAdInfo.Save();
+            
             AdImplementation.OnImpressionDatas?.Invoke( ImpressionDatasFromAdMostDatas( ad, true ) );
         }
 
@@ -496,6 +520,8 @@ namespace com.binouze
             Log( $"OnVideoClick networkName:{networkName}" );
             
             RewardAdInfo.NbClicks++;
+            RewardAdInfo.Save();
+            
             AdImplementation.OnAdClicked?.Invoke(networkName, true);
         }
 
@@ -532,6 +558,7 @@ namespace com.binouze
         }
     }
 
+    [Serializable]
     public class AdViewInfo
     {
         public string Network;
@@ -542,8 +569,64 @@ namespace com.binouze
         public double Revenus;
         public string RevenusCurrency;
         public string UserID;
+        public bool   Sent;
+        // ReSharper disable once MemberCanBePrivate.Global
+        public bool   Rewarded;
+        
+        
+        /// <summary>
+        /// fonction pour enregistrer l'objet en json sur le disque dans le persistent data
+        /// </summary>
+        public void Save()
+        {
+            try
+            {
+                var json = JsonUtility.ToJson( this );
+                var path = Path.Combine( Application.persistentDataPath, $"AdViewInfo{( Rewarded ? "Rewarded" : "" )}.json" );
+                File.WriteAllText( path, json );
+                
+                AdImplementation.Log( $"[AdViewInfo] SavedToFile OK {json}" );
+            }
+            catch( Exception e )
+            {
+                Debug.LogError( $"[AdViewInfo] SavedToFile FAILED {e}" );
+            }
+        }
 
-        public void Init( string network, double ecpm, bool rewarded = false)
+        /// <summary>
+        /// recuperer l'objet depuis le disque
+        /// </summary>
+        /// <param name="rewarded"></param>
+        /// <returns></returns>
+        public static AdViewInfo Get( bool rewarded )
+        {
+            // essayer de charger l'objet serialise en json depuis le disque
+            var path = Path.Combine( Application.persistentDataPath, $"AdViewInfo{( rewarded ? "Rewarded" : "" )}.json" );
+            if( File.Exists( path ) )
+            {
+                try
+                {
+                    var json = File.ReadAllText( path );
+                    AdImplementation.Log( $"[AdViewInfo] ReadingFromFile {path} -> {json}" );
+                    return JsonUtility.FromJson<AdViewInfo>( json );
+                }
+                catch( Exception e )
+                {
+                    Debug.LogError( e );
+                }
+            }
+
+            return new AdViewInfo
+            {
+                Network  = "N/A",
+                Type     = rewarded ? "Rewarded" : "Banner",
+                UserID   = AdImplementation.UserId,
+                Rewarded = rewarded,
+                Sent     = true
+            };
+        }
+        
+        public void Init( string network, double ecpm )
         {
             Network         = network;
             eCPM            = ecpm;
@@ -551,8 +634,10 @@ namespace com.binouze
             RevenusCurrency = "USD";
             Complete        = false;
             NbClicks        = 0;
-            Type            = rewarded ? "rewarded" : "interstitial";
             UserID          = AdImplementation.UserId;
+            Sent            = false;
+            
+            Save();
         }
 
         public override string ToString()

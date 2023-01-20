@@ -376,7 +376,7 @@ namespace com.binouze
         /// <param name="ad"></param>
         private static void OnInterstitialImpression( AMRAd ad )
         {
-            Log( $"OnInterstitialImpression ad:{ad.Network}-{ad.ZoneId}-{ad.Currency}-{ad.Revenue}" );
+            Log( $"OnInterstitialImpression ad:{ad.Network}-{ad.ZoneId}-{ad.AdSpaceId}-{ad.Currency}-{ad.Revenue}" );
             
             InterstitialAdInfo.Revenus         = ad.Revenue;
             InterstitialAdInfo.RevenusCurrency = ad.Currency;
@@ -510,7 +510,7 @@ namespace com.binouze
         /// <param name="ad"></param>
         private static void OnVideoImpression( AMRAd ad )
         {
-            Log( $"OnVideoImpression ad:{ad.Network}-{ad.ZoneId}-{ad.Currency}-{ad.Revenue}" );
+            Log( $"OnVideoImpression ad:{ad.Network}-{ad.ZoneId}-{ad.AdSpaceId}-{ad.Currency}-{ad.Revenue}" );
             
             RewardAdInfo.Revenus         = ad.Revenue;
             RewardAdInfo.RevenusCurrency = ad.Currency;

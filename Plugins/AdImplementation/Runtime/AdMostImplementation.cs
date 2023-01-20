@@ -628,7 +628,7 @@ namespace com.binouze
             return new AdViewInfo
             {
                 Network  = "N/A",
-                Type     = rewarded ? "Rewarded" : "Banner",
+                Type     = rewarded ? "Rewarded" : "Interstitial",
                 UserID   = AdImplementation.UserId,
                 Rewarded = rewarded,
                 Started  = false

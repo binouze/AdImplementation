@@ -351,8 +351,8 @@ namespace com.binouze
         {
             Log( $"OnInterstitialImpression ad:{ad.Network}-{ad.ZoneId}-{ad.Currency}-{ad.Revenue}" );
             
-            InterstitialAdInfo.eCPM_paid         = ad.Revenue;
-            InterstitialAdInfo.eCPM_paidCurrency = ad.Currency;
+            InterstitialAdInfo.Revenus         = ad.Revenue;
+            InterstitialAdInfo.RevenusCurrency = ad.Currency;
             AdImplementation.OnImpressionDatas?.Invoke( ImpressionDatasFromAdMostDatas( ad, false ) );
         }
 
@@ -481,8 +481,8 @@ namespace com.binouze
         {
             Log( $"OnVideoImpression ad:{ad.Network}-{ad.ZoneId}-{ad.Currency}-{ad.Revenue}" );
             
-            RewardAdInfo.eCPM_paid         = ad.Revenue;
-            RewardAdInfo.eCPM_paidCurrency = ad.Currency;
+            RewardAdInfo.Revenus         = ad.Revenue;
+            RewardAdInfo.RevenusCurrency = ad.Currency;
             AdImplementation.OnImpressionDatas?.Invoke( ImpressionDatasFromAdMostDatas( ad, true ) );
         }
 
@@ -541,17 +541,18 @@ namespace com.binouze
         public int    NbClicks;
         public string Type;
         public double eCPM;
-        public double eCPM_paid;
-        public string eCPM_paidCurrency;
+        public double Revenus;
+        public string RevenusCurrency;
 
         public void Init( string network, double ecpm, bool rewarded = false)
         {
-            Network   = network;
-            eCPM      = ecpm;
-            eCPM_paid = 0;
-            Complete  = false;
-            NbClicks  = 0;
-            Type      = rewarded ? "rewarded" : "interstitial";
+            Network         = network;
+            eCPM            = ecpm;
+            Revenus         = 0;
+            RevenusCurrency = "USD";
+            Complete        = false;
+            NbClicks        = 0;
+            Type            = rewarded ? "rewarded" : "interstitial";
         }
     }
 }

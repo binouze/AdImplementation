@@ -665,7 +665,9 @@ namespace com.binouze
                    $"{nameof( eCPM )}: {eCPM}, "                       +
                    $"{nameof( Revenus )}: {Revenus}, "                 +
                    $"{nameof( RevenusCurrency )}: {RevenusCurrency}, " +
-                   $"{nameof( UserID )}: {UserID}";
+                   $"{nameof( UserID )}: {UserID}"                     +
+                   $"{nameof( Sent )}: {Sent}"                         +
+                   $"{nameof( Started )}: {Started}";
         }
     }
 }

@@ -543,6 +543,7 @@ namespace com.binouze
         public double eCPM;
         public double Revenus;
         public string RevenusCurrency;
+        public string UserID;
 
         public void Init( string network, double ecpm, bool rewarded = false)
         {
@@ -553,6 +554,7 @@ namespace com.binouze
             Complete        = false;
             NbClicks        = 0;
             Type            = rewarded ? "rewarded" : "interstitial";
+            UserID          = AdImplementation.UserId;
         }
     }
 }

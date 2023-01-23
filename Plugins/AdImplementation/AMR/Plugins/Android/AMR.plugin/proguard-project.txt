@@ -339,6 +339,7 @@ public static <fields>;
 # UNITY
 -dontwarn com.unity3d.**
 -keep class com.unity3d.ads.** { *; }
+-keep class com.unity3d.services.** { *; }
 
 # Vungle
 -dontwarn com.vungle.**

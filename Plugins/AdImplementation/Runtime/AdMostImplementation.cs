@@ -326,7 +326,7 @@ namespace com.binouze
             if( zoneID == null && AdRewarUnit?.Count > 0 )
                 zoneID = AdRewarUnit[0];
             
-            Log( $"HasRewardedAvailable: IsInitComplete:{IsInitComplete} - AdPlaying:{AdPlaying} - zoneID:{zoneID} - AdAvailable:{AMRSDK.isRewardedVideoReady()}" );
+            Log( $"HasRewardedAvailable: IsInitComplete:{IsInitComplete} - AdPlaying:{AdPlaying} - zoneID:{zoneID} - AdAvailable:{RewardedAdsControlller.IsAdReady( zoneID )}" );
             return IsInitComplete && !AdPlaying && RewardedAdsControlller.IsAdReady( zoneID );
         }
 

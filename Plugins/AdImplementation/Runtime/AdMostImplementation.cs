@@ -114,13 +114,9 @@ namespace com.binouze
             var config = new AMRSdkConfig();
             
             #if UNITY_IOS
-            config.ApplicationIdIOS       = AppID;
-            config.InterstitialIdIOS      = AdInterUnit;
-            config.RewardedVideoIdIOS     = AdRewarUnit;
+            config.ApplicationIdIOS = AppID;
             #elif UNITY_ANDROID
-            config.ApplicationIdAndroid   = AppID;
-            config.InterstitialIdAndroid  = AdInterUnit;
-            config.RewardedVideoIdAndroid = AdRewarUnit;
+            config.ApplicationIdAndroid = AppID;
             #endif
 
             config.UserConsent   = AdImplementation.IsDebug || AdImplementation.ConsentResponse == "OK" ? "1" : "0";

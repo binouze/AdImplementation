@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using AMR;
@@ -76,6 +77,19 @@ namespace com.binouze
         {
             IsGDRPReset = reset;
         }
+
+
+        public static bool AutoLoadAds { get; private set; } = true;
+        /// <summary>
+        /// Activer ou desactiver les logs du plugin
+        /// </summary>
+        /// <param name="autoload"></param>
+        [UsedImplicitly]
+        public static void SetAutoLoadAds( bool autoload )
+        {
+            AutoLoadAds = autoload;
+        }
+        
         
         /// <summary>
         /// TEST ONLY: ouvrir ARM Test Suite
@@ -87,8 +101,8 @@ namespace com.binouze
             if( IsDebug && implementation is AdMostImplementation admost )
                 admost.OpenTestSuite();
         }
-        
-        
+
+
 //  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████  
 //
 //                     ██████  █████  ██      ██      ██████   █████   ██████ ██   ██ ███████ 
@@ -167,13 +181,13 @@ namespace com.binouze
 
 //  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████       
 //   
-//    ██████  ██    ██ ██████  ██      ██  ██████         ███    ███ ███████ ████████ ██   ██  ██████  ██████  ███████ 
-//    ██   ██ ██    ██ ██   ██ ██      ██ ██              ████  ████ ██         ██    ██   ██ ██    ██ ██   ██ ██      
-//    ██████  ██    ██ ██████  ██      ██ ██              ██ ████ ██ █████      ██    ███████ ██    ██ ██   ██ ███████ 
-//    ██      ██    ██ ██   ██ ██      ██ ██              ██  ██  ██ ██         ██    ██   ██ ██    ██ ██   ██      ██ 
-//    ██       ██████  ██████  ███████ ██  ██████         ██      ██ ███████    ██    ██   ██  ██████  ██████  ███████ 
+//            ██ ███    ██ ██ ████████ ██  █████  ██      ██ ███████  █████  ████████ ██  ██████  ███    ██ 
+//            ██ ████   ██ ██    ██    ██ ██   ██ ██      ██ ██      ██   ██    ██    ██ ██    ██ ████   ██ 
+//            ██ ██ ██  ██ ██    ██    ██ ███████ ██      ██ ███████ ███████    ██    ██ ██    ██ ██ ██  ██ 
+//            ██ ██  ██ ██ ██    ██    ██ ██   ██ ██      ██      ██ ██   ██    ██    ██ ██    ██ ██  ██ ██ 
+//            ██ ██   ████ ██    ██    ██ ██   ██ ███████ ██ ███████ ██   ██    ██    ██  ██████  ██   ████ 
 //
-//  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████           
+//  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████          
         
         public static string UserId { get; private set; } = string.Empty;
         /// <summary>
@@ -188,22 +202,33 @@ namespace com.binouze
         }
 
         /// <summary>
-        /// definir les id des zones interstitial/rewarded
+        /// definir les id des zones interstitial/rewarded uniques
         /// </summary>
         /// <param name="rewardedId"></param>
         /// <param name="interstitialId"></param>
         [UsedImplicitly]
         public static void SetIds( string rewardedId, string interstitialId )
         {
+            SetIds( new List<string>{rewardedId}, new List<string>{interstitialId} );
+        }
+        
+        /// <summary>
+        /// definir les id des zones interstitial/rewarded
+        /// </summary>
+        /// <param name="rewardedIds"></param>
+        /// <param name="interstitialIds"></param>
+        [UsedImplicitly]
+        public static void SetIds( List<string> rewardedIds, List<string> interstitialIds )
+        {
             #if UNITY_ANDROID 
             var appid = AdImplementationSettings.LoadInstance().AndroidAppId;
             #elif UNITY_IOS
             var appid = AdImplementationSettings.LoadInstance().IOSAppId;
             #else
-            var appid = "0";
+            var appid = string.Empty;
             #endif
             
-            implementation.SetIds( appid, rewardedId, interstitialId );
+            implementation.SetIds( appid, rewardedIds, interstitialIds );
         }
 
         /// <summary>
@@ -237,6 +262,155 @@ namespace com.binouze
             Init2Cancellation = new CancellationTokenSource();
             AdsAsyncUtils.DelayCall( () => privacyConsentRequired("GDPR"), 10_000 );
         }
+
+
+
+//  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████       
+//        
+//           ██ ███    ██ ████████ ███████ ██████  ███████ ████████ ██ ████████ ██  █████  ██      ███████ 
+//           ██ ████   ██    ██    ██      ██   ██ ██         ██    ██    ██    ██ ██   ██ ██      ██      
+//           ██ ██ ██  ██    ██    █████   ██████  ███████    ██    ██    ██    ██ ███████ ██      ███████ 
+//           ██ ██  ██ ██    ██    ██      ██   ██      ██    ██    ██    ██    ██ ██   ██ ██           ██ 
+//           ██ ██   ████    ██    ███████ ██   ██ ███████    ██    ██    ██    ██ ██   ██ ███████ ███████
+//
+//  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████  
+
+        /// <summary>
+        /// true si une video Intersticielle est prete a etre affichee pour la zone par defaut
+        /// </summary>
+        [UsedImplicitly]
+        public static bool HasInterstitialAvailable => implementation.HasInterstitialAvailable();
+
+        /// <summary>
+        /// true si une video Intersticielle est prete a etre affichee pour une zone definie
+        /// </summary>
+        [UsedImplicitly]
+        public static bool HasInterstitialAvailableForZone(string zoneID = null) => implementation.HasInterstitialAvailable(zoneID);
+
+
+        /// <summary>
+        /// lancer l'affichage d'une video Intersticielle pour le placement par defaut
+        /// le callback retournera false si aucune video n'est disponible ou qu'il y a eu un probleme d'affichge
+        /// </summary>
+        /// <param name="OnComplete"></param>
+        [UsedImplicitly]
+        public static void ShowInterstitial( Action<bool> OnComplete )
+        {
+            Log( "ShowInterstitial" );
+            ShowInterstitial( null, OnComplete );
+        }
+        
+        /// <summary>
+        /// lancer l'affichage d'une video Intersticielle pour un placement defini
+        /// le callback retournera false si aucune video n'est disponible ou qu'il y a eu un probleme d'affichge
+        /// </summary>
+        /// <param name="zoneID"></param>
+        /// <param name="OnComplete"></param>
+        [UsedImplicitly]
+        public static void ShowInterstitial( string zoneID, Action<bool> OnComplete )
+        {
+            Log( $"ShowInterstitial {zoneID}" );
+            
+            if( !HasInterstitialAvailableForZone(zoneID) )
+            {
+                Log( "ShowInterstitial NOT AVAILABLE" );
+                OnComplete?.Invoke( false );
+                return;
+            }
+            
+            ShowGdprIfRequired( () =>
+            {
+                OnAdOpen?.Invoke();
+                implementation.ShowInterstitial( zoneID, ok =>
+                {
+                    AdsAsyncUtils.CallOnMainThread( () =>
+                    {
+                        OnAdClose?.Invoke();
+                        OnComplete?.Invoke( ok );
+                    });
+                } );
+            } );
+        }
+        
+        
+//  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████       
+//        
+//                        ██████  ███████ ██     ██  █████  ██████  ██████  ███████ ██████                              
+//                        ██   ██ ██      ██     ██ ██   ██ ██   ██ ██   ██ ██      ██   ██                             
+//                        ██████  █████   ██  █  ██ ███████ ██████  ██   ██ █████   ██   ██                             
+//                        ██   ██ ██      ██ ███ ██ ██   ██ ██   ██ ██   ██ ██      ██   ██                             
+//                        ██   ██ ███████  ███ ███  ██   ██ ██   ██ ██████  ███████ ██████      
+//
+//  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+
+        /// <summary>
+        /// true si une video Rewarded est prete a etre affichee pour la zone par defaut
+        /// </summary>
+        [UsedImplicitly]
+        public static bool HasRewardedAvailable => implementation.HasRewardedAvailable();
+        
+        /// <summary>
+        /// true si une video Rewarded est prete a etre affichee pour une zone definie
+        /// </summary>
+        [UsedImplicitly]
+        public static bool HasRewardedAvailableForZone(string zoneID = null) => implementation.HasRewardedAvailable(zoneID);
+        
+        /// <summary>
+        /// lancer l'affichage d'une video Rewarded
+        /// le callback retournera true si la video a ete vue jusqu'au bout et qu'un reward peut etre accorde
+        /// </summary>
+        /// <param name="OnComplete"></param>
+        [UsedImplicitly]
+        public static void ShowRewarded( Action<bool> OnComplete )
+        {
+            Log( "ShowRewarded" );
+            ShowRewarded( null, OnComplete );
+        }
+
+        /// <summary>
+        /// lancer l'affichage d'une video Rewarded
+        /// le callback retournera true si la video a ete vue jusqu'au bout et qu'un reward peut etre accorde
+        /// </summary>
+        /// <param name="zoneID"></param>
+        /// <param name="OnComplete"></param>
+        [UsedImplicitly]
+        public static void ShowRewarded( string zoneID, Action<bool> OnComplete )
+        {
+            Log( $"ShowRewarded {zoneID}" );
+        
+            if( !HasRewardedAvailableForZone(zoneID) )
+            {
+                Log( "ShowRewarded NOT AVAILABLE" );
+                OnComplete?.Invoke( false );
+                return;
+            }
+            
+            ShowGdprIfRequired( () =>
+            {
+                OnAdOpen?.Invoke();
+                implementation.ShowRewarded( zoneID, ok =>
+                {
+                    AdsAsyncUtils.CallOnMainThread( () =>
+                    {
+                        OnAdClose?.Invoke();
+                        OnComplete?.Invoke( ok );
+                    } );
+                } );
+            } );
+        }
+        
+        
+
+//  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+//                                  
+//                                       ██████  ██████  ██████  ██████  
+//                                      ██       ██   ██ ██   ██ ██   ██ 
+//                                      ██   ███ ██   ██ ██████  ██████  
+//                                      ██    ██ ██   ██ ██      ██   ██ 
+//                                       ██████  ██████  ██      ██   ██ 
+//   
+//  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████          
+        
 
         /// <summary>
         /// le type de consentement requis
@@ -291,78 +465,6 @@ namespace com.binouze
         /// <returns></returns>
         [UsedImplicitly]
         public static bool IsGDPRFormRequired() => ConsentType != "None";
-
-        /// <summary>
-        /// true si une video Rewarded est prete a etre affichee
-        /// </summary>
-        [UsedImplicitly]
-        public static bool HasRewardedAvailable => implementation.HasRewardedAvailable();
-        
-        /// <summary>
-        /// true si une video Intersticielle est prete a etre affichee
-        /// </summary>
-        [UsedImplicitly]
-        public static bool HasInterstitialAvailable => implementation.HasInterstitialAvailable();
-        
-        /// <summary>
-        /// lancer l'affichage d'une video Intersticielle
-        /// le callback retournera false si aucune video n'est disponible ou qu'il y a eu un probleme d'affichge
-        /// </summary>
-        /// <param name="OnComplete"></param>
-        [UsedImplicitly]
-        public static void ShowInterstitial( Action<bool> OnComplete )
-        {
-            Log( $"ShowInterstitial {HasInterstitialAvailable}" );
-            
-            if( !HasInterstitialAvailable )
-            {
-                OnComplete?.Invoke( false );
-                return;
-            }
-            
-            ShowGdprIfRequired( () =>
-            {
-                OnAdOpen?.Invoke();
-                implementation.ShowInterstitial( ok =>
-                {
-                    AdsAsyncUtils.CallOnMainThread( () =>
-                    {
-                        OnAdClose?.Invoke();
-                        OnComplete?.Invoke( ok );
-                    });
-                } );
-            } );
-        }
-
-        /// <summary>
-        /// lancer l'affichage d'une video Rewarded
-        /// le callback retournera true si la video a ete vue jusqu'au bout et qu'un reward peut etre accorde
-        /// </summary>
-        /// <param name="OnComplete"></param>
-        [UsedImplicitly]
-        public static void ShowRewarded( Action<bool> OnComplete )
-        {
-            Log( $"ShowRewarded {HasRewardedAvailable}" );
-        
-            if( !HasRewardedAvailable )
-            {
-                OnComplete?.Invoke( false );
-                return;
-            }
-            
-            ShowGdprIfRequired( () =>
-            {
-                OnAdOpen?.Invoke();
-                implementation.ShowRewarded( ok =>
-                {
-                    AdsAsyncUtils.CallOnMainThread( () =>
-                    {
-                        OnAdClose?.Invoke();
-                        OnComplete?.Invoke( ok );
-                    } );
-                } );
-            } );
-        }
 
         /// <summary>
         /// fonction interne appelee avant le lancement d'une video si le consentement GDPR est requis

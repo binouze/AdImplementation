@@ -293,7 +293,7 @@ namespace com.binouze
         /// </summary>
         /// <param name="zoneID"></param>
         [UsedImplicitly]
-        public static void LoadIntersticielle( string zoneID )
+        public static void LoadInterstitial( string zoneID )
         {
             implementation.LoadInterstitial( zoneID );
         }

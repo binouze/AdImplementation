@@ -12,7 +12,9 @@ namespace com.binouze
         public bool HasRewardedAvailable( string zoneID = null );
         public bool HasInterstitialAvailable( string zoneID = null );
         public bool IsAdSupported();
-        
+
+        public void LoadInterstitial( string zoneID = null );
+        public void LoadRewarded( string zoneID = null );
         
         public void ShowInterstitial( string zoneID, Action<bool> OnComplete );
         public void ShowRewarded( string zoneID,Action<bool> OnComplete );

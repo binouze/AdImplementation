@@ -289,6 +289,16 @@ namespace com.binouze
 
 
         /// <summary>
+        /// lancer le prechargement d'une video intersticielle
+        /// </summary>
+        /// <param name="zoneID"></param>
+        [UsedImplicitly]
+        public static void LoadIntersticielle( string zoneID )
+        {
+            implementation.LoadInterstitial( zoneID );
+        }
+
+        /// <summary>
         /// lancer l'affichage d'une video Intersticielle pour le placement par defaut
         /// le callback retournera false si aucune video n'est disponible ou qu'il y a eu un probleme d'affichge
         /// </summary>
@@ -354,6 +364,17 @@ namespace com.binouze
         /// </summary>
         [UsedImplicitly]
         public static bool HasRewardedAvailableForZone(string zoneID = null) => implementation.HasRewardedAvailable(zoneID);
+        
+        
+        /// <summary>
+        /// lancer le prechargement d'une video rewarded
+        /// </summary>
+        /// <param name="zoneID"></param>
+        [UsedImplicitly]
+        public static void LoadRewarded( string zoneID )
+        {
+            implementation.LoadRewarded( zoneID );
+        }
         
         /// <summary>
         /// lancer l'affichage d'une video Rewarded

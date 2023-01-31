@@ -17,17 +17,15 @@ namespace com.binouze
         
         #region static Singleton
         private static AdsEditorHelper _instance;
-        public static AdsEditorHelper Instance 
+        public static AdsEditorHelper GetInstance()
         {
-            get 
+            if( _instance == null ) 
             {
-                if( _instance == null ) 
-                {
-                    _instance = new GameObject("AdsEditorHelper").AddComponent<AdsEditorHelper> ();
-                    DontDestroyOnLoad (_instance.gameObject);
-                }
-                return _instance;
+                _instance = new GameObject("AdsEditorHelper").AddComponent<AdsEditorHelper> ();
+                DontDestroyOnLoad (_instance.gameObject);
             }
+            return _instance;
+            
         }
         #endregion
         
@@ -48,6 +46,8 @@ namespace com.binouze
 
         public static void ShowDialog( string texte, string bouton1, Action action1, string bouton2 = null, Action action2 = null )
         {
+            GetInstance();
+            
             Texte     = texte;
             Bouton1   = bouton1;
             Bouton2   = bouton2;

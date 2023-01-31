@@ -117,9 +117,15 @@ namespace com.binouze
 
     internal abstract class AbsAdMostAd
     {
+        protected void Log( string str )
+        {
+            AdMostImplementation.Log( $"[AbsAdMostAd<{(Rewarded ? "Rewarded" : "Intersti")}><{_adZoneId}>] {str}" );
+        }
+        
         protected string _adZoneId;
         private   string NetworkName;
         private   double eCPM;
+        protected bool   Rewarded;
         
         private   IAdMostAdDelegate EventReceiver;
         public void SetEventReceiver( IAdMostAdDelegate receiver )
@@ -135,6 +141,8 @@ namespace com.binouze
         {
             if( zoneID != _adZoneId )
                 return;
+
+            Log( $"OnAdLoaded {networkName} {ecpm}" );
             
             NbFail      = 0;
             NetworkName = networkName;
@@ -145,6 +153,8 @@ namespace com.binouze
         {
             if( zoneID != _adZoneId )
                 return;
+            
+            Log( $"OnAdFailedToLoad {errorMsg}" );
             
             var delay = ++NbFail * 5;
             if( delay > 60 )
@@ -158,6 +168,7 @@ namespace com.binouze
             if( zoneID != _adZoneId )
                 return;
             
+            Log( "OnAdShow" );
             EventReceiver?.OnAdShow( NetworkName, eCPM );
         }
 
@@ -166,6 +177,7 @@ namespace com.binouze
             if( zoneID != _adZoneId )
                 return;
             
+            Log( "OnAdFailedToShow" );
             EventReceiver?.OnAdFailToShow();
         }
 
@@ -174,11 +186,13 @@ namespace com.binouze
             if( zoneID != _adZoneId )
                 return;
             
+            Log( $"OnAdClicked {networkName}" );
             EventReceiver?.OnAdClick();
         }
 
         protected void OnAdImpression( AMRAd ad )
         {
+            Log( $"OnAdImpression {ad.Network}" );
             EventReceiver?.OnAdImpression( ad );
         }
 
@@ -187,6 +201,7 @@ namespace com.binouze
             if( zoneID != _adZoneId )
                 return;
             
+            Log( "OnAdComplete" );
             EventReceiver?.OnAdComplete();
         }
 
@@ -195,6 +210,7 @@ namespace com.binouze
             if( zoneID != _adZoneId )
                 return;
             
+            Log( "OnAdDismissed" );
             EventReceiver?.OnAdDismissed();
             EventReceiver = null;
         }
@@ -232,6 +248,7 @@ namespace com.binouze
         
         public AdRewarded( string adZoneId )
         {
+            Rewarded  = true;
             _adZoneId = adZoneId;
             ad        = new AMRRewardedVideoAd
             {
@@ -251,6 +268,7 @@ namespace com.binouze
 
         public override void LoadAd()
         {
+            Log( "LoadAd" );
             ResetCancelationToken();
             ad.LoadRewardedVideo();
         }
@@ -259,6 +277,7 @@ namespace com.binouze
 
         public override void Show( string tag = null )
         {
+            Log( "Show" );
             ad.ShowRewardedVideo( tag );
         }
     }
@@ -290,6 +309,7 @@ namespace com.binouze
 
         public override void LoadAd()
         {
+            Log( "LoadAd" );
             ResetCancelationToken();
             ad.LoadInterstitial();
         }
@@ -298,6 +318,7 @@ namespace com.binouze
 
         public override void Show( string tag = null )
         {
+            Log( "Show" );
             ad.ShowInterstitial( tag );
         }
     }

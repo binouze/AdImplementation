@@ -1,6 +1,7 @@
 ﻿
 using System;
 using AMR.iOS;
+using com.binouze;
 using UnityEngine;
 
 namespace AMR
@@ -52,6 +53,9 @@ namespace AMR
             Status = AdStatus.Loading;
             InterstitialAdDelegate interstitialDelegate = new InterstitialAdDelegate(this);
 
+            #if UNITY_EDITOR
+            interstitialDelegate.didReceiveInterstitial( "test", 0 );
+            #else
             if (Application.platform == RuntimePlatform.IPhonePlayer)
             {
                 AMRInterstitialManager.LoadInterstitial(ZoneId, interstitialDelegate);
@@ -65,12 +69,20 @@ namespace AMR
                 interstitialAndroid = new Android.AMRInterstitial();
                 interstitialAndroid.loadInterstitialForZoneId(ZoneId, interstitialDelegate);
             }
+            #endif
         }
 
         public void ShowInterstitial(string tag = null)
         {
             Status = AdStatus.Playing;
-
+            
+            #if UNITY_EDITOR
+            var interstitialDelegate = new InterstitialAdDelegate(this);
+            AdsEditorHelper.ShowDialog( "TEST INTERSTITIAL", "OK", () =>
+            {
+                interstitialDelegate.didDismissInterstitial();
+            } );
+            #else
             if (Application.platform == RuntimePlatform.IPhonePlayer)
             {
                 AMRInterstitialManager.ShowInterstitial(ZoneId, tag);
@@ -86,6 +98,7 @@ namespace AMR
                     interstitialAndroid.showInterstitial(tag);
                 }
             }
+            #endif
         }
 
         /* Interstitial Callbacks */

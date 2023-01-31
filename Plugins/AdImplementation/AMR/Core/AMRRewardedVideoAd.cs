@@ -52,6 +52,9 @@ namespace AMR
             Status = AdStatus.Loading;
             RewardedVideoAdDelegate videoDelegate = new RewardedVideoAdDelegate(this);
 
+            #if UNITY_EDITOR
+            videoDelegate.didReceiveRewardedVideo( "test", 0 );
+            #else
             if (Application.platform == RuntimePlatform.IPhonePlayer)
             {
                 AMRRewardedVideoManager.LoadRewardedVideo(ZoneId, videoDelegate);
@@ -65,12 +68,21 @@ namespace AMR
                 rewardedVideoAndroid = new Android.AMRRewardedVideo();
                 rewardedVideoAndroid.loadRewardedVideoForZoneId(ZoneId, videoDelegate);
             }
+            #endif
         }
 
         public void ShowRewardedVideo(string tag = null)
         {
             Status = AdStatus.Playing;
-
+            
+            #if UNITY_EDITOR
+            var videoDelegate = new RewardedVideoAdDelegate(this);
+            AdsEditorHelper.ShowDialog( "TEST REWARDED", "OK", () =>
+            {
+                videoDelegate.didCompleteRewardedVideo();
+                videoDelegate.didDismissRewardedVideo();
+            } );
+            #else
             if (Application.platform == RuntimePlatform.IPhonePlayer)
             {
                 AMRRewardedVideoManager.ShowRewardedVideo(ZoneId, tag);
@@ -85,6 +97,7 @@ namespace AMR
                     rewardedVideoAndroid.showRewardedVideo(tag);
                 }
             }
+            #endif
         }
 
         /* Rewarded Video Callbacks */

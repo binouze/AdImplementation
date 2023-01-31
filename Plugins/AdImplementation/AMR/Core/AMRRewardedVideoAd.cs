@@ -78,8 +78,10 @@ namespace AMR
             
             #if UNITY_EDITOR
             var videoDelegate = new RewardedVideoAdDelegate(this);
+            videoDelegate.didShowRewardedVideo();
             AdsEditorHelper.ShowDialog( "TEST REWARDED", "OK", () =>
             {
+                Debug.Log( "AMRRewardedVideoAd_EDITOR OK pressed" );
                 videoDelegate.didCompleteRewardedVideo();
                 videoDelegate.didDismissRewardedVideo();
             } );

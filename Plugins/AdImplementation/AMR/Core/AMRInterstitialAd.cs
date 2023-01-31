@@ -78,8 +78,10 @@ namespace AMR
             
             #if UNITY_EDITOR
             var interstitialDelegate = new InterstitialAdDelegate(this);
+            interstitialDelegate.didShowInterstitial();
             AdsEditorHelper.ShowDialog( "TEST INTERSTITIAL", "OK", () =>
             {
+                Debug.Log( "AMRInterstitialAd_EDITOR OK pressed" );
                 interstitialDelegate.didDismissInterstitial();
             } );
             #else

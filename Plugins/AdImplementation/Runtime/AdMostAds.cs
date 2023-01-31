@@ -242,7 +242,7 @@ namespace com.binouze
             ad.loadRewardedVideoForZoneId( _adZoneId, _adZoneId, false );
         }
 
-        public override bool IsLoaded() => ad.isReadyToShow();
+        public override bool IsLoaded() => ad.isReady();
 
         public override void Show( string tag = null )
         {
@@ -278,7 +278,7 @@ namespace com.binouze
             ad.loadInterstitialForZoneId( _adZoneId, _adZoneId, false );
         }
 
-        public override bool IsLoaded() => ad.isReadyToShow();
+        public override bool IsLoaded() => ad.isReady();
 
         public override void Show( string tag = null )
         {

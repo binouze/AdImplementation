@@ -1,6 +1,7 @@
 ﻿using System;
 using AMR.iOS;
 using UnityEngine;
+using com.binouze;
 
 namespace AMR
 {

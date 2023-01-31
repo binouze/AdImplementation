@@ -128,6 +128,11 @@ namespace AMR
         {
             this.onVideoRewardDelegate = onVideoRewardDelegate;
         }
+        
+        public void SetOnVideoImpression(AdDelegateImpression onVideoImpressionDelegate)
+        {
+            this.onVideoImpressionDelegate = onVideoImpressionDelegate;
+        }
 
         #endregion
 

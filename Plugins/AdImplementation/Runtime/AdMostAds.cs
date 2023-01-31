@@ -131,15 +131,21 @@ namespace com.binouze
             EventReceiver = null;
         }
 
-        protected void OnAdLoaded( string networkName, double ecpm )
+        protected void OnAdLoaded( string zoneID, string networkName, double ecpm )
         {
+            if( zoneID != _adZoneId )
+                return;
+            
             NbFail      = 0;
             NetworkName = networkName;
             eCPM        = ecpm;
         }
 
-        protected void OnAdFailedToLoad( string errorMsg )
+        protected void OnAdFailedToLoad( string zoneID, string errorMsg )
         {
+            if( zoneID != _adZoneId )
+                return;
+            
             var delay = ++NbFail * 5;
             if( delay > 60 )
                 delay = 60;
@@ -147,18 +153,27 @@ namespace com.binouze
             ReloadAdDelayed( delay );
         }
 
-        protected void OnAdShow()
+        protected void OnAdShow( string zoneID )
         {
+            if( zoneID != _adZoneId )
+                return;
+            
             EventReceiver?.OnAdShow( NetworkName, eCPM );
         }
 
-        protected void OnAdFailedToShow()
+        protected void OnAdFailedToShow( string zoneID )
         {
+            if( zoneID != _adZoneId )
+                return;
+            
             EventReceiver?.OnAdFailToShow();
         }
 
-        protected void OnAdClicked( string networkName )
+        protected void OnAdClicked( string zoneID, string networkName )
         {
+            if( zoneID != _adZoneId )
+                return;
+            
             EventReceiver?.OnAdClick();
         }
 
@@ -167,25 +182,21 @@ namespace com.binouze
             EventReceiver?.OnAdImpression( ad );
         }
 
-        protected void OnAdComplete()
+        protected void OnAdComplete( string zoneID )
         {
+            if( zoneID != _adZoneId )
+                return;
+            
             EventReceiver?.OnAdComplete();
         }
 
-        protected void OnAdDismissed()
+        protected void OnAdDismissed( string zoneID )
         {
+            if( zoneID != _adZoneId )
+                return;
+            
             EventReceiver?.OnAdDismissed();
             EventReceiver = null;
-        }
-
-        protected void OnAdStatusChanged( int status )
-        {
-            // nothing to do here
-        }
-
-        protected void OnAdRewarded( double reward )
-        {
-            // nothing to do here
         }
 
 
@@ -217,36 +228,38 @@ namespace com.binouze
     // ADMOST IMPLEMENTATION OF REWARDED AD
     internal class AdRewarded : AbsAdMostAd
     {
-        private readonly AMRRewardedVideoView ad;
+        private readonly AMRRewardedVideoAd ad;
         
         public AdRewarded( string adZoneId )
         {
             _adZoneId = adZoneId;
-            ad        = new AMRRewardedVideoView();
+            ad        = new AMRRewardedVideoAd
+            {
+                AndroidZoneId = adZoneId,
+                iOSZoneId     = adZoneId
+            };
             
-            ad.setOnReady( OnAdLoaded );
-            ad.setOnFail( OnAdFailedToLoad );
-            ad.setOnShow( OnAdShow );
-            ad.setOnFailToShow( OnAdFailedToShow );
-            ad.setOnClick( OnAdClicked );
-            ad.setOnImpression( OnAdImpression );
-            ad.setOnComplete( OnAdComplete );
-            ad.setOnDismiss( OnAdDismissed );
-            ad.setOnStatusChange( OnAdStatusChanged );
-            ad.setOnReward( OnAdRewarded );
+            ad.SetOnVideoReady( OnAdLoaded );
+            ad.SetOnVideoFail( OnAdFailedToLoad );
+            ad.SetOnVideoShow( OnAdShow );
+            ad.SetOnVideoFailToShow( OnAdFailedToShow );
+            ad.SetOnVideoClick( OnAdClicked );
+            ad.SetOnVideoImpression( OnAdImpression );
+            ad.SetOnVideoComplete( OnAdComplete );
+            ad.SetOnVideoDismiss( OnAdDismissed );
         }
 
         public override void LoadAd()
         {
             ResetCancelationToken();
-            ad.loadRewardedVideoForZoneId( _adZoneId, _adZoneId, false );
+            ad.LoadRewardedVideo();
         }
 
-        public override bool IsLoaded() => ad.isReady();
+        public override bool IsLoaded() => ad.Status == AMRRewardedVideoAd.AdStatus.Loaded;
 
         public override void Show( string tag = null )
         {
-            ad.showRewardedVideo( tag );
+            ad.ShowRewardedVideo( tag );
         }
     }
     
@@ -255,34 +268,37 @@ namespace com.binouze
     // ADMOST IMPLEMENTATION OF INTERSTITIALS AD
     internal class AdInterstitial : AbsAdMostAd
     {
-        private readonly AMRInterstitialView ad;
+        private readonly AMRInterstitialAd ad;
         
         public AdInterstitial( string adZoneId )
         {
             _adZoneId = adZoneId;
-            ad        = new AMRInterstitialView();
-            
-            ad.setOnReady( OnAdLoaded );
-            ad.setOnFail( OnAdFailedToLoad );
-            ad.setOnShow( OnAdShow );
-            ad.setOnFailToShow( OnAdFailedToShow );
-            ad.setOnClick( OnAdClicked );
-            ad.setOnImpression( OnAdImpression );
-            ad.setOnDismiss( OnAdDismissed );
-            ad.setOnStatusChange( OnAdStatusChanged );
+            ad        = new AMRInterstitialAd
+            {
+                AndroidZoneId = adZoneId,
+                iOSZoneId     = adZoneId
+            };
+
+            ad.SetOnInterstitialReady( OnAdLoaded );
+            ad.SetOnInterstitialFail( OnAdFailedToLoad );
+            ad.SetOnInterstitialShow( OnAdShow );
+            ad.SetOnInterstitialFailToShow( OnAdFailedToShow );
+            ad.SetOnInterstitialClick( OnAdClicked );
+            ad.SetOnInterstitialImpression( OnAdImpression );
+            ad.SetOnInterstitialDismiss( OnAdDismissed );
         }
 
         public override void LoadAd()
         {
             ResetCancelationToken();
-            ad.loadInterstitialForZoneId( _adZoneId, _adZoneId, false );
+            ad.LoadInterstitial();
         }
 
-        public override bool IsLoaded() => ad.isReady();
+        public override bool IsLoaded() => ad.Status == AMRInterstitialAd.AdStatus.Loaded;
 
         public override void Show( string tag = null )
         {
-            ad.showInterstitial( tag );
+            ad.ShowInterstitial( tag );
         }
     }
     

@@ -119,6 +119,10 @@ namespace AMR
         {
             this.onInterstitialDismissDelegate = onInterstitialDismissDelegate;
         }
+        public void SetOnInterstitialImpression(AdDelegateImpression onInterstitialImpressionDelegate)
+        {
+            this.onInterstitialImpressionDelegate = onInterstitialImpressionDelegate;
+        }
 
         #endregion
 

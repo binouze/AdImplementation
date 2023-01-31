@@ -142,6 +142,10 @@ namespace com.binouze
                 RewardAdInfo.Sent = true;
                 RewardAdInfo.Save();
             }
+            
+            #if UNITY_EDITOR
+            OnSDKDidInitialize( true, null );
+            #endif
         }
         
         private void OnSDKDidInitialize( bool success, string error )

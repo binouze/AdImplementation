@@ -75,15 +75,15 @@ namespace com.binouze
             
             if( ads.TryGetValue( zoneID, out var _ad ) )
             {
-                _ad = Rewarded ? new AdRewarded( zoneID ) : new AdInterstitial( zoneID );
-                _ad.Show();
+                //_ad = Rewarded ? new AdRewarded( zoneID ) : new AdInterstitial( zoneID );
 
-                // au cas ou on en ait toujours un
+                // on reset les event receiver de la video precedente
                 ad?.ClearEventReceiver();
                 
                 // mettre a jour l'ad en cours de lecture
                 ad = _ad;
                 ad.SetEventReceiver( eventsReceiver );
+                _ad.Show();
                 
                 Log( "PlayAd startPlaying" );
                 return true;
@@ -95,21 +95,21 @@ namespace com.binouze
         
         public bool IsAdReady( string zoneID )
         {
-            Log( $"IsAdReady zoneID:{zoneID}" );
-
             if( string.IsNullOrWhiteSpace( zoneID ) )
             {
                 Log( "IsAdReady FAIL zone null" );
                 return false;
             }
 
+            var ready = false;
             if( ads.TryGetValue( zoneID, out var _ad ) )
             {
-                return _ad?.IsLoaded() ?? false;
+                ready = _ad?.IsLoaded() ?? false;
             }
             
-            Log( "IsAdReady FAIL zone non existante" );
-            return false;
+            Log( $"IsAdReady zoneID:{zoneID} - ready:{ready}" );
+            
+            return ready;
         }
     }
     

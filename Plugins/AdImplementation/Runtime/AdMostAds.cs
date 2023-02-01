@@ -29,9 +29,9 @@ namespace com.binouze
         {
             AdMostImplementation.Log( $"[AdMostAd<{(Rewarded ? "Rewarded" : "Intersti")}>] {str}" );
         }
-        internal static void Log( string str, bool Rewarded )
+        internal static void LogZone( string str, string zoneID, bool Rewarded )
         {
-            AdMostImplementation.Log( $"[AdMostAd<{(Rewarded ? "Rewarded" : "Intersti")}>] {str}" );
+            AdMostImplementation.Log( $"[AdMostAd<{(Rewarded ? "Rewarded" : "Intersti")}>][AdZone<{zoneID}>] {str}" );
         }
 
         /// <summary>
@@ -123,7 +123,7 @@ namespace com.binouze
     {
         protected void Log( string str )
         {
-            AdMostAd.Log( $"[AdZone<{_adZoneId}>] {str}", Rewarded );
+            AdMostAd.LogZone( str, _adZoneId, Rewarded );
         }
         
         protected string _adZoneId;

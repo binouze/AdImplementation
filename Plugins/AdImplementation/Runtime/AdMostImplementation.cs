@@ -126,7 +126,10 @@ namespace com.binouze
             AMRSDK.startWithConfig( config, OnSDKDidInitialize );
             
             // si il y avait des infos de visionnage en attente d'envoi, on les envoi
-            if( !InterstitialAdInfo.Sent && InterstitialAdInfo.Started )
+            InterstitialAdInfo.SendIfNeeded();
+            RewardAdInfo.SendIfNeeded();
+            
+            /*if( !InterstitialAdInfo.Sent && InterstitialAdInfo.Started )
             {
                 Log( $"Sending waiting InterstitialAdInfo:{InterstitialAdInfo}" );
                 
@@ -134,14 +137,14 @@ namespace com.binouze
                 InterstitialAdInfo.Sent = true;
                 InterstitialAdInfo.Save();
             }
-            if( !RewardAdInfo.Sent && InterstitialAdInfo.Started )
+            if( !RewardAdInfo.Sent && RewardAdInfo.Started )
             {
                 Log( $"Sending waiting RewardAdInfo:{RewardAdInfo}" );
                 
                 AdImplementation.OnAdViewInfo?.Invoke( RewardAdInfo );
                 RewardAdInfo.Sent = true;
                 RewardAdInfo.Save();
-            }
+            }*/
             
             #if UNITY_EDITOR
             OnSDKDidInitialize( true, null );
@@ -207,10 +210,8 @@ namespace com.binouze
             OnAdPlayComplete?.Invoke( ok );
             OnAdPlayComplete = null;
 
-            // send info statistic about this ad
-            AdImplementation.OnAdViewInfo?.Invoke( adinfo );
-            adinfo.Sent = true;
-            adinfo.Save();
+            // send view statistics about this ad
+            adinfo.SendIfNeeded();
         }
 
         private static ImpressionDatas ImpressionDatasFromAdMostDatas( AMRAd ad, bool rewarded )
@@ -527,6 +528,17 @@ namespace com.binouze
             catch( Exception e )
             {
                 Debug.LogError( $"[AdViewInfo] SavedToFile FAILED {e}" );
+            }
+        }
+
+        public void SendIfNeeded()
+        {
+            if( !Sent && Started )
+            {
+                AdMostImplementation.Log( $"Sending waiting {(Rewarded ? "Rewarded" : "Interstitial")}AdInfo:{this}" );
+                AdImplementation.OnAdViewInfo?.Invoke( this );
+                Sent = true;
+                Save();
             }
         }
 

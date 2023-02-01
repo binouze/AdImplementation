@@ -531,17 +531,6 @@ namespace com.binouze
             }
         }
 
-        public void SendIfNeeded()
-        {
-            if( !Sent && Started )
-            {
-                AdMostImplementation.Log( $"Sending waiting {(Rewarded ? "Rewarded" : "Interstitial")}AdInfo:{this}" );
-                AdImplementation.OnAdViewInfo?.Invoke( this );
-                Sent = true;
-                Save();
-            }
-        }
-
         /// <summary>
         /// recuperer l'objet depuis le disque
         /// </summary>
@@ -590,6 +579,17 @@ namespace com.binouze
             Save();
         }
         
+        public void SendIfNeeded()
+        {
+            if( !Sent && Started )
+            {
+                AdMostImplementation.Log( $"Sending waiting {(Rewarded ? "Rewarded" : "Interstitial")}AdInfo:{this}" );
+                AdImplementation.OnAdViewInfo?.Invoke( this );
+                Sent = true;
+                Save();
+            }
+        }
+        
         public override string ToString()
         {
             return $"AdViewInfo::{nameof( Network )}: {Network}, "     +
@@ -599,8 +599,8 @@ namespace com.binouze
                    $"{nameof( eCPM )}: {eCPM}, "                       +
                    $"{nameof( Revenus )}: {Revenus}, "                 +
                    $"{nameof( RevenusCurrency )}: {RevenusCurrency}, " +
-                   $"{nameof( UserID )}: {UserID}"                     +
-                   $"{nameof( Sent )}: {Sent}"                         +
+                   $"{nameof( UserID )}: {UserID}, "                   +
+                   $"{nameof( Sent )}: {Sent}, "                       +
                    $"{nameof( Started )}: {Started}";
         }
     }

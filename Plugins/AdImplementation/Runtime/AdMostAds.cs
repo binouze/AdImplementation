@@ -29,6 +29,10 @@ namespace com.binouze
         {
             AdMostImplementation.Log( $"[AdMostAd<{(Rewarded ? "Rewarded" : "Intersti")}>] {str}" );
         }
+        internal static void Log( string str, bool Rewarded )
+        {
+            AdMostImplementation.Log( $"[AdMostAd<{(Rewarded ? "Rewarded" : "Intersti")}>] {str}" );
+        }
 
         /// <summary>
         /// Charger une video pour une zone
@@ -119,7 +123,7 @@ namespace com.binouze
     {
         protected void Log( string str )
         {
-            AdMostImplementation.Log( $"[AbsAdMostAd<{(Rewarded ? "Rewarded" : "Intersti")}><{_adZoneId}>] {str}" );
+            AdMostAd.Log( $"[AdZone<{_adZoneId}>] {str}", Rewarded );
         }
         
         protected string _adZoneId;

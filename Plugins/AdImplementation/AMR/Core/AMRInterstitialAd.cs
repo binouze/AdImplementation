@@ -24,6 +24,14 @@ namespace AMR
                 }
                 else
                 {
+                    #if UNITY_EDITOR
+                        #if UNITY_ANDROID
+                            return AndroidZoneId;
+                        #endif
+                        #if UNITY_IOS
+                            return iOSZoneId;
+                        #endif
+                    #endif
                     return null;
                 }
             }

@@ -22,6 +22,14 @@ namespace AMR
                     return AndroidZoneId;
                 } else
                 {
+                    #if UNITY_EDITOR
+                        #if UNITY_ANDROID
+                        return AndroidZoneId;
+                        #endif
+                        #if UNITY_IOS
+                        return iOSZoneId;
+                        #endif
+                    #endif
                     return null;
                 }
             }
@@ -80,7 +88,7 @@ namespace AMR
             onVideoShowDelegate?.Invoke( ZoneId );
             AdsEditorHelper.ShowDialog( "TEST REWARDED", "OK", () =>
             {
-                Debug.Log( "AMRRewardedVideoAd_EDITOR OK pressed" );
+                Debug.Log( $"AMRRewardedVideoAd_EDITOR OK pressed {ZoneId}" );
                 onVideoCompleteDelegate?.Invoke( ZoneId );
                 onVideoDismissDelegate?.Invoke( ZoneId );
             } );

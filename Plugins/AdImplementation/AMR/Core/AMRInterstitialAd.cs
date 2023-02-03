@@ -77,12 +77,11 @@ namespace AMR
             Status = AdStatus.Playing;
             
             #if UNITY_EDITOR
-            var interstitialDelegate = new InterstitialAdDelegate(this);
-            interstitialDelegate.didShowInterstitial();
+            onInterstitialShowDelegate?.Invoke( ZoneId );
             AdsEditorHelper.ShowDialog( "TEST INTERSTITIAL", "OK", () =>
             {
                 Debug.Log( "AMRInterstitialAd_EDITOR OK pressed" );
-                interstitialDelegate.didDismissInterstitial();
+                onInterstitialDismissDelegate?.Invoke( ZoneId );
             } );
             #else
             if (Application.platform == RuntimePlatform.IPhonePlayer)

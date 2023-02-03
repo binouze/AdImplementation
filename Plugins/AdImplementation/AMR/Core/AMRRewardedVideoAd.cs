@@ -77,13 +77,12 @@ namespace AMR
             Status = AdStatus.Playing;
             
             #if UNITY_EDITOR
-            var videoDelegate = new RewardedVideoAdDelegate(this);
-            videoDelegate.didShowRewardedVideo();
+            onVideoShowDelegate?.Invoke( ZoneId );
             AdsEditorHelper.ShowDialog( "TEST REWARDED", "OK", () =>
             {
                 Debug.Log( "AMRRewardedVideoAd_EDITOR OK pressed" );
-                videoDelegate.didCompleteRewardedVideo();
-                videoDelegate.didDismissRewardedVideo();
+                onVideoCompleteDelegate?.Invoke( ZoneId );
+                onVideoDismissDelegate?.Invoke( ZoneId );
             } );
             #else
             if (Application.platform == RuntimePlatform.IPhonePlayer)

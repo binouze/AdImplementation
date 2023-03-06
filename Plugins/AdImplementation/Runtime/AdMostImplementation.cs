@@ -414,6 +414,9 @@ namespace com.binouze
 
         public void OnAdImpression( AMRAd ad )
         {
+            if( ad == null )
+                return;
+            
             Log( $"OnAdImpression rewarded:{IsRewardedPlaying} network:{ad.Network} zone:{ad.ZoneId} space:{ad.AdSpaceId} currency:{ad.Currency} revenu:{ad.Revenue}" );
 
             if( IsRewardedPlaying )
@@ -546,7 +549,9 @@ namespace com.binouze
                 {
                     var json = File.ReadAllText( path );
                     AdImplementation.Log( $"[AdViewInfo] ReadingFromFile {path} -> {json}" );
-                    return JsonUtility.FromJson<AdViewInfo>( json );
+                    var info = JsonUtility.FromJson<AdViewInfo>( json );
+                    if( info != null )
+                        return info;
                 }
                 catch( Exception e )
                 {

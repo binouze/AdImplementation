@@ -18,6 +18,8 @@ namespace com.binouze
 
         public static AdImplementationSettings LoadSettingsInstance()
         {
+            AdsPrebuildScript.CopyAssetsIntoProject();
+            
             var instance = AdImplementationSettings.LoadInstance();
             // Create instance if null.
             if( instance == null )

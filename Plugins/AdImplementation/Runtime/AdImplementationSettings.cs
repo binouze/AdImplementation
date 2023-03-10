@@ -5,7 +5,7 @@ namespace com.binouze
     public class AdImplementationSettings : ScriptableObject
     {
         public const string AdImplementationSettingsFile          = "AdImplementationSettings";
-        public const string AdImplementationSettingsResDir        = "Assets/AdImplementation/Resources";
+        public const string AdImplementationSettingsResDir        = "Assets/LagoonPlugins/AdImplementation/Resources";
         public const string AdImplementationSettingsFileExtension = ".asset";
 
         public static AdImplementationSettings LoadInstance()

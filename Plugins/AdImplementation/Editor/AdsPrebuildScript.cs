@@ -25,17 +25,28 @@ namespace com.binouze.Editor
             CopyAssetsIntoProject();
         }
         
-        [MenuItem( "AdImplementation/Run Pre-Build Script")]
+        [MenuItem( "LagoonPlugins/AdImplementation/Run Pre-Build Script")]
         public static void CopyAssetsIntoProject()
         {
-            if( !AssetDatabase.IsValidFolder("Assets/AdImplementation") )
+            if( !AssetDatabase.IsValidFolder("Assets/LagoonPlugins") )
             {
-                AssetDatabase.CreateFolder("Assets", "AdImplementation");
+                AssetDatabase.CreateFolder("Assets", "LagoonPlugins");
+            }
+
+            // Moving fromm old to new localtion
+            if( AssetDatabase.IsValidFolder( "Assets/AdImplementation" ) )
+            {
+                AssetDatabase.MoveAsset( "Assets/AdImplementation", "Assets/LagoonPlugins/AdImplementation" );
             }
             
-            if( !AssetDatabase.IsValidFolder("Assets/AdImplementation/Editor") )
+            if( !AssetDatabase.IsValidFolder("Assets/LagoonPlugins/AdImplementation") )
             {
-                AssetDatabase.CreateFolder("Assets/AdImplementation", "Editor");
+                AssetDatabase.CreateFolder("Assets/LagoonPlugins", "AdImplementation");
+            }
+            
+            if( !AssetDatabase.IsValidFolder("Assets/LagoonPlugins/AdImplementation/Editor") )
+            {
+                AssetDatabase.CreateFolder("Assets/LagoonPlugins/AdImplementation", "Editor");
             }
 
             if( !AssetDatabase.IsValidFolder(BASE_FOLDER) )
@@ -51,7 +62,7 @@ namespace com.binouze.Editor
             }
             
             // Copy SKAdNetworkItems.txt into project
-            AssetDatabase.CopyAsset( BASE_FOLDER+"Editor/SKAdNetworkItems.txt", "Assets/AdImplementation/Editor/SKAdNetworkItems.txt" );
+            AssetDatabase.CopyAsset( BASE_FOLDER+"Editor/SKAdNetworkItems.txt", "Assets/LagoonPlugins/AdImplementation/Editor/SKAdNetworkItems.txt" );
             
             
             #if UNITY_ANDROID

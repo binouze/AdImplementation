@@ -48,6 +48,11 @@ namespace com.binouze.Editor
             {
                 AssetDatabase.CreateFolder("Assets/LagoonPlugins/AdImplementation", "Editor");
             }
+            
+            if( !AssetDatabase.IsValidFolder("Assets/LagoonPlugins/AdImplementation/Resources") )
+            {
+                AssetDatabase.CreateFolder("Assets/LagoonPlugins/AdImplementation", "Resources");
+            }
 
             if( !AssetDatabase.IsValidFolder(BASE_FOLDER) )
             {

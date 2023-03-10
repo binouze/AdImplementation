@@ -6,7 +6,7 @@ namespace AMR
 {
 	public class AMRSDK
 	{
-        public const string AMR_PLUGIN_VERSION = "1.7.3"; 
+        public const string AMR_PLUGIN_VERSION = "1.7.5"; 
 	    
 	    public delegate void VirtualCurrencyDelegateDidSpend(string network, string currency, double amount);
         public delegate void SDKInitializeDelegateDidInitialize(bool isInitialized, string errorMessage);
@@ -148,9 +148,14 @@ namespace AMR
             create();
             setOnSDKDidInitialize(onDidInitializeDelegate);
 
+            if (Instance != null && Instance.Config != null && Instance.Config.IsApiHttps)
+            {
+                AMRSdk.setApiHttps();
+            }
+
             if (Application.platform == RuntimePlatform.IPhonePlayer) 
             {
-				AMRSdk.startWithAppId(appIdiOS, isUserChild != null && isUserChild.Equals("1"));
+                AMRSdk.startWithAppId(appIdiOS, isUserChild != null && isUserChild.Equals("1"));
             }
             else if (Application.platform == RuntimePlatform.Android)
             {
@@ -163,6 +168,11 @@ namespace AMR
             create();
             setOnSDKDidInitialize(onDidInitializeDelegate);
 
+            if (Instance != null && Instance.Config != null && Instance.Config.IsApiHttps)
+            {
+                AMRSdk.setApiHttps();
+            }
+
             if (Application.platform == RuntimePlatform.IPhonePlayer)
             {
                 AMRSdk.startWithAppIdConsent(appIdiOS, subjectToGDPR, subjectToCCPA, userConsent, isUserChild != null && isUserChild.Equals("1"));
@@ -170,6 +180,17 @@ namespace AMR
             else if (Application.platform == RuntimePlatform.Android)
             {
                 AMRSdk.startWithAppId(appIdAndroid, subjectToGDPR, subjectToCCPA, userConsent,isUserChild, isHuaweiApp);
+            }
+        }
+
+        public static void setUnityMainThread()
+        {
+            AMRUtil.Log("setUnityMainThread : [" + AMR_PLUGIN_VERSION + "]");
+
+            Instance.create();
+            if (Application.platform == RuntimePlatform.Android)
+            {
+                Instance.AMRSdk.setUnityMainThread();
             }
         }
 

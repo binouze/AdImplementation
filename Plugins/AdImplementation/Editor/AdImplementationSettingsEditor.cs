@@ -31,7 +31,7 @@ namespace com.binouze
             return instance;
         }
         
-        [MenuItem("AdImplementation/Settings...")]
+        [MenuItem("LagoonPlugins/AdImplementation Settings")]
         public static void OpenInspector()
         {
             Selection.activeObject = LoadSettingsInstance();

@@ -14,6 +14,7 @@ namespace AMR.Android
         private AMRPlugin.Android.AMRPrivacyConsentListener privacyConsentListener;
         private AMRPlugin.Android.AMRRemoteConfigListener rcListener;
         private AMRPlugin.Android.AMRInitializeListener initListener;
+        private bool isApiHttps;
 
         public AMRInitialize()
         {
@@ -47,7 +48,7 @@ namespace AMR.Android
 
             if (Application.platform == RuntimePlatform.Android)
             {
-                config.Call("initialize", new object[6] { appId, subjectToGDPR, subjectToCCPA, userConsent, isUserChild, isHuaweiApp });
+                config.Call("initialize", new object[7] { appId, subjectToGDPR, subjectToCCPA, userConsent, isUserChild, isHuaweiApp, isApiHttps });
             }
         }
 
@@ -204,6 +205,16 @@ namespace AMR.Android
             initListener.setDelegateObject(delegateObject);
 
             config.Call("setInitializationListener", new object[1] { initListener });
+        }
+
+        public void setUnityMainThread()
+        {
+            config.Call("setUnityMainThread");
+        }
+
+        public void setApiHttps()
+        {
+            isApiHttps = true;
         }
     }
 

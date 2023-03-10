@@ -39,7 +39,10 @@ namespace AMR.iOS
 
         [DllImport("__Internal")]
         private static extern void _setUserChild(bool userChild);
-        
+
+        [DllImport("__Internal")]
+        private static extern void _setUseHttps(bool isHttps);
+
         [DllImport("__Internal")]
         private static extern void _spendVirtualCurrency();
         
@@ -65,6 +68,7 @@ namespace AMR.iOS
         private delegate void IsGDPRApplicableCallback(IntPtr gdprHandlePtr, bool isApplicable);
         private delegate void PrivacyConsentRequiredCallback(IntPtr privacyConsentHandlePtr, int consentStatus);
         private delegate void SDKInitializeCallback(IntPtr sdkInitializeHandlePtr, bool isInitialized, string errorMessage);
+        private bool isApiHttps;
 
         public void start() {}
         public void stop() {}
@@ -78,6 +82,11 @@ namespace AMR.iOS
             if (isUserChild)
             {
                 _setUserChild(isUserChild);
+            }
+
+            if (isApiHttps)
+            {
+                _setUseHttps(isApiHttps);
             }
             
             _startWithAppId(appId);
@@ -101,12 +110,17 @@ namespace AMR.iOS
             {
                 _setUserChild(isUserChild);
             }
+
+            if (isApiHttps)
+            {
+                _setUseHttps(isApiHttps);
+            }
                 
             _startWithAppId(appId);
 #endif
         }
-		
-		public void startWithAppIdConsent(string appId, string subjectToGDPR, string subjectToCCPA, string userConsent, bool isUserChild)
+
+        public void startWithAppIdConsent(string appId, string subjectToGDPR, string subjectToCCPA, string userConsent, bool isUserChild)
         {
 #if UNITY_IOS
             if (!string.IsNullOrEmpty(userConsent))
@@ -127,6 +141,11 @@ namespace AMR.iOS
             if (isUserChild == true)
             {
                 _setUserChild(isUserChild);
+            }
+
+            if (isApiHttps)
+            {
+                _setUseHttps(isApiHttps);
             }
                 
             _startWithAppId(appId);
@@ -338,6 +357,16 @@ namespace AMR.iOS
         public string trackIAPForHuawei(string uniqueID, string signature, string[] tags)
         {
             return "";
+        }
+
+        public void setUnityMainThread()
+        {
+            
+        }
+
+        public void setApiHttps()
+        {
+            isApiHttps = true;
         }
     }
 }

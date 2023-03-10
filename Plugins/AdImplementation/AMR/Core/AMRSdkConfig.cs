@@ -21,5 +21,6 @@ namespace AMR
 		public string SubjectToCCPA;
         public string IsUserChild;
         public bool IsHuaweiApp;
+        public bool IsApiHttps;
     }
 }

@@ -4,6 +4,7 @@ namespace AMR
 {
 	public interface IAMRSdk
 	{
+        void setApiHttps();
 		void startWithAppId(string appId, bool isUserChild);
         void startWithAppIdConsent(string appId, string subjectToGDPR, string userConsent, bool isUserChild);
 		void startWithAppIdConsent(string appId, string subjectToGDPR, string subjectToCCPA, string userConsent, bool isUserChild);
@@ -27,6 +28,7 @@ namespace AMR
         void setTrackPurchaseDelegate(AMRTrackPurchaseDelegate delegateObject);
         void setGDPRDelegate(AMRGDPRDelegate delegateObject);
         void setPrivacyConsentDelegate(AMRPrivacyConsentDelegate delegateObject);
+        void setUnityMainThread();
     }
 }
 

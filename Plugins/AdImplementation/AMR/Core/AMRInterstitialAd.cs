@@ -1,7 +1,6 @@
 ﻿
 using System;
 using AMR.iOS;
-using com.binouze;
 using UnityEngine;
 
 namespace AMR
@@ -24,14 +23,6 @@ namespace AMR
                 }
                 else
                 {
-                    #if UNITY_EDITOR
-                        #if UNITY_ANDROID
-                            return AndroidZoneId;
-                        #endif
-                        #if UNITY_IOS
-                            return iOSZoneId;
-                        #endif
-                    #endif
                     return null;
                 }
             }
@@ -61,9 +52,6 @@ namespace AMR
             Status = AdStatus.Loading;
             InterstitialAdDelegate interstitialDelegate = new InterstitialAdDelegate(this);
 
-            #if UNITY_EDITOR
-            interstitialDelegate.didReceiveInterstitial( "test", 0 );
-            #else
             if (Application.platform == RuntimePlatform.IPhonePlayer)
             {
                 AMRInterstitialManager.LoadInterstitial(ZoneId, interstitialDelegate);
@@ -77,21 +65,12 @@ namespace AMR
                 interstitialAndroid = new Android.AMRInterstitial();
                 interstitialAndroid.loadInterstitialForZoneId(ZoneId, interstitialDelegate);
             }
-            #endif
         }
 
         public void ShowInterstitial(string tag = null)
         {
             Status = AdStatus.Playing;
-            
-            #if UNITY_EDITOR
-            onInterstitialShowDelegate?.Invoke( ZoneId );
-            AdsEditorHelper.ShowDialog( "TEST INTERSTITIAL", "OK", () =>
-            {
-                Debug.Log( "AMRInterstitialAd_EDITOR OK pressed" );
-                onInterstitialDismissDelegate?.Invoke( ZoneId );
-            } );
-            #else
+
             if (Application.platform == RuntimePlatform.IPhonePlayer)
             {
                 AMRInterstitialManager.ShowInterstitial(ZoneId, tag);
@@ -107,7 +86,6 @@ namespace AMR
                     interstitialAndroid.showInterstitial(tag);
                 }
             }
-            #endif
         }
 
         /* Interstitial Callbacks */
@@ -137,13 +115,14 @@ namespace AMR
             this.onInterstitialClickDelegate = onInterstitialClickDelegate;
         }
 
-        public void SetOnInterstitialDismiss(AdDelegateDismiss onInterstitialDismissDelegate)
-        {
-            this.onInterstitialDismissDelegate = onInterstitialDismissDelegate;
-        }
         public void SetOnInterstitialImpression(AdDelegateImpression onInterstitialImpressionDelegate)
         {
             this.onInterstitialImpressionDelegate = onInterstitialImpressionDelegate;
+        }
+
+        public void SetOnInterstitialDismiss(AdDelegateDismiss onInterstitialDismissDelegate)
+        {
+            this.onInterstitialDismissDelegate = onInterstitialDismissDelegate;
         }
 
         #endregion

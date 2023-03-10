@@ -1,7 +1,6 @@
 ﻿using System;
 using AMR.iOS;
 using UnityEngine;
-using com.binouze;
 
 namespace AMR
 {
@@ -22,14 +21,6 @@ namespace AMR
                     return AndroidZoneId;
                 } else
                 {
-                    #if UNITY_EDITOR
-                        #if UNITY_ANDROID
-                        return AndroidZoneId;
-                        #endif
-                        #if UNITY_IOS
-                        return iOSZoneId;
-                        #endif
-                    #endif
                     return null;
                 }
             }
@@ -61,9 +52,6 @@ namespace AMR
             Status = AdStatus.Loading;
             RewardedVideoAdDelegate videoDelegate = new RewardedVideoAdDelegate(this);
 
-            #if UNITY_EDITOR
-            videoDelegate.didReceiveRewardedVideo( "test", 0 );
-            #else
             if (Application.platform == RuntimePlatform.IPhonePlayer)
             {
                 AMRRewardedVideoManager.LoadRewardedVideo(ZoneId, videoDelegate);
@@ -77,22 +65,12 @@ namespace AMR
                 rewardedVideoAndroid = new Android.AMRRewardedVideo();
                 rewardedVideoAndroid.loadRewardedVideoForZoneId(ZoneId, videoDelegate);
             }
-            #endif
         }
 
         public void ShowRewardedVideo(string tag = null)
         {
             Status = AdStatus.Playing;
-            
-            #if UNITY_EDITOR
-            onVideoShowDelegate?.Invoke( ZoneId );
-            AdsEditorHelper.ShowDialog( "TEST REWARDED", "OK", () =>
-            {
-                Debug.Log( $"AMRRewardedVideoAd_EDITOR OK pressed {ZoneId}" );
-                onVideoCompleteDelegate?.Invoke( ZoneId );
-                onVideoDismissDelegate?.Invoke( ZoneId );
-            } );
-            #else
+
             if (Application.platform == RuntimePlatform.IPhonePlayer)
             {
                 AMRRewardedVideoManager.ShowRewardedVideo(ZoneId, tag);
@@ -107,7 +85,6 @@ namespace AMR
                     rewardedVideoAndroid.showRewardedVideo(tag);
                 }
             }
-            #endif
         }
 
         /* Rewarded Video Callbacks */
@@ -137,6 +114,11 @@ namespace AMR
             this.onVideoClickDelegate = onVideoClickDelegate;
         }
 
+        public void SetOnVideoImpression(AdDelegateImpression onVideoImpressionDelegate)
+        {
+            this.onVideoImpressionDelegate = onVideoImpressionDelegate;
+        }
+
         public void SetOnVideoComplete(AdDelegateComplete onVideoCompleteDelegate)
         {
             this.onVideoCompleteDelegate = onVideoCompleteDelegate;
@@ -150,11 +132,6 @@ namespace AMR
         public void SetOnVideoReward(AdDelegateReward onVideoRewardDelegate)
         {
             this.onVideoRewardDelegate = onVideoRewardDelegate;
-        }
-        
-        public void SetOnVideoImpression(AdDelegateImpression onVideoImpressionDelegate)
-        {
-            this.onVideoImpressionDelegate = onVideoImpressionDelegate;
         }
 
         #endregion

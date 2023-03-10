@@ -151,6 +151,7 @@ static NSString* CreateNSString(const char* string) {
 + (void)subjectToGDPR:(bool)subject;
 + (void)subjectToCCPA:(bool)subject;
 + (void)setUserChild:(bool)userChild;
++ (void)setUseHttps:(bool)isHttps;
 + (void)spendVirtualCurrency;
 @end
 
@@ -293,6 +294,10 @@ static int trackPurchaseHandle;
 
 + (void)setUserChild:(bool)userChild {
     [AMRSDK setUserChild:userChild];
+}
+
++ (void)setUseHttps:(bool)isHttps {
+    [AMRSDK setUseHttps:isHttps];
 }
 
 + (void)spendVirtualCurrency {
@@ -752,6 +757,10 @@ extern "C"
 
     void _setUserChild(bool userChild) {
         [AMRSDKPlugin setUserChild:userChild];
+    }
+
+    void _setUseHttps(bool isHttps) {
+        [AMRSDKPlugin setUseHttps:isHttps];
     }
     
     void _spendVirtualCurrency() {

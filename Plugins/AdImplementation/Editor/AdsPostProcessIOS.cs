@@ -10,7 +10,7 @@ namespace com.binouze
 {
     public class AdsPostProcessIOS : IPostprocessBuildWithReport
     {
-        private const string SKADNETWORKS_RELATIVE_PATH = "AdImplementation/Editor/SKAdNetworkItems.txt";
+        private const string SKADNETWORKS_RELATIVE_PATH = "LagoonPlugins/AdImplementation/Editor/SKAdNetworkItems.txt";
         
         /// <summary>
         ///   <para>Returns the relative callback order for callbacks.  Callbacks with lower values are called before ones with higher values.</para>

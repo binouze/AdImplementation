@@ -18,7 +18,7 @@ namespace com.binouze.Editor
             var settings = AdImplementationSettingsEditor.LoadSettingsInstance();
             if( settings == null || !settings.IsValide() )
             {
-                Debug.LogError( "AdMost settings not valid please check AdIntegration/Settings..." );
+                Debug.LogWarning( "AdMost settings not valid please check AdIntegration/Settings..." );
             }
             
             // copier les fichiers necessaires avant la compilation

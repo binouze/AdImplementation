@@ -25,7 +25,11 @@ namespace com.binouze
             var elemApplication = elemManifest.Element( "application" );
             
             var instance = AdImplementationSettings.LoadInstance();
-
+            if( instance == null )
+            {
+                Debug.LogError("AdsPreProcessAndroid AdImplementationSettings.LoadInstance NULL");
+                return;
+            }
             var metas = elemApplication.Descendants().Where( elem => elem.Name.LocalName.Equals( "meta-data" ) );
 
             // -- ADD android:name="androidx.multidex.MultiDexApplication" attribute inside the application tag

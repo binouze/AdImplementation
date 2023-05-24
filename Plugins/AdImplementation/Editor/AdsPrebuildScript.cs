@@ -1,3 +1,4 @@
+using System.IO;
 using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
@@ -33,7 +34,7 @@ namespace com.binouze.Editor
                 AssetDatabase.CreateFolder("Assets", "LagoonPlugins");
             }
 
-            // Moving fromm old to new localtion
+            // en cas  de mise a jour du plugin : Moving fromm old to new localtion
             if( AssetDatabase.IsValidFolder( "Assets/AdImplementation" ) )
             {
                 AssetDatabase.MoveAsset( "Assets/AdImplementation", "Assets/LagoonPlugins/AdImplementation" );
@@ -67,12 +68,40 @@ namespace com.binouze.Editor
             }
             
             // Copy SKAdNetworkItems.txt into project
-            AssetDatabase.CopyAsset( BASE_FOLDER+"Editor/SKAdNetworkItems.txt", "Assets/LagoonPlugins/AdImplementation/Editor/SKAdNetworkItems.txt" );
+            CopyAsset( BASE_FOLDER+"Editor/SKAdNetworkItems.txt", "Assets/LagoonPlugins/AdImplementation/Editor/SKAdNetworkItems.txt" );
             
             
             #if UNITY_ANDROID
             AdsPreProcessAndroid.PreprocessAndroid();
             #endif
+        }
+
+        /// <summary>
+        /// Copier un asset unity
+        ///  - AssetDatabase.CopyAsset change le GUID des fichier existant et c'est un peu genant, du coup cette fonction va verifier si le fichier cible existe, si il existe on va faire un File.Copy sinon on utilisera le AssetDatabase.CopyAsset
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
+        /// <returns></returns>
+        private static bool CopyAsset(string from, string to)
+        {
+            var fullPath = Path.Combine(Application.dataPath, "..", from);
+            if (!File.Exists(fullPath))
+            {
+                Debug.LogError(from + ": file not found.");
+                return false;
+            }
+   
+            var fullNewPath = Path.Combine(Application.dataPath, "..", to);
+            if (File.Exists(fullNewPath))
+            {
+                File.Copy(fullPath, fullNewPath, true);
+                return true;
+            }
+            else
+            {
+                return AssetDatabase.CopyAsset(from, to);
+            }
         }
     }
 }

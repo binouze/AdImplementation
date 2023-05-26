@@ -273,17 +273,18 @@ namespace com.binouze
 
             InterstitalAdsControlller.LoadAd( zoneID );
         }
-        
+
         /// <summary>
         /// Afficher une video interstitielle
         /// </summary>
         /// <param name="OnComplete"></param>
-        public void ShowInterstitial( Action<bool> OnComplete )
+        /// <param name="tag"></param>
+        public void ShowInterstitial( Action<bool> OnComplete, string tag = null )
         {
             Log( "ShowInterstitial" );
 
             if( AdInterUnit?.Count > 0 )
-                ShowInterstitial( AdInterUnit[0], OnComplete );
+                ShowInterstitial( AdInterUnit[0], OnComplete, tag );
         }
 
         /// <summary>
@@ -291,7 +292,8 @@ namespace com.binouze
         /// </summary>
         /// <param name="zoneID"></param>
         /// <param name="OnComplete"></param>
-        public void ShowInterstitial( string zoneID, Action<bool> OnComplete )
+        /// <param name="tag"></param>
+        public void ShowInterstitial( string zoneID, Action<bool> OnComplete, string tag = null )
         {
             Log( $"ShowInterstitial zoneID:{zoneID}" );
             
@@ -300,7 +302,7 @@ namespace com.binouze
                 AdPlaying         = true;
                 OnAdPlayComplete  = OnComplete;
                 IsRewardedPlaying = false;
-                var ok = InterstitalAdsControlller.PlayAd( zoneID, this );
+                var ok = InterstitalAdsControlller.PlayAd( zoneID, this, tag );
                 if( ! ok )
                     OnComplete?.Invoke( false );
             }
@@ -355,20 +357,22 @@ namespace com.binouze
         /// Afficher une video Rewarded
         /// </summary>
         /// <param name="OnComplete"></param>
-        public void ShowRewarded( Action<bool> OnComplete )
+        /// <param name="tag"></param>
+        public void ShowRewarded( Action<bool> OnComplete, string tag = null )
         {
             Log( "ShowRewarded" );
             
             if( AdRewarUnit?.Count > 0 )
-                ShowRewarded( AdRewarUnit[0], OnComplete );
+                ShowRewarded( AdRewarUnit[0], OnComplete, tag );
         }
-        
+
         /// <summary>
         /// Afficher une video rewarded
         /// </summary>
         /// <param name="zoneID"></param>
         /// <param name="OnComplete"></param>
-        public void ShowRewarded( string zoneID, Action<bool> OnComplete )
+        /// <param name="tag"></param>
+        public void ShowRewarded( string zoneID, Action<bool> OnComplete, string tag = null )
         {
             Log( $"ShowRewarded zoneID:{zoneID}" );
             
@@ -377,7 +381,7 @@ namespace com.binouze
                 AdPlaying         = true;
                 OnAdPlayComplete  = OnComplete;
                 IsRewardedPlaying = true;
-                var ok = RewardedAdsControlller.PlayAd( zoneID, this );
+                var ok = RewardedAdsControlller.PlayAd( zoneID, this, tag );
                 if( ! ok )
                     OnComplete?.Invoke( false );
             }

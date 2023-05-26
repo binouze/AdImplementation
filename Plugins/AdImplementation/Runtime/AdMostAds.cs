@@ -67,7 +67,7 @@ namespace com.binouze
             }
         }
 
-        public bool PlayAd( string zoneID, IAdMostAdDelegate eventsReceiver )
+        public bool PlayAd( string zoneID, IAdMostAdDelegate eventsReceiver, string tag = null )
         {
             Log( $"PlayAd zoneID:{zoneID}" );
 
@@ -87,7 +87,7 @@ namespace com.binouze
                 // mettre a jour l'ad en cours de lecture
                 ad = _ad;
                 ad.SetEventReceiver( eventsReceiver );
-                _ad.Show();
+                _ad.Show(tag);
                 
                 Log( "PlayAd startPlaying" );
                 return true;

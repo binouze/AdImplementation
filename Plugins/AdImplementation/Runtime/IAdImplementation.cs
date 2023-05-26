@@ -16,9 +16,9 @@ namespace com.binouze
         public void LoadInterstitial( string zoneID = null );
         public void LoadRewarded( string zoneID = null );
         
-        public void ShowInterstitial( string zoneID, Action<bool> OnComplete );
-        public void ShowRewarded( string zoneID,Action<bool> OnComplete );
-        public void ShowInterstitial( Action<bool> OnComplete );
-        public void ShowRewarded( Action<bool> OnComplete );
+        public void ShowInterstitial( string zoneID, Action<bool> OnComplete, string tag = null );
+        public void ShowRewarded( string zoneID, Action<bool> OnComplete, string tag = null );
+        public void ShowInterstitial( Action<bool> OnComplete, string tag = null );
+        public void ShowRewarded( Action<bool> OnComplete, string tag = null );
     }
 }

@@ -303,21 +303,23 @@ namespace com.binouze
         /// le callback retournera false si aucune video n'est disponible ou qu'il y a eu un probleme d'affichge
         /// </summary>
         /// <param name="OnComplete"></param>
+        /// <param name="tag"></param>
         [UsedImplicitly]
-        public static void ShowInterstitial( Action<bool> OnComplete )
+        public static void ShowInterstitial( Action<bool> OnComplete, string tag = null )
         {
             Log( "ShowInterstitial" );
-            ShowInterstitial( null, OnComplete );
+            ShowInterstitial( null, OnComplete, tag );
         }
-        
+
         /// <summary>
         /// lancer l'affichage d'une video Intersticielle pour un placement defini
         /// le callback retournera false si aucune video n'est disponible ou qu'il y a eu un probleme d'affichge
         /// </summary>
         /// <param name="zoneID"></param>
         /// <param name="OnComplete"></param>
+        /// <param name="tag"></param>
         [UsedImplicitly]
-        public static void ShowInterstitial( string zoneID, Action<bool> OnComplete )
+        public static void ShowInterstitial( string zoneID, Action<bool> OnComplete, string tag = null )
         {
             Log( $"ShowInterstitial {zoneID}" );
             
@@ -338,7 +340,7 @@ namespace com.binouze
                         OnAdClose?.Invoke();
                         OnComplete?.Invoke( ok );
                     });
-                } );
+                }, tag );
             } );
         }
         
@@ -375,17 +377,18 @@ namespace com.binouze
         {
             implementation.LoadRewarded( zoneID );
         }
-        
+
         /// <summary>
         /// lancer l'affichage d'une video Rewarded
         /// le callback retournera true si la video a ete vue jusqu'au bout et qu'un reward peut etre accorde
         /// </summary>
         /// <param name="OnComplete"></param>
+        /// <param name="tag"></param>
         [UsedImplicitly]
-        public static void ShowRewarded( Action<bool> OnComplete )
+        public static void ShowRewarded( Action<bool> OnComplete, string tag = null )
         {
             Log( "ShowRewarded" );
-            ShowRewarded( null, OnComplete );
+            ShowRewarded( null, OnComplete, tag );
         }
 
         /// <summary>
@@ -394,8 +397,9 @@ namespace com.binouze
         /// </summary>
         /// <param name="zoneID"></param>
         /// <param name="OnComplete"></param>
+        /// <param name="tag"></param>
         [UsedImplicitly]
-        public static void ShowRewarded( string zoneID, Action<bool> OnComplete )
+        public static void ShowRewarded( string zoneID, Action<bool> OnComplete, string tag = null )
         {
             Log( $"ShowRewarded {zoneID}" );
         
@@ -416,7 +420,7 @@ namespace com.binouze
                         OnAdClose?.Invoke();
                         OnComplete?.Invoke( ok );
                     } );
-                } );
+                }, tag );
             } );
         }
         

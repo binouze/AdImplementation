@@ -258,6 +258,18 @@ namespace com.binouze
         }
         
         /// <summary>
+        /// true si une video intersticielle est en cours de chargement
+        /// </summary>
+        public bool HasInterstitialLoading( string zoneID = null )
+        {
+            if( zoneID == null && AdInterUnit?.Count > 0 )
+                zoneID = AdInterUnit[0];
+            
+            Log( $"HasInterstitialLoading: IsInitComplete:{IsInitComplete} - AdPlaying:{AdPlaying} - zoneID:{zoneID} - AdLoading:{InterstitalAdsControlller.IsLoading( zoneID )}" );
+            return IsInitComplete && !AdPlaying && InterstitalAdsControlller.IsLoading( zoneID );
+        }
+        
+        /// <summary>
         /// lancer le chargement d'une video intersticielle
         /// </summary>
         /// <param name="zoneID"></param>
@@ -336,6 +348,18 @@ namespace com.binouze
             return IsInitComplete && !AdPlaying && RewardedAdsControlller.IsAdReady( zoneID );
         }
 
+        /// <summary>
+        /// true si une video rewarded est en cours de chargement
+        /// </summary>
+        public bool HasRewardedLoading( string zoneID = null )
+        {
+            if( zoneID == null && AdRewarUnit?.Count > 0 )
+                zoneID = AdRewarUnit[0];
+            
+            Log( $"HasRewardedLoading: IsInitComplete:{IsInitComplete} - AdPlaying:{AdPlaying} - zoneID:{zoneID} - AdLoading:{RewardedAdsControlller.IsLoading( zoneID )}" );
+            return IsInitComplete && !AdPlaying && RewardedAdsControlller.IsLoading( zoneID );
+        }
+        
         /// <summary>
         /// lancer le chargement d'une video rewarded
         /// </summary>

@@ -115,6 +115,25 @@ namespace com.binouze
             
             return ready;
         }
+        
+        public bool IsLoading( string zoneID )
+        {
+            if( string.IsNullOrWhiteSpace( zoneID ) )
+            {
+                Log( "IsAdReady FAIL zone null" );
+                return false;
+            }
+
+            var ready = false;
+            if( ads.TryGetValue( zoneID, out var _ad ) )
+            {
+                ready = _ad?.IsLoading() ?? false;
+            }
+            
+            Log( $"IsAdReady zoneID:{zoneID} - ready:{ready}" );
+            
+            return ready;
+        }
     }
     
     // ADMOB VIDEO INTERFACE
@@ -220,9 +239,10 @@ namespace com.binouze
         }
 
 
-        public virtual void LoadAd()                    { throw new NotImplementedException(); }
-        public virtual bool IsLoaded()                  { throw new NotImplementedException(); }
-        public virtual void Show(string tag = null)     { throw new NotImplementedException(); }
+        public virtual void LoadAd()                { throw new NotImplementedException(); }
+        public virtual bool IsLoaded()              { throw new NotImplementedException(); }
+        public virtual bool IsLoading()              { throw new NotImplementedException(); }
+        public virtual void Show(string tag = null) { throw new NotImplementedException(); }
         
         
         
@@ -278,6 +298,7 @@ namespace com.binouze
         }
 
         public override bool IsLoaded() => ad.Status == AMRRewardedVideoAd.AdStatus.Loaded;
+        public override bool IsLoading() => ad.Status == AMRRewardedVideoAd.AdStatus.Loading;
 
         public override void Show( string tag = null )
         {
@@ -318,7 +339,8 @@ namespace com.binouze
             ad.LoadInterstitial();
         }
 
-        public override bool IsLoaded() => ad.Status == AMRInterstitialAd.AdStatus.Loaded;
+        public override bool IsLoaded()  => ad.Status == AMRInterstitialAd.AdStatus.Loaded;
+        public override bool IsLoading() => ad.Status == AMRInterstitialAd.AdStatus.Loading;
 
         public override void Show( string tag = null )
         {

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using AMR;
 using JetBrains.Annotations;
 using UnityEngine;
@@ -113,6 +114,30 @@ namespace com.binouze
 //
 //  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████  
 
+        private static float MaxTimeLoadingBeforeShowAds = 0f;
+        /// <summary>
+        /// si lorsqu'on essaye de lancer une video, elle est en cours de chargement,
+        /// on va laisser charger la video pendant un temps max avant de dire qu'iol n'u a pas de video dispo
+        /// dans ces cas la la fonction OnAdWaitToStart sera appelee
+        /// </summary>
+        /// <param name="val"></param>
+        public static void SetMaxTimeLoadingBeforeShowAd(float val)
+        {
+            MaxTimeLoadingBeforeShowAds = val;
+        }
+        
+        private static Action OnAdWaitToStart;
+        /// <summary>
+        /// une fonction a appeler lorsqu'on commence l'attente de fin de chargement avant de montrer ou pas une video
+        /// </summary>
+        /// <param name="onAdWaitToStart"></param>
+        [UsedImplicitly]
+        public static void SetOnAdWaitToStart( Action onAdWaitToStart )
+        {
+            OnAdWaitToStart = onAdWaitToStart;
+        }
+
+
         public static Action<ImpressionDatas> OnImpressionDatas { get; private set; }
         /// <summary>
         /// recevoir les infos d'impression des videos
@@ -189,6 +214,7 @@ namespace com.binouze
 //
 //  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████          
         
+
         public static string UserId { get; private set; } = string.Empty;
         /// <summary>
         /// definir l'identifiant du joueur
@@ -287,6 +313,12 @@ namespace com.binouze
         [UsedImplicitly]
         public static bool HasInterstitialAvailableForZone(string zoneID = null) => implementation.HasInterstitialAvailable(zoneID);
 
+        /// <summary>
+        /// true si une video Intersticielle est en train de charger pour une zone definie
+        /// </summary>
+        [UsedImplicitly]
+        public static bool HasInterstitialLoadingForZone(string zoneID = null) => implementation.HasInterstitialLoading(zoneID);
+
 
         /// <summary>
         /// lancer le prechargement d'une video intersticielle
@@ -319,15 +351,37 @@ namespace com.binouze
         /// <param name="OnComplete"></param>
         /// <param name="tag"></param>
         [UsedImplicitly]
-        public static void ShowInterstitial( string zoneID, Action<bool> OnComplete, string tag = null )
+        public static async void ShowInterstitial( string zoneID, Action<bool> OnComplete, string tag = null )
         {
             Log( $"ShowInterstitial {zoneID}" );
             
             if( !HasInterstitialAvailableForZone(zoneID) )
             {
-                Log( "ShowInterstitial NOT AVAILABLE" );
-                OnComplete?.Invoke( false );
-                return;
+                var available = false;
+                var loading   = false;
+                
+                if( MaxTimeLoadingBeforeShowAds > 0 && HasInterstitialLoadingForZone( zoneID ) )
+                {
+                    loading = true;
+                    OnAdWaitToStart?.Invoke();
+                    
+                    var tend = Time.realtimeSinceStartup + MaxTimeLoadingBeforeShowAds;
+                    while( Time.realtimeSinceStartup < tend && !available )
+                    {
+                        available = HasInterstitialAvailableForZone( zoneID );
+                        await Task.Yield();
+                    }
+                }
+
+                if( !available )
+                {
+                    if( loading )
+                        OnAdClose?.Invoke();
+                    
+                    Log( "ShowInterstitial NOT AVAILABLE" );
+                    OnComplete?.Invoke( false );
+                    return;
+                }
             }
             
             ShowGdprIfRequired( () =>
@@ -367,6 +421,12 @@ namespace com.binouze
         [UsedImplicitly]
         public static bool HasRewardedAvailableForZone(string zoneID = null) => implementation.HasRewardedAvailable(zoneID);
         
+        /// <summary>
+        /// true si une video Rewarded est en cours de chargement pour une zone definie
+        /// </summary>
+        [UsedImplicitly]
+        public static bool HasRewardedLoadingForZone(string zoneID = null) => implementation.HasRewardedLoading(zoneID);
+        
         
         /// <summary>
         /// lancer le prechargement d'une video rewarded
@@ -399,15 +459,37 @@ namespace com.binouze
         /// <param name="OnComplete"></param>
         /// <param name="tag"></param>
         [UsedImplicitly]
-        public static void ShowRewarded( string zoneID, Action<bool> OnComplete, string tag = null )
+        public static async void ShowRewarded( string zoneID, Action<bool> OnComplete, string tag = null )
         {
             Log( $"ShowRewarded {zoneID}" );
         
             if( !HasRewardedAvailableForZone(zoneID) )
             {
-                Log( "ShowRewarded NOT AVAILABLE" );
-                OnComplete?.Invoke( false );
-                return;
+                var available = false;
+                var loading   = false;
+                
+                if( MaxTimeLoadingBeforeShowAds > 0 && HasRewardedLoadingForZone( zoneID ) )
+                {
+                    loading = true;
+                    OnAdWaitToStart?.Invoke();
+                    
+                    var tend = Time.realtimeSinceStartup + MaxTimeLoadingBeforeShowAds;
+                    while( Time.realtimeSinceStartup < tend && !available )
+                    {
+                        available = HasRewardedLoadingForZone( zoneID );
+                        await Task.Yield();
+                    }
+                }
+
+                if( !available )
+                {
+                    if( loading )
+                        OnAdClose?.Invoke();
+                    
+                    Log( "ShowRewarded NOT AVAILABLE" );
+                    OnComplete?.Invoke( false );
+                    return;
+                }
             }
             
             ShowGdprIfRequired( () =>

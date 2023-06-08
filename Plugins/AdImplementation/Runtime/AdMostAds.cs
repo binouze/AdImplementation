@@ -67,6 +67,13 @@ namespace com.binouze
             }
         }
 
+        /// <summary>
+        /// Start playing an Ad
+        /// </summary>
+        /// <param name="zoneID"></param>
+        /// <param name="eventsReceiver"></param>
+        /// <param name="tag"></param>
+        /// <returns></returns>
         public bool PlayAd( string zoneID, IAdMostAdDelegate eventsReceiver, string tag = null )
         {
             Log( $"PlayAd zoneID:{zoneID}" );
@@ -97,6 +104,11 @@ namespace com.binouze
             return false;
         }
         
+        /// <summary>
+        /// returns true if an Ad is ready to display for a specific zone
+        /// </summary>
+        /// <param name="zoneID"></param>
+        /// <returns></returns>
         public bool IsAdReady( string zoneID )
         {
             if( string.IsNullOrWhiteSpace( zoneID ) )
@@ -116,6 +128,11 @@ namespace com.binouze
             return ready;
         }
         
+        /// <summary>
+        /// returns true if an Ad is currently loading for a specific zone
+        /// </summary>
+        /// <param name="zoneID"></param>
+        /// <returns></returns>
         public bool IsLoading( string zoneID )
         {
             if( string.IsNullOrWhiteSpace( zoneID ) )
@@ -136,7 +153,7 @@ namespace com.binouze
         }
     }
     
-    // ADMOB VIDEO INTERFACE
+    // ADMOST VIDEO INTERFACE
 
     internal abstract class AbsAdMostAd
     {

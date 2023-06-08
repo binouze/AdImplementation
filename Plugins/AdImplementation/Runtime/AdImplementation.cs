@@ -24,6 +24,7 @@ namespace com.binouze
                 Debug.Log( $"[AdImplementation] {str}" );
         }
         
+        
 //  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████       
 //          
 //                                   ██████  ███████ ██████  ██    ██  ██████  
@@ -34,6 +35,7 @@ namespace com.binouze
 //
 //  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████  
         
+
         private static bool LogEnabled;
         /// <summary>
         /// Activer ou desactiver les logs du plugin
@@ -102,8 +104,75 @@ namespace com.binouze
             if( IsDebug && implementation is AdMostImplementation admost )
                 admost.OpenTestSuite();
         }
+        
+
+//  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████  
+//
+//              ██████   █████  ██████   █████  ███    ███ ███████ ████████ ███████ ██████  ███████ 
+//              ██   ██ ██   ██ ██   ██ ██   ██ ████  ████ ██         ██    ██      ██   ██ ██      
+//              ██████  ███████ ██████  ███████ ██ ████ ██ █████      ██    █████   ██████  ███████ 
+//              ██      ██   ██ ██   ██ ██   ██ ██  ██  ██ ██         ██    ██      ██   ██      ██ 
+//              ██      ██   ██ ██   ██ ██   ██ ██      ██ ███████    ██    ███████ ██   ██ ███████
+//
+//  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████  
 
 
+        private static float MaxTimeLoadingBeforeShowAds;
+        /// <summary>
+        /// si lorsqu'on essaye de lancer une video, elle est en cours de chargement,
+        /// on va laisser charger la video pendant un temps max avant de dire qu'iol n'u a pas de video dispo
+        /// dans ces cas la la fonction OnAdWaitToStart sera appelee
+        /// </summary>
+        /// <param name="val"></param>
+        [UsedImplicitly]
+        public static void SetMaxTimeLoadingBeforeShowAd(float val)
+        {
+            MaxTimeLoadingBeforeShowAds = val;
+        }
+
+        public static string UserId { get; private set; } = string.Empty;
+        /// <summary>
+        /// definir l'identifiant du joueur
+        /// </summary>
+        /// <param name="userId"></param>
+        [UsedImplicitly]
+        public static void SetUserID( string userId )
+        {
+            UserId = userId;
+            implementation.SetUserID( userId );
+        }
+
+        /// <summary>
+        /// definir les id des zones interstitial/rewarded uniques
+        /// </summary>
+        /// <param name="rewardedId"></param>
+        /// <param name="interstitialId"></param>
+        [UsedImplicitly]
+        public static void SetIds( string rewardedId, string interstitialId )
+        {
+            SetIds( new List<string>{rewardedId}, new List<string>{interstitialId} );
+        }
+        
+        /// <summary>
+        /// definir les id des zones interstitial/rewarded
+        /// </summary>
+        /// <param name="rewardedIds"></param>
+        /// <param name="interstitialIds"></param>
+        [UsedImplicitly]
+        public static void SetIds( List<string> rewardedIds, List<string> interstitialIds )
+        {
+            #if UNITY_ANDROID 
+            var appid = AdImplementationSettings.LoadInstance().AndroidAppId;
+            #elif UNITY_IOS
+            var appid = AdImplementationSettings.LoadInstance().IOSAppId;
+            #else
+            var appid = string.Empty;
+            #endif
+            
+            implementation.SetIds( appid, rewardedIds, interstitialIds );
+        }
+        
+        
 //  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████  
 //
 //                     ██████  █████  ██      ██      ██████   █████   ██████ ██   ██ ███████ 
@@ -114,18 +183,7 @@ namespace com.binouze
 //
 //  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████  
 
-        private static float MaxTimeLoadingBeforeShowAds = 0f;
-        /// <summary>
-        /// si lorsqu'on essaye de lancer une video, elle est en cours de chargement,
-        /// on va laisser charger la video pendant un temps max avant de dire qu'iol n'u a pas de video dispo
-        /// dans ces cas la la fonction OnAdWaitToStart sera appelee
-        /// </summary>
-        /// <param name="val"></param>
-        public static void SetMaxTimeLoadingBeforeShowAd(float val)
-        {
-            MaxTimeLoadingBeforeShowAds = val;
-        }
-        
+
         private static Action OnAdWaitToStart;
         /// <summary>
         /// une fonction a appeler lorsqu'on commence l'attente de fin de chargement avant de montrer ou pas une video
@@ -204,6 +262,7 @@ namespace com.binouze
             ShowGDPRPopup = showGDPRPopup;
         }
 
+
 //  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████       
 //   
 //            ██ ███    ██ ██ ████████ ██  █████  ██      ██ ███████  █████  ████████ ██  ██████  ███    ██ 
@@ -212,50 +271,8 @@ namespace com.binouze
 //            ██ ██  ██ ██ ██    ██    ██ ██   ██ ██      ██      ██ ██   ██    ██    ██ ██    ██ ██  ██ ██ 
 //            ██ ██   ████ ██    ██    ██ ██   ██ ███████ ██ ███████ ██   ██    ██    ██  ██████  ██   ████ 
 //
-//  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████          
-        
+//  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████         
 
-        public static string UserId { get; private set; } = string.Empty;
-        /// <summary>
-        /// definir l'identifiant du joueur
-        /// </summary>
-        /// <param name="userId"></param>
-        [UsedImplicitly]
-        public static void SetUserID( string userId )
-        {
-            UserId = userId;
-            implementation.SetUserID( userId );
-        }
-
-        /// <summary>
-        /// definir les id des zones interstitial/rewarded uniques
-        /// </summary>
-        /// <param name="rewardedId"></param>
-        /// <param name="interstitialId"></param>
-        [UsedImplicitly]
-        public static void SetIds( string rewardedId, string interstitialId )
-        {
-            SetIds( new List<string>{rewardedId}, new List<string>{interstitialId} );
-        }
-        
-        /// <summary>
-        /// definir les id des zones interstitial/rewarded
-        /// </summary>
-        /// <param name="rewardedIds"></param>
-        /// <param name="interstitialIds"></param>
-        [UsedImplicitly]
-        public static void SetIds( List<string> rewardedIds, List<string> interstitialIds )
-        {
-            #if UNITY_ANDROID 
-            var appid = AdImplementationSettings.LoadInstance().AndroidAppId;
-            #elif UNITY_IOS
-            var appid = AdImplementationSettings.LoadInstance().IOSAppId;
-            #else
-            var appid = string.Empty;
-            #endif
-            
-            implementation.SetIds( appid, rewardedIds, interstitialIds );
-        }
 
         /// <summary>
         /// true si la plateforme supporte les ads et que l'initialisation est terminee
@@ -288,8 +305,7 @@ namespace com.binouze
             Init2Cancellation = new CancellationTokenSource();
             AdsAsyncUtils.DelayCall( () => privacyConsentRequired("GDPR"), 10_000 );
         }
-
-
+        
 
 //  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████       
 //        
@@ -300,6 +316,7 @@ namespace com.binouze
 //           ██ ██   ████    ██    ███████ ██   ██ ███████    ██    ██    ██    ██ ██   ██ ███████ ███████
 //
 //  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████  
+
 
         /// <summary>
         /// true si une video Intersticielle est prete a etre affichee pour la zone par defaut
@@ -409,6 +426,7 @@ namespace com.binouze
 //
 //  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
 
+
         /// <summary>
         /// true si une video Rewarded est prete a etre affichee pour la zone par defaut
         /// </summary>
@@ -505,7 +523,6 @@ namespace com.binouze
                 }, tag );
             } );
         }
-        
         
 
 //  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████

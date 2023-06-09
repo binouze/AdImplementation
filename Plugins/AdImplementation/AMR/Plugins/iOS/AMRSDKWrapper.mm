@@ -489,7 +489,7 @@ static int trackPurchaseHandle;
 }
 
 + (void)setSSVCustomData:(NSString *)zoneId jsonString:(NSString *)jsonString {
-    [[AMRRewardedVideoManager sharedInstance] setSSVCustomData:jsonString];
+    [[AMRRewardedVideoManager sharedInstance] setSSVCustomData:zoneId jsonString:jsonString];
 }
 
 + (BOOL)isReadyToShowForZoneId:(NSString *)zoneId {

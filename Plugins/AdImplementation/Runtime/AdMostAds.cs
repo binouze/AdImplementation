@@ -320,6 +320,14 @@ namespace com.binouze
         public override void Show( string tag = null )
         {
             Log( "Show" );
+            
+            // adding tag to ssv custom datas if defined
+            if( tag != null )
+            {
+                ad.setSSVCustomData( new Dictionary<string, string>{ {"tag", tag} } );
+            }
+            
+            // play video
             ad.ShowRewardedVideo( tag );
         }
     }

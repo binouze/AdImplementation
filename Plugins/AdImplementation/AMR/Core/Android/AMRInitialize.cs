@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using System.Runtime.InteropServices;
+using System.Collections.Generic;
 
 namespace AMR.Android
 {
@@ -216,6 +217,7 @@ namespace AMR.Android
         {
             isApiHttps = true;
         }
+
     }
 
 }

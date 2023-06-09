@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using AMR.iOS;
-using com.binouze;
 using UnityEngine;
+
+#if UNITY_EDITOR
+using com.binouze;
+#endif
 
 namespace AMR
 {
@@ -22,14 +26,6 @@ namespace AMR
                     return AndroidZoneId;
                 } else
                 {
-                    #if UNITY_EDITOR
-                        #if UNITY_ANDROID
-                            return AndroidZoneId;
-                        #endif
-                        #if UNITY_IOS
-                            return iOSZoneId;
-                        #endif
-                    #endif
                     return null;
                 }
             }
@@ -108,6 +104,21 @@ namespace AMR
                 }
             }
             #endif
+        }
+
+        public void setSSVCustomData(IDictionary<string, string> parameters)
+        {
+            Status = AdStatus.Playing;
+
+            if (Application.platform == RuntimePlatform.IPhonePlayer)
+            {
+                // Cemcem not implemented yet ..!
+                AMRRewardedVideoManager.SetSSVCustomData(ZoneId, parameters);
+            }
+            else if (Application.platform == RuntimePlatform.Android)
+            {
+                rewardedVideoAndroid.setSSVCustomData(parameters);
+            }
         }
 
         /* Rewarded Video Callbacks */

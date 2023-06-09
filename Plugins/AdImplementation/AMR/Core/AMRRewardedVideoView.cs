@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using AMR.iOS;
 using UnityEngine;
 
@@ -226,6 +227,19 @@ namespace AMR
             else if (Application.platform == RuntimePlatform.Android)
             {
                 rewardedVideoAndroid.showRewardedVideo(tag);
+            }
+        }
+
+        public void setSSVCustomData(IDictionary<string, string> parameters)
+        {
+            if (Application.platform == RuntimePlatform.IPhonePlayer)
+            {
+                // Cemcem not implemented yet ..!
+                AMRRewardedVideoManager.SetSSVCustomData(iosZoneId, parameters);
+            }
+            else if (Application.platform == RuntimePlatform.Android)
+            {
+                rewardedVideoAndroid.setSSVCustomData(parameters);
             }
         }
 

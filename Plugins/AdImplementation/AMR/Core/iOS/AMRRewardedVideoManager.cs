@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Text;
 using UnityEngine;
 
 namespace AMR.iOS
@@ -13,6 +14,9 @@ namespace AMR.iOS
 
         [DllImport("__Internal")]
         private static extern void _showRewardedVideo(string zoneId, string tag);
+
+        [DllImport("__Internal")]
+        private static extern void _setSSVCustomData(string zoneId, string jsonString);
 
         [DllImport("__Internal")]
         private static extern bool _isRewardedVideoReadyToShow(string zoneId);
@@ -168,17 +172,31 @@ namespace AMR.iOS
 
         public static void LoadRewardedVideo(string zoneId, AMRRewardedVideoViewDelegate delegateObject)
         {
-#if UNITY_IOS
+            #if UNITY_IOS
             Instance.UpdateDelegate(zoneId, delegateObject);
             _loadRewardedVideoForZoneId(zoneId);
-#endif
+            #endif
         }
 
+        
+        public static void SetSSVCustomData(string zoneId, IDictionary<string,string> data)
+        {
+            if( data == null || data.Count == 0 )
+                return;
+            
+            #if UNITY_IOS
+            // convert data to json string
+            var jsonString = AMRRewardedVideoManager.CustomDatasToJsonString( data );
+            // set customdatas
+            _setSSVCustomData(zoneId, jsonString);
+            #endif
+        }
+        
         public static void ShowRewardedVideo(string zoneId, string tag)
         {
-#if UNITY_IOS
+            #if UNITY_IOS
             _showRewardedVideo(zoneId, tag);
-#endif
+            #endif
         }
 
         public static bool isReadyToShow(string zoneId)
@@ -188,13 +206,11 @@ namespace AMR.iOS
                 return false;
             }
 
-#if UNITY_IOS
+            #if UNITY_IOS
             return _isRewardedVideoReadyToShow(zoneId);
-#else
-        return false;
-#endif
-
-
+            #else
+            return false;
+            #endif
         }
 
         #endregion
@@ -211,6 +227,18 @@ namespace AMR.iOS
             }
         }
 
+        private static string CustomDatasToJsonString( IDictionary<string, string> dic )
+        {
+            var values = new List<string>();
+            foreach( var entry in dic )
+            {
+                values.Add( $"\"{entry.Key}\",\"{entry.Value}\"" );
+            }
+            var valuesString = string.Join( ",", values );
+            
+            return $"{{{valuesString}}}";
+        }
+        
         #endregion
     }
 

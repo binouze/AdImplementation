@@ -1,8 +1,10 @@
-﻿
-using System;
+﻿using System;
 using AMR.iOS;
 using UnityEngine;
+
+#if UNITY_EDITOR
 using com.binouze;
+#endif
 
 namespace AMR
 {

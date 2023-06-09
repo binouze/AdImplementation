@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using System.Runtime.InteropServices;
+using System.Collections.Generic;
 
 namespace AMR.Android
 {
@@ -48,6 +49,12 @@ namespace AMR.Android
         public bool isReadyToShow()
         {
             return rewardedVideo.Call<bool>("isReadyToShow");
+        }
+
+        public void setSSVCustomData(IDictionary<string, string> parameters)
+        {
+            AndroidJavaObject javaMap = CreateJavaMapFromDictainary(parameters);
+            rewardedVideo.Call("setSSVCustomData", javaMap);
         }
 
         #endregion
@@ -117,6 +124,34 @@ namespace AMR.Android
         }
 
         #endregion
+
+        private AndroidJavaObject CreateJavaMapFromDictainary(IDictionary<string, string> parameters)
+        {
+            AndroidJavaObject javaMap = new AndroidJavaObject("java.util.Hashtable");
+            IntPtr putMethod = AndroidJNIHelper.GetMethodID(
+                javaMap.GetRawClass(), "put",
+                    "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
+
+            object[] args = new object[2];
+            foreach (KeyValuePair<string, string> kvp in parameters)
+            {
+
+                using (AndroidJavaObject k = new AndroidJavaObject(
+                    "java.lang.String", kvp.Key))
+                {
+                    using (AndroidJavaObject v = new AndroidJavaObject(
+                        "java.lang.String", kvp.Value))
+                    {
+                        args[0] = k;
+                        args[1] = v;
+                        AndroidJNI.CallObjectMethod(javaMap.GetRawObject(),
+                                putMethod, AndroidJNIHelper.CreateJNIArgArray(args));
+                    }
+                }
+            }
+
+            return javaMap;
+        }
     }
 }
 

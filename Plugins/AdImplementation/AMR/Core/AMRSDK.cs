@@ -1,12 +1,13 @@
 ﻿using System;
 using UnityEngine;
 using AMR;
+using System.Collections.Generic;
 
 namespace AMR
 {
 	public class AMRSDK
 	{
-        public const string AMR_PLUGIN_VERSION = "1.7.5"; 
+        public const string AMR_PLUGIN_VERSION = "1.7.6"; 
 	    
 	    public delegate void VirtualCurrencyDelegateDidSpend(string network, string currency, double amount);
         public delegate void SDKInitializeDelegateDidInitialize(bool isInitialized, string errorMessage);
@@ -687,6 +688,11 @@ namespace AMR
         public static Boolean isRewardedVideoReadyToShow()
         {
             return AMRRewardedVideoView.Instance.isReadyToShow();
+        }
+
+        public static void setRewardedSSVCustomData(IDictionary<string, string> parameters)
+        {
+            AMRRewardedVideoView.Instance.setSSVCustomData(parameters);
         }
 
         public static void setOnRewardedVideoReady(AMRAdView.EventDelegateReady onReadyDelegate)

@@ -232,7 +232,7 @@ namespace AMR.iOS
             var values = new List<string>();
             foreach( var entry in dic )
             {
-                values.Add( $"\"{entry.Key}\",\"{entry.Value}\"" );
+                values.Add( $"\"{entry.Key}\":\"{entry.Value}\"" );
             }
             var valuesString = string.Join( ",", values );
             

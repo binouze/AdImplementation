@@ -512,7 +512,7 @@ static int trackPurchaseHandle;
         NSData       *jsonData = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
         NSError      *error;
         NSDictionary *data = [NSJSONSerialization JSONObjectWithData:jsonData
-                                                             options:NSJSONReadingTopLevelDictionaryAssumed
+                                                             options:NSJSONReadingAllowFragments
                                                                error:&error];
         if (error) {
             NSLog(@"setSSVCustomData Got an error: %@", error);

@@ -117,6 +117,12 @@ namespace com.binouze
 //  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████  
 
 
+        /// <summary>
+        /// si true, la gestion du consentement ne sera pas geree par le plugin mais en externe (UMP)
+        /// </summary>
+        public static bool UserConsentManagedExternaly;
+
+
         private static float MaxTimeLoadingBeforeShowAds;
         /// <summary>
         /// si lorsqu'on essaye de lancer une video, elle est en cours de chargement,
@@ -261,6 +267,18 @@ namespace com.binouze
         {
             ShowGDPRPopup = showGDPRPopup;
         }
+        
+        
+        private static Func<bool> MustShowGDPRPopup;
+        /// <summary>
+        /// definir la fonction a appeler pour savoir si on doit forcer l'affichage du popup de consentement GDPR
+        /// </summary>
+        /// <param name="mustShowGDPRPopup"></param>
+        [UsedImplicitly]
+        public static void SetMustShowGDPRFormFunction( Func<bool> mustShowGDPRPopup )
+        {
+            MustShowGDPRPopup = mustShowGDPRPopup;
+        }
 
 
 //  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████       
@@ -298,12 +316,19 @@ namespace com.binouze
             IsInIt = true;
             
             AdsAsyncUtils.SetInstance();
-            // recuperer le type de consentement necessaire avant initialisation, on en aura besoin a l'init
-            AMRSDK.setPrivacyConsentRequired( privacyConsentRequired );
 
-            // on met un delai maximum de 10 secondes sur la recuperation du status GDPR, sinon on passe en mode GDPR
-            Init2Cancellation = new CancellationTokenSource();
-            AdsAsyncUtils.DelayCall( () => privacyConsentRequired("GDPR"), 10_000 );
+            if( UserConsentManagedExternaly )
+            {
+                privacyConsentRequired( "None" );
+            }
+            else
+            {
+                // recuperer le type de consentement necessaire avant initialisation, on en aura besoin a l'init
+                AMRSDK.setPrivacyConsentRequired( privacyConsentRequired );
+                // on met un delai maximum de 10 secondes sur la recuperation du status GDPR, sinon on passe en mode GDPR
+                Init2Cancellation = new CancellationTokenSource();
+                AdsAsyncUtils.DelayCall( () => privacyConsentRequired("GDPR"), 10_000 );
+            }
         }
         
 
@@ -562,7 +587,7 @@ namespace com.binouze
             Init2Cancellation = null;
             
             // en mode debug on test si on doit forcer le GDPR consent et le reset des infos GDPR
-            if( IsDebug )
+            if( IsDebug && !UserConsentManagedExternaly )
             {
                 if( IsGDRPReset )
                     SetGDPRStatus( "UNKNOWN" );
@@ -596,9 +621,11 @@ namespace com.binouze
         /// <param name="complete"></param>
         private static void ShowGdprIfRequired( Action complete )
         {
-            Log( $"ShowGdprIfRequired {MustAskGDPR}" );
+            var mustShow = MustShowGDPRPopup?.Invoke() ?? MustAskGDPR;
             
-            if( MustAskGDPR )
+            Log( $"ShowGdprIfRequired {MustAskGDPR} / {mustShow}" );
+            
+            if( mustShow )
                 ShowGdprForm( complete );
             else
                 complete?.Invoke();

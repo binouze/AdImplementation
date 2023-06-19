@@ -118,10 +118,13 @@ namespace com.binouze
             config.ApplicationIdAndroid = AppID;
             #endif
 
-            config.UserConsent   = AdImplementation.IsDebug || AdImplementation.ConsentResponse == "OK" ? "1" : "0";
-            config.SubjectToGDPR = AdImplementation.ConsentType     == "GDPR" ? "1" : "0";
-            config.SubjectToCCPA = AdImplementation.ConsentResponse == "CCPA" ? "1" : "0";
-            config.IsUserChild   = "0";
+            if( !AdImplementation.UserConsentManagedExternaly )
+            {
+                config.UserConsent   = AdImplementation.IsDebug || AdImplementation.ConsentResponse == "OK" ? "1" : "0";
+                config.SubjectToGDPR = AdImplementation.ConsentType     == "GDPR" ? "1" : "0";
+                config.SubjectToCCPA = AdImplementation.ConsentResponse == "CCPA" ? "1" : "0";
+            }
+            config.IsUserChild = "0";
             
             AMRSDK.startWithConfig( config, OnSDKDidInitialize );
             

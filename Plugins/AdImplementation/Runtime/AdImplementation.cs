@@ -317,17 +317,17 @@ namespace com.binouze
             
             AdsAsyncUtils.SetInstance();
 
-            /*if( UserConsentManagedExternaly )
+            if( UserConsentManagedExternaly )
             {
                 privacyConsentRequired( "None" );
             }
-            else*/
+            else
             {
                 // recuperer le type de consentement necessaire avant initialisation, on en aura besoin a l'init
                 AMRSDK.setPrivacyConsentRequired( privacyConsentRequired );
                 // on met un delai maximum de 10 secondes sur la recuperation du status GDPR, sinon on passe en mode None
                 Init2Cancellation = new CancellationTokenSource();
-                AdsAsyncUtils.DelayCall( () => privacyConsentRequired("None"), 10_000 );
+                AdsAsyncUtils.DelayCall( () => privacyConsentRequired("GDPR"), 10_000 );
             }
         }
         

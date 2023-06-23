@@ -309,7 +309,7 @@ namespace com.binouze
 
         public override void LoadAd()
         {
-            Log( "LoadAd" );
+            Log( $"LoadAd {ad.Status}" );
             ResetCancelationToken();
             ad.LoadRewardedVideo();
         }
@@ -319,7 +319,7 @@ namespace com.binouze
 
         public override void Show( string tag = null )
         {
-            Log( "Show" );
+            Log( $"Show {ad.Status}" );
             
             // adding tag to ssv custom datas if defined
             if( tag != null )
@@ -359,7 +359,7 @@ namespace com.binouze
 
         public override void LoadAd()
         {
-            Log( "LoadAd" );
+            Log( $"LoadAd {ad.Status}" );
             ResetCancelationToken();
             ad.LoadInterstitial();
         }
@@ -369,7 +369,7 @@ namespace com.binouze
 
         public override void Show( string tag = null )
         {
-            Log( "Show" );
+            Log( $"Show {ad.Status}" );
             ad.ShowInterstitial( tag );
         }
     }

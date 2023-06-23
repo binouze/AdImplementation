@@ -164,6 +164,7 @@ static NSString* CreateNSString(const char* string) {
 @interface AMRRewardedVideoManager : NSObject <AMRRewardedVideoDelegate>
 + (void)loadRewardedVideoForZoneId:(NSString *)zoneId;
 + (void)showRewardedVideoForZoneId:(NSString *)zoneId tag:(NSString *)tag;
++ (void)setSSVCustomDataForZoneId:(NSString *)zoneId jsonParams:(NSString *)jsonParams;
 + (BOOL)isReadyToShowForZoneId:(NSString *)zoneId;
 @end
 
@@ -488,8 +489,8 @@ static int trackPurchaseHandle;
     [[AMRRewardedVideoManager sharedInstance] showRewardedVideoForZoneId:zoneId tag:tag];
 }
 
-+ (void)setSSVCustomData:(NSString *)zoneId jsonString:(NSString *)jsonString {
-    [[AMRRewardedVideoManager sharedInstance] setSSVCustomData:zoneId jsonString:jsonString];
++ (void)setSSVCustomDataForZoneId:(NSString *)zoneId jsonParams:(NSString *)jsonParams {
+    [[AMRRewardedVideoManager sharedInstance] setSSVCustomDataForZoneId:zoneId jsonParams:jsonParams];
 }
 
 + (BOOL)isReadyToShowForZoneId:(NSString *)zoneId {
@@ -505,29 +506,25 @@ static int trackPurchaseHandle;
     }
 }
 
-- (void)setSSVCustomData:(NSString *)zoneId jsonString:(NSString *)jsonString {
-    AMRRewardedVideo *rw = [self rewardedVideoForZoneId:zoneId];
-    if (rw) {
-        // convert jsonString to NSDictionary
-        NSData       *jsonData = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
-        NSError      *error;
-        NSDictionary *data = [NSJSONSerialization JSONObjectWithData:jsonData
-                                                             options:NSJSONReadingAllowFragments
-                                                               error:&error];
-        if (error) {
-            NSLog(@"setSSVCustomData Got an error: %@", error);
-            return;
-        } else {
-            NSLog(@"setSSVCustomData OK %@", data);
-        }
-        rw.customData = data;
-    }
-}
-
 - (void)showRewardedVideoForZoneId:(NSString *)zoneId tag:(NSString *)tag {
     AMRRewardedVideo *rw = [self rewardedVideoForZoneId:zoneId];
     if (rw) {
         [rw showFromViewController:[AMRSDKPluginHelper topViewController] withTag:tag];
+    }
+}
+
+- (void)setSSVCustomDataForZoneId:(NSString *)zoneId jsonParams:(NSString *)jsonParams {
+    AMRRewardedVideo *rw = [self rewardedVideoForZoneId:zoneId];
+    if (rw && jsonParams != nil) {
+        NSError *jsonError;
+        NSData *objectData = [jsonParams dataUsingEncoding:NSUTF8StringEncoding];
+        NSDictionary *dictParams = [NSJSONSerialization JSONObjectWithData:objectData
+                                              options:NSJSONReadingMutableContainers
+                                                error:&jsonError];
+        
+        if (jsonError == nil && dictParams != nil) {
+            rw.customData = dictParams;
+        }
     }
 }
 
@@ -885,8 +882,8 @@ extern "C"
         [AMRRewardedVideoManager showRewardedVideoForZoneId:CreateNSString(zoneId) tag:CreateNSString(tag)];
     }
 
-    void _setSSVCustomData(const char* zoneId, const char* jsonString) {
-        [AMRRewardedVideoManager setSSVCustomData:CreateNSString(zoneId) jsonString:CreateNSString(jsonString)];
+    void _setSSVCustomData(const char* zoneId, const char* jsonParams) {
+        [AMRRewardedVideoManager setSSVCustomDataForZoneId:CreateNSString(zoneId) jsonParams:CreateNSString(jsonParams)];
     }
 
     bool _isRewardedVideoReadyToShow(const char* zoneId) {

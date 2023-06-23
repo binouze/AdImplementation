@@ -234,7 +234,6 @@ namespace AMR
         {
             if (Application.platform == RuntimePlatform.IPhonePlayer)
             {
-                // Cemcem not implemented yet ..!
                 AMRRewardedVideoManager.SetSSVCustomData(iosZoneId, parameters);
             }
             else if (Application.platform == RuntimePlatform.Android)

@@ -519,7 +519,7 @@ namespace com.binouze
                     var tend = Time.realtimeSinceStartup + MaxTimeLoadingBeforeShowAds;
                     while( Time.realtimeSinceStartup < tend && !available )
                     {
-                        available = HasRewardedLoadingForZone( zoneID );
+                        available = HasRewardedAvailableForZone( zoneID );
                         await Task.Yield();
                     }
                 }

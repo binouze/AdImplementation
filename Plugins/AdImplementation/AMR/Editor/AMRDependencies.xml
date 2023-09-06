@@ -10,7 +10,7 @@
 
 	</iosPods>
 	<androidPackages>
-		<androidPackage spec="com.admost.sdk:amr:2.7.9"/>
+		<androidPackage spec="com.admost.sdk:amr:2.8.3"/>
 		<androidPackage spec="com.google.android.gms:play-services-base:17.1.0"/>
 		<androidPackage spec="androidx.arch.core:core-common:2.1.0"/>
 		<androidPackage spec="androidx.arch.core:core-runtime:2.1.0"/>

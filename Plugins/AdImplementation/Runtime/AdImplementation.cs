@@ -102,9 +102,12 @@ namespace com.binouze
         public static void OpenTestSuite()
         {
             Log( $"OpenTestSuite {IsDebug}" );
-            
+
             if( IsDebug && implementation is AdMostImplementation admost )
+            {
+                Log( $"OpenTestSuite OK" );
                 admost.OpenTestSuite();
+            }
         }
         
 

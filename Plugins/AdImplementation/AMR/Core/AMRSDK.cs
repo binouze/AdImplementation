@@ -245,7 +245,7 @@ namespace AMR
             if (initialized()) {
                 Instance.AMRSdk.startTestSuite(zoneIds);   
             } else {
-                //AMRUtil.Log("AMRSDK has not been initialized.");
+                AMRUtil.Log("AMRSDK has not been initialized.");
             }
 		}
 

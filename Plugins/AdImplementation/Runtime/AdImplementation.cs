@@ -101,6 +101,8 @@ namespace com.binouze
         [UsedImplicitly]
         public static void OpenTestSuite()
         {
+            Log( $"OpenTestSuite {IsDebug}" );
+            
             if( IsDebug && implementation is AdMostImplementation admost )
                 admost.OpenTestSuite();
         }

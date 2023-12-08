@@ -7,7 +7,7 @@ namespace AMR
 {
 	public class AMRSDK
 	{
-        public const string AMR_PLUGIN_VERSION = "1.7.6"; 
+        public const string AMR_PLUGIN_VERSION = "1.7.7"; 
 	    
 	    public delegate void VirtualCurrencyDelegateDidSpend(string network, string currency, double amount);
         public delegate void SDKInitializeDelegateDidInitialize(bool isInitialized, string errorMessage);
@@ -132,7 +132,7 @@ namespace AMR
 
             if (Application.platform == RuntimePlatform.IPhonePlayer)
             {
-                AMRSdk = new iOS.AMRInitialize();
+                AMRSdk = iOS.AMRInitialize.Instance;
             }
             else if (Application.platform == RuntimePlatform.Android)
             {
@@ -144,7 +144,7 @@ namespace AMR
             }
         }
 
-        private void startWithAppId(SDKInitializeDelegateDidInitialize onDidInitializeDelegate, string appIdiOS, string appIdAndroid, string isUserChild, bool isHuaweiApp = false)
+        private void startWithAppId(SDKInitializeDelegateDidInitialize onDidInitializeDelegate, string appIdiOS, string appIdAndroid, string isUserChild, string canRequestAds, bool isHuaweiApp = false)
 		{
             create();
             setOnSDKDidInitialize(onDidInitializeDelegate);
@@ -156,15 +156,15 @@ namespace AMR
 
             if (Application.platform == RuntimePlatform.IPhonePlayer) 
             {
-                AMRSdk.startWithAppId(appIdiOS, isUserChild != null && isUserChild.Equals("1"));
+                AMRSdk.startWithAppId(appIdiOS, isUserChild != null && isUserChild.Equals("1"), canRequestAds);
             }
             else if (Application.platform == RuntimePlatform.Android)
             {
-                AMRSdk.startWithAppId(appIdAndroid, null, null, null, isUserChild, isHuaweiApp);
+                AMRSdk.startWithAppId(appIdAndroid, null, null, null, isUserChild, isHuaweiApp, canRequestAds);
             }
 		}
 		
-		private void startWithAppIdConsent(SDKInitializeDelegateDidInitialize onDidInitializeDelegate, string appIdiOS, string appIdAndroid, string subjectToGDPR, string subjectToCCPA, string userConsent, string isUserChild, bool isHuaweiApp = false)
+		private void startWithAppIdConsent(SDKInitializeDelegateDidInitialize onDidInitializeDelegate, string appIdiOS, string appIdAndroid, string subjectToGDPR, string subjectToCCPA, string userConsent, string isUserChild, string canRequestAds, bool isHuaweiApp = false)
         {
             create();
             setOnSDKDidInitialize(onDidInitializeDelegate);
@@ -176,11 +176,11 @@ namespace AMR
 
             if (Application.platform == RuntimePlatform.IPhonePlayer)
             {
-                AMRSdk.startWithAppIdConsent(appIdiOS, subjectToGDPR, subjectToCCPA, userConsent, isUserChild != null && isUserChild.Equals("1"));
+                AMRSdk.startWithAppIdConsent(appIdiOS, subjectToGDPR, subjectToCCPA, userConsent, isUserChild != null && isUserChild.Equals("1"), canRequestAds);
             }
             else if (Application.platform == RuntimePlatform.Android)
             {
-                AMRSdk.startWithAppId(appIdAndroid, subjectToGDPR, subjectToCCPA, userConsent,isUserChild, isHuaweiApp);
+                AMRSdk.startWithAppId(appIdAndroid, subjectToGDPR, subjectToCCPA, userConsent,isUserChild, isHuaweiApp, canRequestAds);
             }
         }
 
@@ -203,9 +203,9 @@ namespace AMR
                 Instance.Config = config;
                 if (config.SubjectToGDPR != null || config.UserConsent != null || config.SubjectToCCPA != null)
                 {
-                    Instance.startWithAppIdConsent(null, config.ApplicationIdIOS, config.ApplicationIdAndroid, config.SubjectToGDPR, config.SubjectToCCPA, config.UserConsent, config.IsUserChild, config.IsHuaweiApp);
+                    Instance.startWithAppIdConsent(null, config.ApplicationIdIOS, config.ApplicationIdAndroid, config.SubjectToGDPR, config.SubjectToCCPA, config.UserConsent, config.IsUserChild, config.CanRequestAds, config.IsHuaweiApp);
                 } else { 
-                    Instance.startWithAppId(null, config.ApplicationIdIOS, config.ApplicationIdAndroid, config.IsUserChild, config.IsHuaweiApp);
+                    Instance.startWithAppId(null, config.ApplicationIdIOS, config.ApplicationIdAndroid, config.IsUserChild, config.CanRequestAds, config.IsHuaweiApp);
                 }
                 Instance.isInitialized = true;
             } else {
@@ -222,11 +222,11 @@ namespace AMR
                 Instance.Config = config;
                 if (config.SubjectToGDPR != null || config.UserConsent != null || config.SubjectToCCPA != null)
                 {
-                    Instance.startWithAppIdConsent(onDidInitializeDelegate, config.ApplicationIdIOS, config.ApplicationIdAndroid, config.SubjectToGDPR, config.SubjectToCCPA, config.UserConsent, config.IsUserChild, config.IsHuaweiApp);
+                    Instance.startWithAppIdConsent(onDidInitializeDelegate, config.ApplicationIdIOS, config.ApplicationIdAndroid, config.SubjectToGDPR, config.SubjectToCCPA, config.UserConsent, config.IsUserChild, config.CanRequestAds, config.IsHuaweiApp);
                 }
                 else
                 {
-                    Instance.startWithAppId(onDidInitializeDelegate, config.ApplicationIdIOS, config.ApplicationIdAndroid, config.IsUserChild, config.IsHuaweiApp);
+                    Instance.startWithAppId(onDidInitializeDelegate, config.ApplicationIdIOS, config.ApplicationIdAndroid, config.IsUserChild, config.CanRequestAds, config.IsHuaweiApp);
                 }
                 Instance.isInitialized = true;
             }
@@ -245,7 +245,7 @@ namespace AMR
             if (initialized()) {
                 Instance.AMRSdk.startTestSuite(zoneIds);   
             } else {
-                AMRUtil.Log("AMRSDK has not been initialized.");
+                //AMRUtil.Log("AMRSDK has not been initialized.");
             }
 		}
 
@@ -431,7 +431,21 @@ namespace AMR
 			
 		}
 
-		public static void spendVirtualCurrency()
+        public static void setCanRequestAds(Boolean canRequestAds)
+        {
+            if (initialized())
+            {
+                Instance.AMRSdk.setCanRequestAds(canRequestAds);
+               
+            }
+            else
+            {
+                AMRUtil.Log("AMRSDK has not been initialized.");
+            }
+
+        }
+
+        public static void spendVirtualCurrency()
 	    {
 	        if (initialized())
 	        {

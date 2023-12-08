@@ -19,6 +19,7 @@ namespace AMR
         public string UserConsent;
         public string SubjectToGDPR;
 		public string SubjectToCCPA;
+        public string CanRequestAds;
         public string IsUserChild;
         public bool IsHuaweiApp;
         public bool IsApiHttps;

@@ -135,7 +135,7 @@ static NSString* CreateNSString(const char* string) {
 @end
 
 @interface AMRSDKPlugin : NSObject
-+ (void)startWithAppId:(NSString *)appId completion:(_Nullable AMRInitCompletionHandler)completion;
++ (void)startWithAppId:(NSString *)appId;
 + (void)startTestSuite:(NSString *)zoneIds;
 + (void)trackPurchase:(NSString *)identifier
          currencyCode:(NSString *)currencyCode
@@ -151,8 +151,8 @@ static NSString* CreateNSString(const char* string) {
 + (void)subjectToGDPR:(bool)subject;
 + (void)subjectToCCPA:(bool)subject;
 + (void)setUserChild:(bool)userChild;
-+ (void)setUseHttps:(bool)isHttps;
 + (void)spendVirtualCurrency;
++ (void)sendUnityEvent:(NSString *)event params:(NSArray *)params;
 @end
 
 @interface AMRInterstitialManager : NSObject <AMRInterstitialDelegate>
@@ -172,8 +172,6 @@ static NSString* CreateNSString(const char* string) {
 @interface OfferWallDelegateWrapper : NSObject <AMROfferWallDelegate> @end
 @interface VirtualCurrencyDelegateWrapper : NSObject <AMRVirtualCurrencyDelegate> @end
 @interface TrackPurchaseResponseDelegateWrapper : NSObject <AMRTrackPurchaseResponseDelegate> @end
-
-typedef void (* SDKDidInitializeCallback)(int didInitializeRefPtr, bool isInitialized, const char* errorMessage);
 
 // banner
 typedef void (* BannerSuccessCallback)(int bannerRefPtr, const char* networkName, double ecpm);
@@ -196,8 +194,6 @@ typedef void (* TrackPurchaseResponseCallback)(int trackPurchaseRefPtr, const ch
 typedef void (* IsGDPRApplicableCallback)(int IsGDPRApplicableRefPtr, bool status);
 typedef void (* PrivacyConsentRequiredCallback)(int PrivacyConsentRequiredRefPtr, int consentStatus);
 
-static SDKDidInitializeCallback sdkDidInitializeCallback;
-static int sdkDidInitializeHandle;
 
 // banner
 typedef const void *AMRBannerRef;
@@ -226,21 +222,21 @@ static int offerWallHandle;
 
 // virtualCurrency
 static VirtualCurrencyDelegateWrapper *virtualCurrencyDelegate;
-static VirtualCurrencyDidSpendCallback virtualCurrencyDidSpendCallback;
-static int virtualCurrencyHandle;
 
 // track purchase
 static TrackPurchaseResponseDelegateWrapper *trackPurchaseResponseDelegate;
-static TrackPurchaseResponseCallback trackPurchaseResponseCallback;
-static int trackPurchaseHandle;
 
 @implementation AMRSDKPlugin
 
-+ (void)startWithAppId:(NSString *)appId completion:(_Nullable AMRInitCompletionHandler)completion {
++ (void)startWithAppId:(NSString *)appId {
     [AMRSDK setLogLevel:AMRLogLevelSilent];
     
     [AMRSDK startWithAppId:appId completion:^(AMRError * _Nullable error) {
-        completion(error);
+        if (error) {
+            [self sendUnityEvent:@"SDKInitializeEvent" params:@[@(NO), error.errorDescription]];
+        } else {
+            [self sendUnityEvent:@"SDKInitializeEvent" params:@[@(YES), @""]];
+        }
     }];
 }
 
@@ -297,12 +293,13 @@ static int trackPurchaseHandle;
     [AMRSDK setUserChild:userChild];
 }
 
-+ (void)setUseHttps:(bool)isHttps {
-    [AMRSDK setUseHttps:isHttps];
-}
-
 + (void)spendVirtualCurrency {
     [AMRSDK spendVirtualCurrency];
+}
+
++ (void)sendUnityEvent:(NSString *)event params:(NSArray *)params {
+    NSString *paramsString = [params componentsJoinedByString:@"<>"];
+    UnitySendMessage("AMRInitialize", event.UTF8String, paramsString.UTF8String);
 }
 
 @end
@@ -636,14 +633,6 @@ static int trackPurchaseHandle;
             bannerSuccessCallback(bannerHandle, [banner.networkName UTF8String], [banner.ecpm doubleValue]);
         }
         
-//        if (bannerFillCount > 0) {
-//            if (useCoordinates == 1) {
-//                [AMRSDKPluginHelper updateBannerView:banner.bannerView forPositionX:bannerPosX positionY:bannerPosY];
-//            } else {
-//                [AMRSDKPluginHelper updateBannerView:banner.bannerView forPosition:position offset:bannerOffset];
-//            }
-//        }
-        
         bannerFillCount += 1;
     });
 }
@@ -701,9 +690,7 @@ static int trackPurchaseHandle;
 - (void)didSpendVirtualCurrency:(NSString *)currency
                          amount:(NSNumber *)amount
                     networkName:(NSString *)networkName {
-    if (virtualCurrencyDidSpendCallback) {
-        virtualCurrencyDidSpendCallback(virtualCurrencyHandle, [networkName UTF8String], [currency UTF8String], [amount doubleValue]);
-    }
+    [AMRSDKPlugin sendUnityEvent:@"VirtualCurrencyDidSpendEvent" params:@[networkName, currency, @(amount.doubleValue)]];
 }
 
 @end
@@ -711,9 +698,7 @@ static int trackPurchaseHandle;
 @implementation TrackPurchaseResponseDelegateWrapper
 
 - (void)trackPurchaseResponse:(NSString *)identifier status:(AMRTrackPurchaseResponseStatus)status {
-    if (trackPurchaseResponseCallback) {
-        trackPurchaseResponseCallback(trackPurchaseHandle, [identifier UTF8String], (int)status);
-    }
+    [AMRSDKPlugin sendUnityEvent:@"TrackPurchaseResponseEvent" params:@[identifier, @((int)status)]];
 }
 
 @end
@@ -722,11 +707,7 @@ extern "C"
 {
 #pragma mark - SDK
     void _startWithAppId(const char* appId) {
-        [AMRSDKPlugin startWithAppId:CreateNSString(appId) completion:^(AMRError * _Nullable error) {
-            if (sdkDidInitializeCallback) {
-                sdkDidInitializeCallback(sdkDidInitializeHandle, error == nil, "");
-            }
-        }];
+        [AMRSDKPlugin startWithAppId:CreateNSString(appId)];
     }
     
     void _startTestSuite(const char* zoneIds) {
@@ -779,10 +760,6 @@ extern "C"
         [AMRSDKPlugin setUserChild:userChild];
     }
 
-    void _setUseHttps(bool isHttps) {
-        [AMRSDKPlugin setUseHttps:isHttps];
-    }
-    
     void _spendVirtualCurrency() {
         [AMRSDKPlugin spendVirtualCurrency];
     }
@@ -925,40 +902,29 @@ extern "C"
     
 #pragma mark - Virtual Currency
     
-    void _setVirtualCurrencyDidSpendCallback(VirtualCurrencyDidSpendCallback cb, int x) {
-        virtualCurrencyDidSpendCallback = cb;
-        
-        virtualCurrencyHandle = x;
+    void _setVirtualCurrencyDidSpendCallback() {
         virtualCurrencyDelegate = [VirtualCurrencyDelegateWrapper new];
         [AMRSDK setVirtualCurrencyDelegate:virtualCurrencyDelegate];
-    }
-
-    void _setSDKInitializeCallback(SDKDidInitializeCallback cb, int x) {
-        sdkDidInitializeCallback = cb;
-        sdkDidInitializeHandle = x;
     }
     
 #pragma mark - Track Purchase
     
-    void _setTrackPurchaseResponseCallback(TrackPurchaseResponseCallback cb, int x) {
-        trackPurchaseResponseCallback = cb;
-        
-        trackPurchaseHandle = x;
+    void _setTrackPurchaseResponseCallback() {
         trackPurchaseResponseDelegate = [TrackPurchaseResponseDelegateWrapper new];
         [AMRSDK setTrackPurchaseResponseDelegate:trackPurchaseResponseDelegate];
     }
     
 #pragma mark - Privacy
     
-    void _setIsGDPRApplicableCallback(IsGDPRApplicableCallback cb, int x) {
+    void _setIsGDPRApplicableCallback() {
         [AMRSDK isGDPRApplicable:^(BOOL isGDPRApplicable) {
-            cb(x, (int)isGDPRApplicable);
+            [AMRSDKPlugin sendUnityEvent:@"IsGdprApplicableEvent" params:@[@((int)isGDPRApplicable)]];
         }];
     }
 
-    void _setPrivacyConsentRequiredCallback(PrivacyConsentRequiredCallback cb, int x) {
+    void _setPrivacyConsentRequiredCallback() {
         [AMRSDK isPrivacyConsentRequired:^(AMRPrivacyConsentStatus consentStatus) {
-            cb(x, (int)consentStatus);
+            [AMRSDKPlugin sendUnityEvent:@"PrivacyConsentRequiredEvent" params:@[@((int)consentStatus)]];
         }];
     }
 

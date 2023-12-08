@@ -5,10 +5,10 @@ namespace AMR
 	public interface IAMRSdk
 	{
         void setApiHttps();
-		void startWithAppId(string appId, bool isUserChild);
-        void startWithAppIdConsent(string appId, string subjectToGDPR, string userConsent, bool isUserChild);
-		void startWithAppIdConsent(string appId, string subjectToGDPR, string subjectToCCPA, string userConsent, bool isUserChild);
-        void startWithAppId(string appId, string subjectToGDPR, string subjectToCCPA, string userConsent, string isUserChild, bool isHuaweiApp);
+		void startWithAppId(string appId, bool isUserChild, string canRequestAds);
+        void startWithAppIdConsent(string appId, string subjectToGDPR, string userConsent, bool isUserChild, string canRequestAds);
+		void startWithAppIdConsent(string appId, string subjectToGDPR, string subjectToCCPA, string userConsent, bool isUserChild, string canRequestAds);
+        void startWithAppId(string appId, string subjectToGDPR, string subjectToCCPA, string userConsent, string isUserChild, bool isHuaweiApp, string canRequestAds);
         void pause();
         void resume();
         void start();
@@ -18,6 +18,7 @@ namespace AMR
         void setUserId(string userId);
         void setAdjustUserId(string adjustUserId);
         void setClientCampaignId(string campaignId);
+        void setCanRequestAds(Boolean canRequestAds);
         string trackPurchase(string uniqueID, double localizedPrice, string isoCurrencyCode);
         string trackIAP(string uniqueID, double localizedPrice, string isoCurrencyCode, string[] tags);
         string trackPurchaseForAmazon(string userId, string receiptId, double localizedPrice, string marketPlace, string isoCurrencyCode);

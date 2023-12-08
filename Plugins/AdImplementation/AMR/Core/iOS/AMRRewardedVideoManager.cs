@@ -24,23 +24,21 @@ namespace AMR.iOS
 
         #region Singleton
         private Dictionary<string, AMRRewardedVideoViewDelegate> delegates = new Dictionary<string, AMRRewardedVideoViewDelegate>();
-        private static AMRRewardedVideoManager instance;
-        public static AMRRewardedVideoManager Instance
+        private static AMRRewardedVideoManager _instance;
+        private static AMRRewardedVideoManager Instance
         {
-            get
-            {
-                if (instance == null)
-                {
+            get {
+                if (_instance == null) {
                     var obj = new GameObject("AMRRewardedVideoManager");
-                    instance = obj.AddComponent<AMRRewardedVideoManager>();
+                    _instance = obj.AddComponent<AMRRewardedVideoManager>();
                 }
-                return instance;
+                return _instance;
             }
         }
 
         private void Awake()
         {
-            if (instance != null)
+            if (_instance != null)
             {
                 Destroy(gameObject);
                 return;

@@ -28,28 +28,28 @@ namespace AMR.Android
 
         }
 
-        public void startWithAppId(string appId, bool isUserChild)
+        public void startWithAppId(string appId, bool isUserChild, string canReqeustAds)
         {
-            startWithAppId(appId, null, null, null, isUserChild ? "1" : "0", false);
+            startWithAppId(appId, null, null, null, isUserChild ? "1" : "0", false, canReqeustAds);
         }
 
-        public void startWithAppIdConsent(string appId, string subjectToGDPR, string userConsent, bool isUserChild)
+        public void startWithAppIdConsent(string appId, string subjectToGDPR, string userConsent, bool isUserChild, string canReqeustAds)
         {
-            startWithAppId(appId, subjectToGDPR, null, userConsent, isUserChild ? "1" : "0", false);
+            startWithAppId(appId, subjectToGDPR, null, userConsent, isUserChild ? "1" : "0", false, canReqeustAds);
 
         }
 
-        public void startWithAppIdConsent(string appId, string subjectToGDPR, string subjectToCCPA, string userConsent, bool isUserChild)
+        public void startWithAppIdConsent(string appId, string subjectToGDPR, string subjectToCCPA, string userConsent, bool isUserChild, string canReqeustAds)
         {
-            startWithAppId(appId, subjectToGDPR, subjectToCCPA, userConsent, isUserChild ? "1":"0", false);
+            startWithAppId(appId, subjectToGDPR, subjectToCCPA, userConsent, isUserChild ? "1":"0", false, canReqeustAds);
         }
 
-        public void startWithAppId(string appId, string subjectToGDPR, string subjectToCCPA, string userConsent, string isUserChild, bool isHuaweiApp)
+        public void startWithAppId(string appId, string subjectToGDPR, string subjectToCCPA, string userConsent, string isUserChild, bool isHuaweiApp, string canReqeustAds)
         {
 
             if (Application.platform == RuntimePlatform.Android)
             {
-                config.Call("initialize", new object[7] { appId, subjectToGDPR, subjectToCCPA, userConsent, isUserChild, isHuaweiApp, isApiHttps });
+                config.Call("initialize", new object[8] { appId, subjectToGDPR, subjectToCCPA, userConsent, isUserChild, isHuaweiApp, isApiHttps, canReqeustAds });
             }
         }
 
@@ -92,6 +92,11 @@ namespace AMR.Android
         public void setClientCampaignId(string campaignId)
         {
             config.Call("setClientCampaignId", new object[1] { campaignId });
+        }
+
+        public void setCanRequestAds(Boolean canRequestAds)
+        {
+            config.Call("setCanRequestAds", new object[1] { canRequestAds });
         }
 
         public string trackPurchase(string uniqueID, double localizedPrice, string isoCurrencyCode)

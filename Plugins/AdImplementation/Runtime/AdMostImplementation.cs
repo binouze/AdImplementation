@@ -108,7 +108,7 @@ namespace com.binouze
                 return;
             IsInit = true;
 
-            Log( $"Initialize debug:{AdImplementation.IsDebug}" );
+            Log( $"Initialize debug:{AdImplementation.IsDebug} ConsentType:{AdImplementation.ConsentType} ConsentResponse:{AdImplementation.ConsentResponse}" );
             
             var config = new AMRSdkConfig();
             
@@ -118,21 +118,24 @@ namespace com.binouze
             config.ApplicationIdAndroid = AppID;
             #endif
 
-            if( !AdImplementation.UserConsentManagedExternaly )
+            /*if( !AdImplementation.UserConsentManagedExternaly )
             {
                 config.CanRequestAds = AdImplementation.IsDebug || AdImplementation.ConsentResponse is "OK" or "NON" ? "1" : "0";
                 config.UserConsent   = AdImplementation.IsDebug || AdImplementation.ConsentResponse == "OK" ? "1" : "0";
-                config.SubjectToGDPR = AdImplementation.ConsentType     == "GDPR" ? "1" : "0";
-                config.SubjectToCCPA = AdImplementation.ConsentResponse == "CCPA" ? "1" : "0";
+                config.SubjectToGDPR = AdImplementation.ConsentType == "GDPR" ? "1" : "0";
+                config.SubjectToCCPA = AdImplementation.ConsentType == "CCPA" ? "1" : "0";
             }
             else
             {
-                // si c'est gere, on appelle l'init apres le popup de consentement donc dans tous les cas on peut request les ads
-                config.CanRequestAds = "1";
-                config.SubjectToGDPR = AdImplementation.ConsentType     == "GDPR" ? "1" : "0";
-                config.SubjectToCCPA = AdImplementation.ConsentResponse == "CCPA" ? "1" : "0";
-                config.UserConsent   = AdImplementation.IsDebug || AdImplementation.ConsentResponse == "OK" ? "1" : "0";
-            }
+                
+            }*/
+            
+            // il faudra absolument gerer le user consent avant l'initialisation
+            config.CanRequestAds = AdImplementation.ConsentResponse is "OK" or "NON" ? "1" : "0";
+            config.SubjectToGDPR = AdImplementation.ConsentType == "GDPR" ? "1" : "0";
+            config.SubjectToCCPA = AdImplementation.ConsentType == "CCPA" ? "1" : "0";
+            config.UserConsent   = AdImplementation.ConsentResponse == "OK" ? "1" : "0";
+            
             config.IsUserChild = "0";
             
             AMRSDK.startWithConfig( config, OnSDKDidInitialize );

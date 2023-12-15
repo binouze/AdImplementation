@@ -575,6 +575,16 @@ namespace com.binouze
         {
             ConsentType = type;
         }
+        
+        /// <summary>
+        /// valid values are "OK", "NON", "UNKNOWN"
+        /// </summary>
+        /// <param name="response"></param>
+        /// <returns></returns>
+        public static void SetPrivacyConsentResponse( string response )
+        {
+            ConsentResponse = response;
+        }
 
         /// <summary>
         /// le type de consentement requis

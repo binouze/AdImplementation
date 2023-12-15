@@ -324,7 +324,7 @@ namespace com.binouze
 
             if( UserConsentManagedExternaly )
             {
-                privacyConsentRequired( "None" );
+                privacyConsentRequired( ConsentType );
             }
             else
             {

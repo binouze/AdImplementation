@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -285,7 +286,6 @@ namespace com.binouze
             MustShowGDPRPopup = mustShowGDPRPopup;
         }
 
-
 //  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████       
 //   
 //            ██ ███    ██ ██ ████████ ██  █████  ██      ██ ███████  █████  ████████ ██  ██████  ███    ██ 
@@ -565,6 +565,16 @@ namespace com.binouze
 //   
 //  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████          
         
+
+        /// <summary>
+        /// valid values are GDPR, CCPA, None
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static void SetPrivacyConsentType( string type )
+        {
+            ConsentType = type;
+        }
 
         /// <summary>
         /// le type de consentement requis

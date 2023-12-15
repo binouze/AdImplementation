@@ -120,9 +120,18 @@ namespace com.binouze
 
             if( !AdImplementation.UserConsentManagedExternaly )
             {
+                config.CanRequestAds = AdImplementation.IsDebug || AdImplementation.ConsentResponse is "OK" or "NON" ? "1" : "0";
                 config.UserConsent   = AdImplementation.IsDebug || AdImplementation.ConsentResponse == "OK" ? "1" : "0";
                 config.SubjectToGDPR = AdImplementation.ConsentType     == "GDPR" ? "1" : "0";
                 config.SubjectToCCPA = AdImplementation.ConsentResponse == "CCPA" ? "1" : "0";
+            }
+            else
+            {
+                // si c'est gere, on appelle l'init apres le popup de consentement donc dans tous les cas on peut request les ads
+                config.CanRequestAds = "1";
+                config.SubjectToGDPR = AdImplementation.ConsentType     == "GDPR" ? "1" : "0";
+                config.SubjectToCCPA = AdImplementation.ConsentResponse == "CCPA" ? "1" : "0";
+                config.UserConsent   = AdImplementation.IsDebug || AdImplementation.ConsentResponse == "OK" ? "1" : "0";
             }
             config.IsUserChild = "0";
             

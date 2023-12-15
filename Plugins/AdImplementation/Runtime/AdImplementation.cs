@@ -583,7 +583,8 @@ namespace com.binouze
         /// <returns></returns>
         public static void SetPrivacyConsentResponse( string response )
         {
-            ConsentResponse = response;
+            SetGDPRStatus( response );
+            //ConsentResponse = response;
         }
 
         /// <summary>

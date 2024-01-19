@@ -6,10 +6,10 @@
 
         <!--meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="YOUR_APP_ID_HERE" /-->
+            android:value="YOUR_APP_ID_HERE" /
         <meta-data
             android:name="applovin.sdk.key"
-            android:value="YOUR_APPLOVIN_SDK_KEY_HERE" />
+            android:value="YOUR_APPLOVIN_SDK_KEY_HERE" />-->
 
     </application>
 

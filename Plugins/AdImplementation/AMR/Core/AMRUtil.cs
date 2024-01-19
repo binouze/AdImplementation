@@ -27,6 +27,13 @@ namespace AMR
                 string.Format("\"{0}\": \"{1}\"", d.Key, string.Join(",", d.Value)));
             return "{" + string.Join(",", entries) + "}";
         }
+        
+        public static string BoolDictionaryToJson(IDictionary<string, bool> dict)
+        {
+            var entries = dict.Select(d =>
+                string.Format("\"{0}\": \"{1}\"", d.Key, string.Join(",", d.Value)));
+            return "{" + string.Join(",", entries) + "}";
+        }
     }
 }
 

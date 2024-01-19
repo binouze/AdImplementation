@@ -25,6 +25,12 @@ namespace AMR.iOS
 
         [DllImport("__Internal")]
         private static extern void _setAdjustUserId(string adjustUserId);
+        
+        [DllImport("__Internal")]
+        private static extern void _setCanRequestAds(bool canRequestAds);
+        
+        [DllImport("__Internal")]
+        private static extern void _setCustomVendors(string jsonParams);
 
         [DllImport("__Internal")]
         private static extern void _setClientCampaignId(string campaignId);
@@ -157,7 +163,8 @@ namespace AMR.iOS
             {
                 _setUserChild(isUserChild);
             }
-            
+
+            setCanRequestAds(canReqeustAds == "1");
             _startWithAppId(appId);
 #endif
         }
@@ -217,7 +224,7 @@ namespace AMR.iOS
             startWithAppIdConsent(appId, subjectToGDPR, subjectToCCPA, userConsent, isUserChild == "1", canReqeustAds);
 #endif
         }
-        
+
         public void startTestSuite(string[] zoneIds)
 		{
 #if UNITY_IOS
@@ -273,7 +280,26 @@ namespace AMR.iOS
 #endif
         }
 
-        public void setCanRequestAds(Boolean canRequestAds)
+        public void setCanRequestAds(bool canRequestAds)
+        {
+#if UNITY_IOS
+            _setCanRequestAds(canRequestAds);
+#endif
+        }
+
+        public void setCustomVendors(Dictionary<string, bool> parameters)
+        {
+#if UNITY_IOS
+            var jsonParams = AMRUtil.BoolDictionaryToJson(parameters);
+            if (jsonParams != null) {
+                _setCustomVendors(jsonParams);
+            } else {
+                Debug.Log("<Admost> Missing custom vendors!");
+            }
+#endif
+        }
+
+        public void setThirdPartyExperiment(string experiment, string group)
         {
 #if UNITY_IOS
             

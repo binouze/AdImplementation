@@ -146,6 +146,8 @@ static NSString* CreateNSString(const char* string) {
             tags:(NSString *)tags;
 + (void)setUserId:(NSString *)userId;
 + (void)setAdjustUserId:(NSString *)adjustUserId;
++ (void)setCanRequestAds:(bool)canRequestAds;
++ (void)setCustomVendors:(NSString *)jsonParams;
 + (void)setClientCampaignId:(NSString *)campaignId;
 + (void)setUserConsent:(bool)consent;
 + (void)subjectToGDPR:(bool)subject;
@@ -272,6 +274,24 @@ static TrackPurchaseResponseDelegateWrapper *trackPurchaseResponseDelegate;
 }
 
 + (void)setAdjustUserId:(NSString *)adjustUserId {}
+
++ (void)setCanRequestAds:(bool)canRequestAds {
+    [AMRSDK canRequestAds:canRequestAds];
+}
+
++ (void)setCustomVendors:(NSString *)jsonParams {
+    if (jsonParams != nil) {
+        NSError *jsonError;
+        NSData *objectData = [jsonParams dataUsingEncoding:NSUTF8StringEncoding];
+        NSDictionary *dictParams = [NSJSONSerialization JSONObjectWithData:objectData
+                                              options:NSJSONReadingMutableContainers
+                                                error:&jsonError];
+        
+        if (jsonError == nil && dictParams != nil) {
+            [AMRSDK setTCFVendors:dictParams];
+        }
+    }
+}
 
 + (void)setClientCampaignId:(NSString *)campaignId {
     [AMRSDK setClientCampaignId:campaignId];
@@ -739,7 +759,15 @@ extern "C"
     void _setAdjustUserId(const char* adjustUserId) {
         [AMRSDKPlugin setAdjustUserId:CreateNSString(adjustUserId)];
     }
-    
+
+    void _setCanRequestAds(bool canRequestAds) {
+        [AMRSDKPlugin setCanRequestAds:canRequestAds];
+    }
+
+    void _setCustomVendors(const char* jsonParams) {
+        [AMRSDKPlugin setCustomVendors:CreateNSString(jsonParams)];
+    }
+
     void _setClientCampaignId(const char* campaignId) {
         [AMRSDKPlugin setClientCampaignId:CreateNSString(campaignId)];
     }

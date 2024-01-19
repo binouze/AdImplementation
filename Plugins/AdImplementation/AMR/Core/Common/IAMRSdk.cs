@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace AMR
 {
@@ -18,7 +19,9 @@ namespace AMR
         void setUserId(string userId);
         void setAdjustUserId(string adjustUserId);
         void setClientCampaignId(string campaignId);
-        void setCanRequestAds(Boolean canRequestAds);
+        void setCanRequestAds(bool canRequestAds);
+        void setCustomVendors(Dictionary<string, bool> parameters);
+        void setThirdPartyExperiment(string experiment, string group);
         string trackPurchase(string uniqueID, double localizedPrice, string isoCurrencyCode);
         string trackIAP(string uniqueID, double localizedPrice, string isoCurrencyCode, string[] tags);
         string trackPurchaseForAmazon(string userId, string receiptId, double localizedPrice, string marketPlace, string isoCurrencyCode);

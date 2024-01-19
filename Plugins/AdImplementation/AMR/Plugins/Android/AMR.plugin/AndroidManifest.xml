@@ -4,16 +4,12 @@
     <!-- Androidx+ multidex, put inside application tag : android:name="androidx.multidex.MultiDexApplication" -->
     <application>
 
-        <!--
-        TODO  CRITICAL: You need to uncomment it and add your  admob app id.
-        <meta-data
-                android:name="com.google.android.gms.ads.APPLICATION_ID"
-                android:value="ADMOB_APP_ID"/>-->
-		
-        <!-- APPLOVIN 
+        <!--meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="YOUR_APP_ID_HERE" /-->
         <meta-data
             android:name="applovin.sdk.key"
-            android:value="YOUR_APPLOVIN_SDK_KEY_HERE" />-->
+            android:value="YOUR_APPLOVIN_SDK_KEY_HERE" />
 
     </application>
 

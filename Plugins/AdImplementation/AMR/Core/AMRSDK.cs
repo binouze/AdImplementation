@@ -7,7 +7,7 @@ namespace AMR
 {
 	public class AMRSDK
 	{
-        public const string AMR_PLUGIN_VERSION = "1.7.7"; 
+        public const string AMR_PLUGIN_VERSION = "1.7.8"; 
 	    
 	    public delegate void VirtualCurrencyDelegateDidSpend(string network, string currency, double amount);
         public delegate void SDKInitializeDelegateDidInitialize(bool isInitialized, string errorMessage);
@@ -306,6 +306,16 @@ namespace AMR
 
         public static string trackIAPForAndroid(string receipt, decimal localizedPrice, string isoCurrencyCode, string[] tags)
         {
+            if (!initialized())
+            {
+                Instance.create();
+            }
+
+            if (Instance.AMRSdk == null)
+            {
+                return "";
+            }
+
             if (receipt == null ||
                 receipt.Equals("") ||
                 isoCurrencyCode == null ||
@@ -336,6 +346,16 @@ namespace AMR
 
         public static string trackIAPForHuawei(string receipt, string signature, string[] tags)
         {
+            if (!initialized())
+            {
+                Instance.create();
+            }
+
+            if (Instance.AMRSdk == null)
+            {
+                return "";
+            }
+
             if (receipt == null ||
                 receipt.Equals("") ||
                 signature == null ||
@@ -431,12 +451,42 @@ namespace AMR
 			
 		}
 
-        public static void setCanRequestAds(Boolean canRequestAds)
+        public static void setCanRequestAds(bool canRequestAds)
         {
             if (initialized())
             {
                 Instance.AMRSdk.setCanRequestAds(canRequestAds);
-               
+            }
+            else
+            {
+                AMRUtil.Log("AMRSDK has not been initialized.");
+            }
+        }
+
+        public static void setCustomVendors(Dictionary<string, bool> parameters)
+        {
+            if (initialized())
+            {
+                Instance.AMRSdk.setCustomVendors(parameters);
+            }
+            else
+            {
+                AMRUtil.Log("AMRSDK has not been initialized.");
+            }
+        }
+
+        public static void setThirdPartyExperiment(string experiment, string group)
+        {
+            if (initialized())
+            {
+                if (!String.IsNullOrEmpty(experiment) && !String.IsNullOrEmpty(group))
+                {
+                    Instance.AMRSdk.setThirdPartyExperiment(experiment, group);
+                }
+                else
+                {
+                    //AMRUtil.Log("campaignId is null or empty!");
+                }
             }
             else
             {
@@ -444,6 +494,7 @@ namespace AMR
             }
 
         }
+
 
         public static void spendVirtualCurrency()
 	    {

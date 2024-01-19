@@ -99,6 +99,18 @@ namespace AMR.Android
             config.Call("setCanRequestAds", new object[1] { canRequestAds });
         }
 
+        public void setCustomVendors(Dictionary<string, bool> parameters)
+        {
+            AndroidJavaObject javaMap = CreateJavaMapFromDictainary(parameters);
+            config.Call("setCustomVendors", javaMap);
+        }
+
+        public void setThirdPartyExperiment(string experiment, string group)
+        {
+            config.Call("setThirdPartyExperiment", new object[2] { experiment, group});
+        }
+
+
         public string trackPurchase(string uniqueID, double localizedPrice, string isoCurrencyCode)
 		{
             /* uniqueID = receipt for android */
@@ -221,6 +233,34 @@ namespace AMR.Android
         public void setApiHttps()
         {
             isApiHttps = true;
+        }
+
+        private AndroidJavaObject CreateJavaMapFromDictainary(IDictionary<string, bool> parameters)
+        {
+            AndroidJavaObject javaMap = new AndroidJavaObject("java.util.HashMap");
+            IntPtr putMethod = AndroidJNIHelper.GetMethodID(
+                javaMap.GetRawClass(), "put",
+                    "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
+
+            object[] args = new object[2];
+            foreach (KeyValuePair<string, bool> kvp in parameters)
+            {
+
+                using (AndroidJavaObject k = new AndroidJavaObject(
+                    "java.lang.String", kvp.Key))
+                {
+                    using (AndroidJavaObject v = new AndroidJavaObject(
+                        "java.lang.Boolean", kvp.Value))
+                    {
+                        args[0] = k;
+                        args[1] = v;
+                        AndroidJNI.CallObjectMethod(javaMap.GetRawObject(),
+                                putMethod, AndroidJNIHelper.CreateJNIArgArray(args));
+                    }
+                }
+            }
+
+            return javaMap;
         }
 
     }

@@ -586,6 +586,16 @@ namespace com.binouze
             SetGDPRStatus( response );
             //ConsentResponse = response;
         }
+        
+        /// <summary>
+        /// set the canRequestAd for AdMob
+        /// </summary>
+        /// <param name="canRequestAd"></param>
+        /// <returns></returns>
+        public static void SetCanRequestAd( bool canRequestAd )
+        {
+            AMRSDK.setCanRequestAds( canRequestAd );
+        }
 
         /// <summary>
         /// le type de consentement requis

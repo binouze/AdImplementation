@@ -8,11 +8,12 @@ namespace com.binouze
         public void SetIds( string appID, List<string> rewardedId, List<string> interstitialId );
         public void Initialize();
         public void SetUserID( string id );
+        public void SetCanRequestAds( bool canRequestAd );
         
-        public bool HasRewardedAvailable( string     zoneID = null );
+        public bool HasRewardedAvailable( string zoneID = null );
         public bool HasInterstitialAvailable( string zoneID = null );
-        public bool HasRewardedLoading( string       zoneID = null );
-        public bool HasInterstitialLoading( string   zoneID = null );
+        public bool HasRewardedLoading( string zoneID = null );
+        public bool HasInterstitialLoading( string zoneID = null );
         public bool IsAdSupported();
 
         public void LoadInterstitial( string zoneID = null );

@@ -88,6 +88,19 @@ namespace com.binouze
             AMRSDK.startTestSuite( ids.ToArray() );
         }
 
+        private bool? CanRequestAds;
+        /// <summary>
+        /// set the canRequestAd for AdMob
+        /// </summary>
+        /// <param name="canRequestAd"></param>
+        /// <returns></returns>
+        public void SetCanRequestAds( bool canRequestAd )
+        {
+            CanRequestAds = canRequestAd;
+            if( IsInitComplete )
+                AMRSDK.setCanRequestAds( canRequestAd );
+        }
+        
 //  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████       
 //   
 //            ██ ███    ██ ██ ████████ ██  █████  ██      ██ ███████  █████  ████████ ██  ██████  ███    ██ 
@@ -179,6 +192,9 @@ namespace com.binouze
                 if( !string.IsNullOrEmpty(AdImplementation.UserId) )
                     AMRSDK.setUserId(AdImplementation.UserId);
 
+                if( CanRequestAds != null )
+                    AMRSDK.setCanRequestAds( CanRequestAds == true );
+                
                 // if we want to auto load the placements,
                 // start loading now
                 if( AdImplementation.AutoLoadAds )

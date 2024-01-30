@@ -94,11 +94,18 @@ namespace com.binouze
         /// </summary>
         /// <param name="canRequestAd"></param>
         /// <returns></returns>
-        public void SetCanRequestAds( bool canRequestAd )
+        public void SetCanRequestAds( bool canRequestAds )
         {
-            CanRequestAds = canRequestAd;
+            CanRequestAds = canRequestAds;
             if( IsInitComplete )
-                AMRSDK.setCanRequestAds( canRequestAd );
+            {
+                Log( $"SetCansRequestAds {canRequestAds}" );
+                AMRSDK.setCanRequestAds( canRequestAds );
+            }
+            else
+            {
+                Log( $"SetCansRequestAds {canRequestAds} WAIT FOR INIT" );
+            }
         }
         
 //  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████       
@@ -193,7 +200,10 @@ namespace com.binouze
                     AMRSDK.setUserId(AdImplementation.UserId);
 
                 if( CanRequestAds != null )
+                {
+                    Log( $"SetCansRequestAds after init complete {CanRequestAds}" );
                     AMRSDK.setCanRequestAds( CanRequestAds == true );
+                }
                 
                 // if we want to auto load the placements,
                 // start loading now

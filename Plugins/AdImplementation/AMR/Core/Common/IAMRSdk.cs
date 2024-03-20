@@ -33,6 +33,7 @@ namespace AMR
         void setGDPRDelegate(AMRGDPRDelegate delegateObject);
         void setPrivacyConsentDelegate(AMRPrivacyConsentDelegate delegateObject);
         void setUnityMainThread();
-    }
+        int getDeviceScore();
+	}
 }
 

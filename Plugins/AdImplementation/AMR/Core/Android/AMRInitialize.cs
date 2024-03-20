@@ -230,6 +230,10 @@ namespace AMR.Android
             config.Call("setUnityMainThread");
         }
 
+        public int getDeviceScore() {
+            return config.Call<int>("getDeviceScore");
+        }
+
         public void setApiHttps()
         {
             isApiHttps = true;

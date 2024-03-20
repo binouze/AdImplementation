@@ -382,6 +382,10 @@ namespace AMR.iOS
 
         public string trackIAPForHuawei(string uniqueID, string signature, string[] tags) { return ""; }
         public void setUnityMainThread() { }
+        public int getDeviceScore() {
+            return 100;
+        }
+
         public void pause() { }
         public void resume() { }
 

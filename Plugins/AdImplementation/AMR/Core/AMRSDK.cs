@@ -7,7 +7,7 @@ namespace AMR
 {
 	public class AMRSDK
 	{
-        public const string AMR_PLUGIN_VERSION = "1.7.8"; 
+        public const string AMR_PLUGIN_VERSION = "1.7.9"; 
 	    
 	    public delegate void VirtualCurrencyDelegateDidSpend(string network, string currency, double amount);
         public delegate void SDKInitializeDelegateDidInitialize(bool isInitialized, string errorMessage);
@@ -233,6 +233,15 @@ namespace AMR
             else
             {
                 AMRUtil.Log("AMRSDK only supports Android and iOS platforms.");
+            }
+        }
+
+        public static int getDeviceScore() {
+            if (Application.platform == RuntimePlatform.Android) {
+                if (Instance.AMRSdk == null) Instance.AMRSdk = new Android.AMRInitialize();
+                return Instance.AMRSdk.getDeviceScore();
+            } else {
+                return 100;
             }
         }
 

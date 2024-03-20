@@ -603,6 +603,10 @@
         	</dict>
         	<dict>
         		<key>SKAdNetworkIdentifier</key>
+        		<string>6yxyv74ff7.skadnetwork</string>
+        	</dict>
+        	<dict>
+        		<key>SKAdNetworkIdentifier</key>
         		<string>7953jerfzd.skadnetwork</string>
         	</dict>
         	<dict>

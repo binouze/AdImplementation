@@ -1,13 +1,11 @@
 <dependencies>
 	<iosPods>
 		<iosPod name="AMRSDK" version="~> 1.5" minTargetSdk="8.0"/>
-		<iosPod name="AMRAdapterAdcolony" version="~> 4.9" minTargetSdk="9.0"/>
 		<iosPod name="AMRAdapterAdmob" version="~> 11.1" minTargetSdk="12.0"/>
 		<iosPod name="AMRAdapterApplovin" version="~> 12.3" minTargetSdk="9.0"/>
 		<iosPod name="AMRAdapterChartboost" version="~> 9.7" minTargetSdk="11.0"/>
 		<iosPod name="AMRAdapterUnity" version="~> 4.9" minTargetSdk="9.0"/>
 		<iosPod name="AMRAdapterVungle" version="~> 7.2" minTargetSdk="10.0"/>
-
 	</iosPods>
 	<androidPackages>
 		<androidPackage spec="com.admost.sdk:amr:2.9.7"/>
@@ -17,7 +15,6 @@
 		<androidPackage spec="androidx.lifecycle:lifecycle-common:2.1.0"/>
 		<androidPackage spec="com.admost.sdk:unity-plugin:2.0.2"/>
 		<androidPackage spec="com.google.android.gms:play-services-ads-identifier:17.0.0"/>
-		<androidPackage spec="com.admost.sdk:adcolony-adapter:4.8.0.a44"/>
 		<androidPackage spec="com.google.android.gms:play-services-ads:23.0.0"/>
 		<androidPackage spec="com.admost.sdk:admob-adapter:23.0.0.a44"/>
 		<androidPackage spec="com.admost.sdk:applovin-adapter:12.1.0.a44"/>

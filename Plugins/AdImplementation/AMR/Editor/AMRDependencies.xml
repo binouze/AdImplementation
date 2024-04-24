@@ -2,10 +2,10 @@
 	<iosPods>
 		<iosPod name="AMRSDK" version="~> 1.5" minTargetSdk="8.0"/>
 		<iosPod name="AMRAdapterAdmob" version="~> 11.2" minTargetSdk="12.0"/>
-		<iosPod name="AMRAdapterApplovin" version="~> 12.4.0" minTargetSdk="9.0"/>
+		<iosPod name="AMRAdapterApplovin" version="~> 12.4" minTargetSdk="9.0"/>
 		<iosPod name="AMRAdapterChartboost" version="~> 9.7" minTargetSdk="11.0"/>
+		<iosPod name="AMRAdapterLiftoff" version="~> 7.3" minTargetSdk="10.0"/>
 		<iosPod name="AMRAdapterUnity" version="~> 4.10" minTargetSdk="9.0"/>
-		<iosPod name="AMRAdapterVungle" version="~> 7.3" minTargetSdk="10.0"/>
 	</iosPods>
 	<androidPackages>
 		<androidPackage spec="androidx.arch.core:core-common:2.1.0"/>
@@ -19,13 +19,13 @@
 		<androidPackage spec="com.google.android.gms:play-services-tasks:18.0.1"/>
 		<androidPackage spec="com.google.android.gms:play-services-appset:16.0.2"/>
 
-		<androidPackage spec="com.admost.sdk:amr:2.9.7"/>
+		<androidPackage spec="com.admost.sdk:amr:2.9.8"/>
 		<androidPackage spec="com.admost.sdk:unity-plugin:2.0.2"/>
 		<androidPackage spec="com.admost.sdk:admob-adapter:23.0.0.a44"/>
-		<androidPackage spec="com.admost.sdk:applovin-adapter:12.1.0.a44"/>
-		<androidPackage spec="com.admost.sdk:chartboost-adapter:9.6.1.a44"/>
-		<androidPackage spec="com.admost.sdk:vungle-adapter:7.1.0.a44"/>
-		<androidPackage spec="com.admost.sdk:unity-adapter:4.9.2.2.a44"/>
+		<androidPackage spec="com.admost.sdk:applovin-adapter:12.3.1.a44"/>
+		<androidPackage spec="com.admost.sdk:chartboost-adapter:9.7.0.a44"/>
+		<androidPackage spec="com.admost.sdk:vungle-adapter:7.3.0.a44"/>
+		<androidPackage spec="com.admost.sdk:unity-adapter:4.10.0.a44"/>
 		<repositories>
 			<repository>https://mvn-repo.admost.com/artifactory/amr-2</repository>
 			<repository>https://cboost.jfrog.io/artifactory/chartboost-ads/</repository>

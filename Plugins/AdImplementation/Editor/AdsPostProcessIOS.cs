@@ -1,9 +1,13 @@
 #if UNITY_IOS
 using System;
 using System.IO;
+using System.Linq;
+using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
+using UnityEditor.Callbacks;
 using UnityEditor.iOS.Xcode;
+using UnityEditor.iOS.Xcode.Extensions;
 using UnityEngine;
 
 namespace com.binouze
@@ -140,6 +144,74 @@ namespace com.binouze
             }
 
             return false;
+        }
+
+        
+        // CAS SPECIAL POUR APPLOVIN QUI A MIS SON SDK EN DYNAMIC LINKING ET QUI CASSE TOUT EN STATIC LINKING
+
+        private const string TargetUnityIphonePodfileLine    = "target 'Unity-iPhone' do";
+        private const string UseFrameworksPodfileLine        = "use_frameworks!";
+        private const string UseFrameworksDynamicPodfileLine = "use_frameworks! :linkage => :dynamic";
+        private const string UseFrameworksStaticPodfileLine  = "use_frameworks! :linkage => :static";
+        private const string AppLovinSDKFramework            = "AppLovinSDK.xcframework";
+        
+        [PostProcessBuild(int.MaxValue)] // on fait ca a la toute fin de la build
+        private static void EndOfBuild(BuildTarget buildTarget, string buildPath)
+        {
+            // Check that the Pods directory exists (it might not if a publisher is building with Generate Podfile setting disabled in EDM).
+            var podsDirectory = Path.Combine(buildPath, "Pods");
+            if( !Directory.Exists(podsDirectory) || !ShouldEmbedDynamicLibraries( buildPath ) ) 
+                return;
+            
+            Debug.Log( $"[AdImplementation] Embedding {AppLovinSDKFramework} to UnityMainTarget" );
+            
+            var projectPath = PBXProject.GetPBXProjectPath(buildPath);
+            var project     = new PBXProject();
+            project.ReadFromFile(projectPath);
+            
+            var unityMainTargetGuid = project.GetUnityMainTargetGuid();
+            
+            var fileGuid = project.AddFile(AppLovinSDKFramework, AppLovinSDKFramework);
+            project.AddFileToEmbedFrameworks(unityMainTargetGuid, fileGuid);
+        }
+
+        /// <summary>
+        /// |-----------------------------------------------------------------------------------------------------------------------------------------------------|
+        /// |         embed             |  use_frameworks! (:linkage => :dynamic)  |  use_frameworks! :linkage => :static  |  `use_frameworks!` line not present  |
+        /// |---------------------------|------------------------------------------|---------------------------------------|--------------------------------------|
+        /// | Unity-iPhone present      | Do not embed dynamic libraries           | Embed dynamic libraries               | Do not embed dynamic libraries       |
+        /// | Unity-iPhone not present  | Embed dynamic libraries                  | Embed dynamic libraries               | Embed dynamic libraries              |
+        /// |-----------------------------------------------------------------------------------------------------------------------------------------------------|
+        /// </summary>
+        /// <param name="buildPath">An iOS build path</param>
+        /// <returns>Whether or not the dynamic libraries should be embedded.</returns>
+        private static bool ShouldEmbedDynamicLibraries( string buildPath )
+        {
+            var podfilePath = Path.Combine( buildPath, "Podfile" );
+            if( !File.Exists( podfilePath ) )
+                return false;
+
+            // If the Podfile doesn't have a `Unity-iPhone` target, we should embed the dynamic libraries.
+            var lines                     = File.ReadAllLines( podfilePath );
+            var containsUnityIphoneTarget = lines.Any( line => line.Contains( TargetUnityIphonePodfileLine ) );
+            if( !containsUnityIphoneTarget )
+                return true;
+
+            // If the Podfile does not have a `use_frameworks! :linkage => static` line, we should not embed the dynamic libraries.
+            var useFrameworksStaticLineIndex =
+                Array.FindIndex( lines, line => line.Contains( UseFrameworksStaticPodfileLine ) );
+            if( useFrameworksStaticLineIndex == -1 ) 
+                return false;
+
+            // If more than one of the `use_frameworks!` lines are present, CocoaPods will use the last one.
+            var useFrameworksLineIndex =
+                Array.FindIndex( lines, line => line.Trim() == UseFrameworksPodfileLine ); // Check for exact line to avoid matching `use_frameworks! :linkage => static/dynamic`
+            var useFrameworksDynamicLineIndex =
+                Array.FindIndex( lines, line => line.Contains( UseFrameworksDynamicPodfileLine ) );
+
+            // Check if `use_frameworks! :linkage => :static` is the last line of the three. If it is, we should embed the dynamic libraries.
+            return useFrameworksLineIndex        < useFrameworksStaticLineIndex &&
+                   useFrameworksDynamicLineIndex < useFrameworksStaticLineIndex;
         }
     }
 }

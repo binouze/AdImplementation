@@ -1,4 +1,4 @@
-#if UNITY_IOS
+#if UNITY_IOS || true
 using System;
 using System.IO;
 using System.Linq;
@@ -171,7 +171,18 @@ namespace com.binouze
             
             var unityMainTargetGuid = project.GetUnityMainTargetGuid();
             
-            var fileGuid = project.AddFile(AppLovinSDKFramework, AppLovinSDKFramework);
+            // find the AppLovinSDK framework into Pods directory
+            
+            // both .framework and .xcframework are directories, not files
+            var directories = Directory.GetDirectories(podsDirectory, AppLovinSDKFramework, SearchOption.AllDirectories);
+            if( directories.Length <= 0 )
+                return;
+
+            var dynamicLibraryAbsolutePath       = directories[0];
+            var index                            = dynamicLibraryAbsolutePath.LastIndexOf("Pods", StringComparison.Ordinal );
+            var AppLovinSDKFrameworkRelativePath = dynamicLibraryAbsolutePath[index..];
+            
+            var fileGuid = project.AddFile(AppLovinSDKFrameworkRelativePath, AppLovinSDKFrameworkRelativePath);
             project.AddFileToEmbedFrameworks(unityMainTargetGuid, fileGuid);
         }
 

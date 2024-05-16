@@ -1,4 +1,4 @@
-#if UNITY_IOS //|| true
+#if UNITY_IOS || true
 using System;
 using System.IO;
 using System.Linq;
@@ -188,7 +188,10 @@ namespace com.binouze
             var fileGuid = project.AddFile(AppLovinSDKFrameworkRelativePath, AppLovinSDKFrameworkRelativePath);
             project.AddFileToEmbedFrameworks(unityMainTargetGuid, fileGuid);
             
-            Debug.Log( $"[AdImplementation] file added with GUID:{fileGuid}" );
+            // save edited project
+            project.WriteToFile(projectPath);
+            
+            Debug.Log( $"[AdImplementation] file:{AppLovinSDKFrameworkRelativePath} added with GUID:{fileGuid}" );
         }
 
         /// <summary>

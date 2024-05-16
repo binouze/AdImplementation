@@ -1,4 +1,4 @@
-#if UNITY_IOS || true
+#if UNITY_IOS //|| true
 using System;
 using System.IO;
 using System.Linq;
@@ -163,7 +163,17 @@ namespace com.binouze
             if( !Directory.Exists(podsDirectory) || !ShouldEmbedDynamicLibraries( buildPath ) ) 
                 return;
             
-            Debug.Log( $"[AdImplementation] Embedding {AppLovinSDKFramework} to UnityMainTarget" );
+            Debug.Log( $"[AdImplementation] try embedding {AppLovinSDKFramework} to UnityMainTarget" );
+            
+            // find the AppLovinSDK framework into Pods directory
+            
+            // both .framework and .xcframework are directories, not files
+            var directories = Directory.GetDirectories(podsDirectory, AppLovinSDKFramework, SearchOption.AllDirectories);
+            if( directories.Length <= 0 )
+            {
+                Debug.LogError( $"[AdImplementation] Framework:{AppLovinSDKFramework} not found in Pods directory:{podsDirectory}" );
+                return;
+            }
             
             var projectPath = PBXProject.GetPBXProjectPath(buildPath);
             var project     = new PBXProject();
@@ -171,19 +181,14 @@ namespace com.binouze
             
             var unityMainTargetGuid = project.GetUnityMainTargetGuid();
             
-            // find the AppLovinSDK framework into Pods directory
-            
-            // both .framework and .xcframework are directories, not files
-            var directories = Directory.GetDirectories(podsDirectory, AppLovinSDKFramework, SearchOption.AllDirectories);
-            if( directories.Length <= 0 )
-                return;
-
             var dynamicLibraryAbsolutePath       = directories[0];
             var index                            = dynamicLibraryAbsolutePath.LastIndexOf("Pods", StringComparison.Ordinal );
             var AppLovinSDKFrameworkRelativePath = dynamicLibraryAbsolutePath[index..];
             
             var fileGuid = project.AddFile(AppLovinSDKFrameworkRelativePath, AppLovinSDKFrameworkRelativePath);
             project.AddFileToEmbedFrameworks(unityMainTargetGuid, fileGuid);
+            
+            Debug.Log( $"[AdImplementation] file added with GUID:{fileGuid}" );
         }
 
         /// <summary>

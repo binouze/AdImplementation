@@ -1,4 +1,4 @@
-#if UNITY_IOS || true
+#if UNITY_IOS //|| true
 using System;
 using System.IO;
 using System.Linq;

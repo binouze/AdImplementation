@@ -39,11 +39,11 @@ namespace com.binouze
             
             // APP LOVIN
             
-            var appLovinSDKKey = instance.AppLovinSDKKey;
+            /*var appLovinSDKKey = instance.AppLovinSDKKey;
             if( !string.IsNullOrEmpty( appLovinSDKKey ) )
             {
                 plist.root.SetString("AppLovinSdkKey", appLovinSDKKey);
-            }
+            }*/
             
             // AD COLONY
             

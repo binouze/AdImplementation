@@ -7,7 +7,7 @@ namespace AMR
 {
 	public class AMRSDK
 	{
-        public const string AMR_PLUGIN_VERSION = "1.7.9"; 
+        public const string AMR_PLUGIN_VERSION = "1.8.0"; 
 	    
 	    public delegate void VirtualCurrencyDelegateDidSpend(string network, string currency, double amount);
         public delegate void SDKInitializeDelegateDidInitialize(bool isInitialized, string errorMessage);
@@ -149,9 +149,12 @@ namespace AMR
             create();
             setOnSDKDidInitialize(onDidInitializeDelegate);
 
-            if (Instance != null && Instance.Config != null && Instance.Config.IsApiHttps)
+            if (Instance != null && Instance.Config != null)
             {
-                AMRSdk.setApiHttps();
+                if (Instance.Config.IsApiHttps)
+                    AMRSdk.setApiHttps();
+                if (Instance.Config.DisableAppharbr)
+                    AMRSdk.disableAppharbr();
             }
 
             if (Application.platform == RuntimePlatform.IPhonePlayer) 
@@ -169,9 +172,12 @@ namespace AMR
             create();
             setOnSDKDidInitialize(onDidInitializeDelegate);
 
-            if (Instance != null && Instance.Config != null && Instance.Config.IsApiHttps)
+            if (Instance != null && Instance.Config != null)
             {
-                AMRSdk.setApiHttps();
+                if (Instance.Config.IsApiHttps)
+                    AMRSdk.setApiHttps();
+                if (Instance.Config.DisableAppharbr)
+                    AMRSdk.disableAppharbr();
             }
 
             if (Application.platform == RuntimePlatform.IPhonePlayer)

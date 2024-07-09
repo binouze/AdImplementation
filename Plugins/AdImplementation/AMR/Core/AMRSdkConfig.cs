@@ -23,5 +23,6 @@ namespace AMR
         public string IsUserChild;
         public bool IsHuaweiApp;
         public bool IsApiHttps;
+        public bool DisableAppharbr;
     }
 }

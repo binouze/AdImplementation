@@ -16,6 +16,7 @@ namespace AMR.Android
         private AMRPlugin.Android.AMRRemoteConfigListener rcListener;
         private AMRPlugin.Android.AMRInitializeListener initListener;
         private bool isApiHttps;
+        private bool disabledAppharbr;
 
         public AMRInitialize()
         {
@@ -49,7 +50,7 @@ namespace AMR.Android
 
             if (Application.platform == RuntimePlatform.Android)
             {
-                config.Call("initialize", new object[8] { appId, subjectToGDPR, subjectToCCPA, userConsent, isUserChild, isHuaweiApp, isApiHttps, canReqeustAds });
+                config.Call("initialize", new object[9] { appId, subjectToGDPR, subjectToCCPA, userConsent, isUserChild, isHuaweiApp, isApiHttps, canReqeustAds, disabledAppharbr });
             }
         }
 
@@ -239,6 +240,11 @@ namespace AMR.Android
             isApiHttps = true;
         }
 
+        public void disableAppharbr()
+        {
+            disabledAppharbr = true;
+        }
+
         private AndroidJavaObject CreateJavaMapFromDictainary(IDictionary<string, bool> parameters)
         {
             AndroidJavaObject javaMap = new AndroidJavaObject("java.util.HashMap");
@@ -266,7 +272,6 @@ namespace AMR.Android
 
             return javaMap;
         }
-
     }
 
 }

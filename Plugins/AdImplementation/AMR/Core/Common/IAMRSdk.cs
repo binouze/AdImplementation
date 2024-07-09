@@ -5,6 +5,7 @@ namespace AMR
 {
 	public interface IAMRSdk
 	{
+        void disableAppharbr();
         void setApiHttps();
 		void startWithAppId(string appId, bool isUserChild, string canRequestAds);
         void startWithAppIdConsent(string appId, string subjectToGDPR, string userConsent, bool isUserChild, string canRequestAds);

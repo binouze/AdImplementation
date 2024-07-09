@@ -1,31 +1,31 @@
 <dependencies>
 	<iosPods>
 		<iosPod name="AMRSDK" version="~> 1.5" minTargetSdk="8.0"/>
-		<iosPod name="AMRAdapterAdmob" version="~> 11.4" minTargetSdk="12.0"/>
+		<iosPod name="AMRAdapterAdmob" version="~> 11.5" minTargetSdk="12.0"/>
 		<iosPod name="AMRAdapterApplovin" version="~> 12.5" minTargetSdk="9.0"/>
 		<iosPod name="AMRAdapterChartboost" version="~> 9.7" minTargetSdk="11.0"/>
 		<iosPod name="AMRAdapterLiftoff" version="~> 7.3" minTargetSdk="10.0"/>
-		<iosPod name="AMRAdapterUnity" version="~> 4.11" minTargetSdk="9.0"/>
+		<iosPod name="AMRAdapterUnity" version="~> 4.12" minTargetSdk="9.0"/>
 	</iosPods>
 	<androidPackages>
+		<androidPackage spec="com.admost.sdk:amr:3.0.4"/>
+		<androidPackage spec="com.google.android.gms:play-services-base:17.1.0"/>
 		<androidPackage spec="androidx.arch.core:core-common:2.1.0"/>
 		<androidPackage spec="androidx.arch.core:core-runtime:2.1.0"/>
 		<androidPackage spec="androidx.lifecycle:lifecycle-common:2.1.0"/>
-		<androidPackage spec="androidx.appcompat:appcompat:1.3.0"/>
-		
-		<androidPackage spec="com.google.android.gms:play-services-base:17.1.0"/>
+		<androidPackage spec="com.admost.sdk:unity-plugin:2.0.3"/>
+		<androidPackage spec="com.google.android.gms:play-services-ads-identifier:17.0.0"/>
 		<androidPackage spec="com.google.android.gms:play-services-ads:23.0.0"/>
+		<androidPackage spec="com.admost.sdk:admob-adapter:23.0.0.a47"/>
+		<androidPackage spec="com.admost.sdk:applovin-adapter:12.5.0.a47"/>
+		<androidPackage spec="com.admost.sdk:chartboost-adapter:9.7.0.a47"/>
+		<androidPackage spec="com.google.android.gms:play-services-ads-identifier:18.0.1"/>
+		<androidPackage spec="com.admost.sdk:vungle-adapter:7.3.1.1.a47"/>
+		<androidPackage spec="androidx.appcompat:appcompat:1.3.0"/>
 		<androidPackage spec="com.google.android.gms:play-services-ads-identifier:18.0.1"/>
 		<androidPackage spec="com.google.android.gms:play-services-tasks:18.0.1"/>
 		<androidPackage spec="com.google.android.gms:play-services-appset:16.0.2"/>
-
-		<androidPackage spec="com.admost.sdk:amr:2.9.9"/>
-		<androidPackage spec="com.admost.sdk:unity-plugin:2.0.2"/>
-		<androidPackage spec="com.admost.sdk:admob-adapter:23.0.0.a47"/>
-		<androidPackage spec="com.admost.sdk:applovin-adapter:12.3.1.a47"/>
-		<androidPackage spec="com.admost.sdk:chartboost-adapter:9.7.0.a47"/>
-		<androidPackage spec="com.admost.sdk:vungle-adapter:7.3.1.1.a47"/>
-		<androidPackage spec="com.admost.sdk:unity-adapter:4.10.0.a47"/>
+		<androidPackage spec="com.admost.sdk:unity-adapter:4.11.3.a47"/>
 		<repositories>
 			<repository>https://mvn-repo.admost.com/artifactory/amr-2</repository>
 			<repository>https://cboost.jfrog.io/artifactory/chartboost-ads/</repository>

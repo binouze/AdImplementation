@@ -393,5 +393,6 @@ namespace AMR.iOS
         public void stop() { }
         public void destroy() { }
         public void setApiHttps() { }
+        public void disableAppharbr() { }
     }
 }

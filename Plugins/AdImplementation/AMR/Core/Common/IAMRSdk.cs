@@ -35,6 +35,7 @@ namespace AMR
         void setPrivacyConsentDelegate(AMRPrivacyConsentDelegate delegateObject);
         void setUnityMainThread();
         int getDeviceScore();
-	}
+        void trackAdmobMediationRevenue(string adFormat, double revenue, string placementId, string adUnitId);
+    }
 }
 

@@ -2,6 +2,7 @@
 using UnityEngine;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
+using System.Xml;
 
 namespace AMR.Android
 {
@@ -271,6 +272,21 @@ namespace AMR.Android
             }
 
             return javaMap;
+        }
+
+        public void trackAdmobMediationRevenue(string adFormat, double revenue, string placementId, string adUnitId)
+        {
+            /* uniqueID = receipt for android */
+            AMRUtil.Log("ADMOST trackAdmobMediationRevenue AMRInitilize called;");
+            string[] paramArray = new string[4];
+            paramArray[0] = adFormat;
+            paramArray[1] = revenue + "";
+            paramArray[2] = placementId;
+            paramArray[3] = adUnitId;
+
+            AMRUtil.Log("adFormat =" + adFormat+ " revenue= " + revenue + "placementId = " + placementId);
+
+            config.Call("trackAdmobMediationRevenue", new object[1] { paramArray });
         }
     }
 

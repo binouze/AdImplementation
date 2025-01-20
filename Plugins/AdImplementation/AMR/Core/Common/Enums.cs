@@ -1,4 +1,6 @@
 ﻿using System;
+using System.ComponentModel;
+
 namespace AMR
 {
 	public class Enums
@@ -14,6 +16,17 @@ namespace AMR
             SuccessfullyValidated = 0,
             FailedToValidate = 1,
             Exception = 2
+        }
+        public enum AMRSDKAdFormat
+        {
+            INTER = 0,
+            REWARDED= 1,
+            REWARDED_INTER = 2,
+            APPOPEN = 3,
+            BANNER = 4,
+            NATIVE = 5,
+            LEADER = 6,
+            MREC = 7
         }
     }
 }

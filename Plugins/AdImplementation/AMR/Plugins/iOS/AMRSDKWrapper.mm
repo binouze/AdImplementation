@@ -144,6 +144,10 @@ static NSString* CreateNSString(const char* string) {
     currencyCode:(NSString *)currencyCode
           amount:(double)amount
             tags:(NSString *)tags;
++ (void)trackReportForExternalRevenue:(NSString *)adFormat
+        revenue:(double)revenue
+        placementId:(NSString *)placementId
+        adUnitId:(NSString *)adUnitId;
 + (void)setUserId:(NSString *)userId;
 + (void)setAdjustUserId:(NSString *)adjustUserId;
 + (void)setCanRequestAds:(bool)canRequestAds;
@@ -267,6 +271,43 @@ static TrackPurchaseResponseDelegateWrapper *trackPurchaseResponseDelegate;
         currencyCode:currencyCode
               amount:amount
                 tags:tagArray];
+}
+
++ (void)trackReportForExternalRevenue:(NSString *)adFormat
+        revenue:(double)revenue
+        placementId:(NSString *)placementId
+                             adUnitId:(NSString *)adUnitId {
+    NSLog(@"<Erge> -- %@", adFormat);
+    
+    AMRExternalRevenue *extRevenue = [AMRExternalRevenue alloc];
+    extRevenue.revenue = revenue;
+    extRevenue.placementId = placementId;
+    extRevenue.adUnitId = adUnitId;
+    extRevenue.adFormat = [self toAdFormat:adFormat];
+    extRevenue.network = @"ADMOB_MEDIATION";
+
+                      
+    [AMRSDK trackExternalAdRevenue :extRevenue];
+}
+
++ (AMRExternalRevenueAdFormat)toAdFormat:(NSString*)adFormat {
+    if ([adFormat isEqualToString: @"INTER"]) {
+        return AMRExternalRevenueAdFormatInterstitial;
+    } else if ([adFormat isEqualToString: @"REWARDED"]) {
+        return AMRExternalRevenueAdFormatRewarded;
+    } else if ([adFormat isEqualToString:  @"REWARDED_INTER"]) {
+        return AMRExternalRevenueAdFormatRewardedInterstitial;
+    } else if ([adFormat isEqualToString:  @"APPOPEN"]) {
+      return AMRExternalRevenueAdFormatAppOpen;
+    } else if ([adFormat isEqualToString:  @"BANNER"]) {
+        return AMRExternalRevenueAdFormatBanner;
+    } else if ([adFormat isEqualToString:  @"NATIVE"]) {
+        return AMRExternalRevenueAdFormatNative;
+    } else if ([adFormat isEqualToString:  @"LEADER"]) {
+        return AMRExternalRevenueAdFormatMREC;
+    }
+    
+    return AMRExternalRevenueAdFormatInterstitial;
 }
 
 + (void)setUserId:(NSString *)userId {
@@ -750,6 +791,17 @@ extern "C"
                   currencyCode:CreateNSString(currencyCode)
                         amount:amount
                           tags:CreateNSString(tags)];
+    }
+
+    void _trackAdmobMediationRevenue(const char* adFormat,
+                   double revenue,
+                   const char* placementId,
+                   const char* adUnitId) {
+
+        [AMRSDKPlugin trackReportForExternalRevenue:CreateNSString(adFormat)
+            revenue:revenue
+            placementId:CreateNSString(placementId)
+            adUnitId:CreateNSString(adUnitId)];
     }
     
     void _setUserId(const char* userId) {

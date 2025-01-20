@@ -7,7 +7,7 @@ namespace AMR
 {
 	public class AMRSDK
 	{
-        public const string AMR_PLUGIN_VERSION = "1.8.0"; 
+        public const string AMR_PLUGIN_VERSION = "1.8.1"; 
 	    
 	    public delegate void VirtualCurrencyDelegateDidSpend(string network, string currency, double amount);
         public delegate void SDKInitializeDelegateDidInitialize(bool isInitialized, string errorMessage);
@@ -508,6 +508,21 @@ namespace AMR
                 AMRUtil.Log("AMRSDK has not been initialized.");
             }
 
+        }
+
+        public static void trackAdmobMediationRevenue(AMR.Enums.AMRSDKAdFormat adFormat, double revenue, string placementId, string adUnitId)
+        {
+            if (!initialized())
+            {
+                Instance.create();
+            }
+
+            if (Instance.AMRSdk == null)
+            {
+                return;
+            }
+
+            Instance.AMRSdk.trackAdmobMediationRevenue(adFormat.ToString(), revenue, placementId, adUnitId);
         }
 
 

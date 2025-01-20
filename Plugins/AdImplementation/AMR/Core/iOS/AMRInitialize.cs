@@ -61,8 +61,11 @@ namespace AMR.iOS
         
         [DllImport("__Internal")] 
         private static extern void _setPrivacyConsentRequiredCallback();
+
+        [DllImport("__Internal")]
+        private static extern void _trackAdmobMediationRevenue(string adFormat, double revenue, string placementId, string adUnitId);
 #endif
-        
+
         #region Singleton
         private AMRInitializeDelegate sdkInitDelegate;
         private AMRGDPRDelegate gdprDelegate;
@@ -380,6 +383,13 @@ namespace AMR.iOS
 #endif
         }
 
+        public void trackAdmobMediationRevenue(string adFormat, double revenue, string placementId, string adUnitId)
+        {
+#if UNITY_IOS
+            _trackAdmobMediationRevenue(adFormat, revenue, placementId, adUnitId);
+#endif
+        }
+
         public string trackIAPForHuawei(string uniqueID, string signature, string[] tags) { return ""; }
         public void setUnityMainThread() { }
         public int getDeviceScore() {
@@ -394,5 +404,7 @@ namespace AMR.iOS
         public void destroy() { }
         public void setApiHttps() { }
         public void disableAppharbr() { }
+
+        
     }
 }

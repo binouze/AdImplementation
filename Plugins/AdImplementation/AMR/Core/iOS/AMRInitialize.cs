@@ -249,7 +249,7 @@ namespace AMR.iOS
             return uniqueID;
         }
 
-        public string trackIAP(string uniqueID, double localizedPrice, string isoCurrencyCode, string[] tags)
+        public string trackIAP(string uniqueID, double localizedPrice, string isoCurrencyCode, string[] tags, bool isDebug = false)
         {
 #if UNITY_IOS
             string tagsString = "";

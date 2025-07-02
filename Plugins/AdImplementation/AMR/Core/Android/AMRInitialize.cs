@@ -127,14 +127,15 @@ namespace AMR.Android
             return config.Call<string>("trackPurchase", new object[2] { toReturnArray, trackPurchaseListener });
 		}
 
-        public string trackIAP(string uniqueID, double localizedPrice, string isoCurrencyCode, string[] tags)
+        public string trackIAP(string uniqueID, double localizedPrice, string isoCurrencyCode, string[] tags, bool isDebug)
         {
             /* uniqueID = receipt for android */
             AMRUtil.Log("ADMOST trackIAP AMRInitilize called;");
-            string[] toReturnArray = new string[3];
+            string[] toReturnArray = new string[4];
             toReturnArray[0] = uniqueID;
             toReturnArray[1] = localizedPrice + "";
             toReturnArray[2] = isoCurrencyCode;
+            toReturnArray[3] = isDebug ? "1" : "0";
 
             AMRUtil.Log("receipt =" + uniqueID + "localizedPriceString = " + localizedPrice + "isoCurrencyCode = " + isoCurrencyCode);
 

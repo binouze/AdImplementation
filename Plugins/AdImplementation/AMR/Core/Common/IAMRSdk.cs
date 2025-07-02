@@ -24,7 +24,7 @@ namespace AMR
         void setCustomVendors(Dictionary<string, bool> parameters);
         void setThirdPartyExperiment(string experiment, string group);
         string trackPurchase(string uniqueID, double localizedPrice, string isoCurrencyCode);
-        string trackIAP(string uniqueID, double localizedPrice, string isoCurrencyCode, string[] tags);
+        string trackIAP(string uniqueID, double localizedPrice, string isoCurrencyCode, string[] tags, bool isDebug = false);
         string trackPurchaseForAmazon(string userId, string receiptId, double localizedPrice, string marketPlace, string isoCurrencyCode);
         string trackIAPForHuawei(string uniqueID, string signature, string[] tags);
         void spendVirtualCurrency();

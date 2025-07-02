@@ -7,7 +7,7 @@ namespace AMR
 {
 	public class AMRSDK
 	{
-        public const string AMR_PLUGIN_VERSION = "1.8.1"; 
+        public const string AMR_PLUGIN_VERSION = "1.8.2"; 
 	    
 	    public delegate void VirtualCurrencyDelegateDidSpend(string network, string currency, double amount);
         public delegate void SDKInitializeDelegateDidInitialize(bool isInitialized, string errorMessage);
@@ -319,7 +319,7 @@ namespace AMR
             return Instance.AMRSdk.trackPurchase(receipt, Convert.ToDouble(localizedPrice), isoCurrencyCode);
         }
 
-        public static string trackIAPForAndroid(string receipt, decimal localizedPrice, string isoCurrencyCode, string[] tags)
+        public static string trackIAPForAndroid(string receipt, decimal localizedPrice, string isoCurrencyCode, string[] tags, bool isDebug = false)
         {
             if (!initialized())
             {
@@ -340,7 +340,7 @@ namespace AMR
                 return "";
             }
 
-            return Instance.AMRSdk.trackIAP(receipt, Convert.ToDouble(localizedPrice), isoCurrencyCode, tags);
+            return Instance.AMRSdk.trackIAP(receipt, Convert.ToDouble(localizedPrice), isoCurrencyCode, tags, isDebug);
         }
 
         public static string trackPurchaseForAmazon(string userId, string receiptId, decimal localizedPrice, string marketplace, string isoCurrencyCode)

@@ -244,6 +244,15 @@ namespace com.binouze
             Log( "OnAdComplete" );
             EventReceiver?.OnAdComplete();
         }
+        
+        protected void OnAdReward( string zoneID, double amount )
+        {
+            if( zoneID != _adZoneId )
+                return;
+            
+            Log( $"OnAdReward {amount}" );
+            EventReceiver?.OnAdComplete();
+        }
 
         protected void OnAdDismissed( string zoneID )
         {
@@ -305,6 +314,7 @@ namespace com.binouze
             ad.SetOnVideoImpression( OnAdImpression );
             ad.SetOnVideoComplete( OnAdComplete );
             ad.SetOnVideoDismiss( OnAdDismissed );
+            ad.SetOnVideoReward( OnAdReward );
         }
 
         public override void LoadAd()

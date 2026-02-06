@@ -18,7 +18,7 @@
 		<androidPackage spec="com.google.android.gms:play-services-ads-identifier:18.0.1"/>
 		<androidPackage spec="com.google.android.gms:play-services-ads:24.2.0"/>
 		<androidPackage spec="com.admost.sdk:admob-adapter:24.0.0.1.a49"/>
-		<androidPackage spec="com.admost.sdk:applovin-adapter:13.5.0.a49"/>
+		<androidPackage spec="com.admost.sdk:applovin-adapter:13.5.1.a49"/>
 		<androidPackage spec="com.admost.sdk:chartboost-adapter:9.9.3.a49"/>
 		<androidPackage spec="com.google.android.gms:play-services-ads-identifier:18.0.1"/>
 		<androidPackage spec="com.admost.sdk:vungle-adapter:7.6.0.a49"/>

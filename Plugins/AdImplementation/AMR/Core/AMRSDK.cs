@@ -7,7 +7,7 @@ namespace AMR
 {
 	public class AMRSDK
 	{
-        public const string AMR_PLUGIN_VERSION = "1.8.2"; 
+        public const string AMR_PLUGIN_VERSION = "1.8.4"; 
 	    
 	    public delegate void VirtualCurrencyDelegateDidSpend(string network, string currency, double amount);
         public delegate void SDKInitializeDelegateDidInitialize(bool isInitialized, string errorMessage);
@@ -138,13 +138,17 @@ namespace AMR
             {
                 AMRSdk = new Android.AMRInitialize();
             }
+            else if (AMRUtil.IsPlatformEditor())
+            {
+                AMRSdk = new Core.UnityEditor.AMRInitialize();
+            }
             else
             {
                 AMRSdk = null;
             }
         }
 
-        private void startWithAppId(SDKInitializeDelegateDidInitialize onDidInitializeDelegate, string appIdiOS, string appIdAndroid, string isUserChild, string canRequestAds, bool isHuaweiApp = false)
+        private void startWithAppId(SDKInitializeDelegateDidInitialize onDidInitializeDelegate, string appIdiOS, string appIdAndroid, string appIdEditor, string isUserChild, string canRequestAds, bool isHuaweiApp = false)
 		{
             create();
             setOnSDKDidInitialize(onDidInitializeDelegate);
@@ -164,6 +168,10 @@ namespace AMR
             else if (Application.platform == RuntimePlatform.Android)
             {
                 AMRSdk.startWithAppId(appIdAndroid, null, null, null, isUserChild, isHuaweiApp, canRequestAds);
+            }
+            else if (AMRUtil.IsPlatformEditor())
+            {
+                AMRSdk.startWithAppId(appIdEditor, null, null, null, isUserChild, isHuaweiApp, canRequestAds);
             }
 		}
 		
@@ -211,11 +219,17 @@ namespace AMR
                 {
                     Instance.startWithAppIdConsent(null, config.ApplicationIdIOS, config.ApplicationIdAndroid, config.SubjectToGDPR, config.SubjectToCCPA, config.UserConsent, config.IsUserChild, config.CanRequestAds, config.IsHuaweiApp);
                 } else { 
-                    Instance.startWithAppId(null, config.ApplicationIdIOS, config.ApplicationIdAndroid, config.IsUserChild, config.CanRequestAds, config.IsHuaweiApp);
+                    Instance.startWithAppId(null, config.ApplicationIdIOS, config.ApplicationIdAndroid, config.ApplicationIdEditor,config.IsUserChild, config.CanRequestAds, config.IsHuaweiApp);
                 }
                 Instance.isInitialized = true;
-            } else {
-                AMRUtil.Log("AMRSDK only supports Android and iOS platforms.");
+            } else if (AMRUtil.IsPlatformEditor())
+            {
+                Instance.Config = config;
+                Instance.isInitialized = true;
+                Instance.startWithAppId(null, config.ApplicationIdIOS, config.ApplicationIdAndroid, config.ApplicationIdEditor,config.IsUserChild, config.CanRequestAds, config.IsHuaweiApp);
+            }
+            else {
+                AMRUtil.Log("AMRSDK only supports Android, iOS and Unity Editor platforms.");
             }
         }
 
@@ -232,13 +246,33 @@ namespace AMR
                 }
                 else
                 {
-                    Instance.startWithAppId(onDidInitializeDelegate, config.ApplicationIdIOS, config.ApplicationIdAndroid, config.IsUserChild, config.CanRequestAds, config.IsHuaweiApp);
+                    Instance.startWithAppId(onDidInitializeDelegate, config.ApplicationIdIOS, config.ApplicationIdAndroid, config.ApplicationIdEditor, config.IsUserChild, config.CanRequestAds, config.IsHuaweiApp);
                 }
                 Instance.isInitialized = true;
             }
+            else if (AMRUtil.IsPlatformEditor())
+            {
+                if (string.IsNullOrEmpty(config.ApplicationIdEditor))
+                {
+                    AMRUtil.LogException("AMR ApplicationIdEditor is null or empty");
+                }
+                else
+                {
+                    if (IsGuidStrict(config.ApplicationIdEditor))
+                    {
+                        Instance.Config = config;
+                        Instance.isInitialized = true;
+                        Instance.startWithAppId(onDidInitializeDelegate, config.ApplicationIdIOS, config.ApplicationIdAndroid, config.ApplicationIdEditor, config.IsUserChild, config.CanRequestAds, config.IsHuaweiApp);
+                    }
+                    else
+                    {
+                        AMRUtil.LogException("AMR ApplicationIdEditor is not valid");
+                    }
+                }
+            }
             else
             {
-                AMRUtil.Log("AMRSDK only supports Android and iOS platforms.");
+                AMRUtil.Log("AMRSDK only supports Android, iOS and Unity Editor platforms.");
             }
         }
 
@@ -263,6 +297,24 @@ namespace AMR
                 //AMRUtil.Log("AMRSDK has not been initialized.");
             }
 		}
+        
+        
+
+        public static string GetAdmostAppId() {
+            switch (Application.platform) {
+                case RuntimePlatform.Android:
+                    return Instance.Config.ApplicationIdAndroid;
+                case RuntimePlatform.IPhonePlayer:
+                    return Instance.Config.ApplicationIdIOS;
+                case RuntimePlatform.LinuxEditor:
+                case RuntimePlatform.WindowsEditor:
+                case RuntimePlatform.OSXEditor:
+                    return instance.Config.ApplicationIdEditor;
+                default:
+                    Debug.LogError("getAdmostId error");
+                    return null;
+            }
+        }
 
         public static void setGDPRIsApplicable(GDPRIsApplicable isGDPRApplicable)
         {
@@ -317,6 +369,46 @@ namespace AMR
 			}
 
             return Instance.AMRSdk.trackPurchase(receipt, Convert.ToDouble(localizedPrice), isoCurrencyCode);
+        }
+
+        public static void trackEvent(string eventName, Dictionary<string, string> parameters)
+        {
+            if (!initialized() || Instance.AMRSdk == null)
+            {
+                return;
+            }
+
+            Instance.AMRSdk.trackEvent(eventName, parameters);
+        }
+
+        public static void trackEvent(string eventName, Dictionary<string, string> parameters, string currency, double value)
+        {
+            if (!initialized() || Instance.AMRSdk == null)
+            {
+                return;
+            }
+            
+            Instance.AMRSdk.trackEvent(eventName, parameters, currency, value);
+        }
+
+        public static void trackLog(string eventName, Dictionary<string, string> parameters)
+        {
+            if (!initialized() || Instance.AMRSdk == null)
+            {
+                return;
+            }
+            
+            Instance.AMRSdk.trackLog(eventName, parameters);
+        }
+
+        public static void trackScreenView(string screenName)
+        {
+            if (!initialized() || Instance.AMRSdk == null)
+            {
+                return;
+            }
+            
+            Instance.AMRSdk.trackScreenView(screenName);
         }
 
         public static string trackIAPForAndroid(string receipt, decimal localizedPrice, string isoCurrencyCode, string[] tags, bool isDebug = false)
@@ -846,6 +938,9 @@ namespace AMR
 
         public static void loadOfferWall()
 	    {
+#if UNITY_IOS // todo <sinan> ios tarafı düzelince açılabilir
+            return;
+#endif
 		    if (!initialized()) return;
 	        
 	        AMROfferWallView.Instance.loadOfferWallForZoneId(instance.Config.OfferWallIdIOS, instance.Config.OfferWallIdAndroid, false);
@@ -909,8 +1004,7 @@ namespace AMR
 
         private static void setOnSDKDidInitialize(SDKInitializeDelegateDidInitialize onDidInitializeDelegate)
         {
-            if (Application.platform == RuntimePlatform.IPhonePlayer ||
-                Application.platform == RuntimePlatform.Android)
+            if (Application.platform == RuntimePlatform.IPhonePlayer || Application.platform == RuntimePlatform.Android || AMRUtil.IsPlatformEditor())
             {
                 Instance.onDidSDKInitializeDelegate = onDidInitializeDelegate;
                 SDKInitializeDelegate initializeDelegate = new SDKInitializeDelegate(Instance);
@@ -924,6 +1018,11 @@ namespace AMR
         public static bool isFullScreenAdShowing()
         {
             return (isInterstitialShowing() || isRewardedVideoShowing() || isOfferWallShowing());
+        }
+        
+        private static bool IsGuidStrict(string value)
+        {
+            return Guid.TryParseExact(value, "D", out _);
         }
 
         #endregion

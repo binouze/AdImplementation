@@ -3,20 +3,20 @@ using System.Collections.Generic;
 
 namespace AMR
 {
-	public interface IAMRSdk
-	{
+    public interface IAMRSdk
+    {
         void disableAppharbr();
         void setApiHttps();
-		void startWithAppId(string appId, bool isUserChild, string canRequestAds);
+        void startWithAppId(string appId, bool isUserChild, string canRequestAds);
         void startWithAppIdConsent(string appId, string subjectToGDPR, string userConsent, bool isUserChild, string canRequestAds);
-		void startWithAppIdConsent(string appId, string subjectToGDPR, string subjectToCCPA, string userConsent, bool isUserChild, string canRequestAds);
+        void startWithAppIdConsent(string appId, string subjectToGDPR, string subjectToCCPA, string userConsent, bool isUserChild, string canRequestAds);
         void startWithAppId(string appId, string subjectToGDPR, string subjectToCCPA, string userConsent, string isUserChild, bool isHuaweiApp, string canRequestAds);
         void pause();
         void resume();
         void start();
         void stop();
         void destroy();
-		void startTestSuite(string[] zoneIds);
+        void startTestSuite(string[] zoneIds);
         void setUserId(string userId);
         void setAdjustUserId(string adjustUserId);
         void setClientCampaignId(string campaignId);
@@ -27,6 +27,10 @@ namespace AMR
         string trackIAP(string uniqueID, double localizedPrice, string isoCurrencyCode, string[] tags, bool isDebug = false);
         string trackPurchaseForAmazon(string userId, string receiptId, double localizedPrice, string marketPlace, string isoCurrencyCode);
         string trackIAPForHuawei(string uniqueID, string signature, string[] tags);
+        void trackEvent(string eventName, Dictionary<string, string> parameters);
+        void trackEvent(string eventName, Dictionary<string, string> parameters, string currency, double value);
+        void trackLog(string eventName, Dictionary<string, string> parameters);
+        void trackScreenView(string screenName);
         void spendVirtualCurrency();
         void setVirtualCurrencyDelegate(AMRVirtualCurrencyDelegate delegateObject);
         void setSDKInitializeDelegate(AMRInitializeDelegate delegateObject);
@@ -38,4 +42,3 @@ namespace AMR
         void trackAdmobMediationRevenue(string adFormat, double revenue, string placementId, string adUnitId);
     }
 }
-

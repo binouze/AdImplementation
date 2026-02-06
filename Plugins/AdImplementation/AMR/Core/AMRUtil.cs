@@ -14,6 +14,13 @@ namespace AMR
                 Debug.Log("<AMRUnity> " + message);
             }
         }
+        public static void LogException(string message)
+        {
+            if (Debug.isDebugBuild)
+            {
+                Debug.LogException(new Exception("<AMRUnity> " + message));
+            }
+        }
 
         public static string[] ArrayFromString(string paramsString)
         {
@@ -34,6 +41,10 @@ namespace AMR
                 string.Format("\"{0}\": \"{1}\"", d.Key, string.Join(",", d.Value)));
             return "{" + string.Join(",", entries) + "}";
         }
+
+        public static bool IsPlatformEditor()
+        {
+            return Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.LinuxEditor || Application.platform == RuntimePlatform.OSXEditor;
+        }
     }
 }
-

@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using System.Runtime.InteropServices;
+using AMR.iOS;
 
 namespace AMR
 {
@@ -158,15 +159,13 @@ namespace AMR
             {
                 if (zoneIdiOS != null)
                 {
-                    Banner = new AMR.iOS.AMRBanner();
-
                     if (useBannerCoordinates)
                     {
-                        Banner.loadBannerForZoneIdWithPosition(zoneIdiOS, positionX, positionY, bDelegate);
+                        AMRBannerManager.LoadBanner(zoneIdiOS, positionX, positionY, bDelegate);
                     }
                     else
                     {
-                        Banner.loadBannerForZoneId(zoneIdiOS, position, offset, bDelegate);
+                        AMRBannerManager.LoadBanner(zoneIdiOS, position, offset, bDelegate);
                     }
                 }
             }
@@ -207,7 +206,12 @@ namespace AMR
             {
                 if (state == BannerState.Loaded)
                 {
-                    Banner.showBanner();
+                    if (Application.platform == RuntimePlatform.IPhonePlayer) {
+                        AMRBannerManager.ShowBanner();
+                    }
+                    else if (Application.platform == RuntimePlatform.Android) {
+                        Banner.showBanner();
+                    }
                 }
                 else if (state == BannerState.New)
                 {
@@ -222,16 +226,28 @@ namespace AMR
             {
                 dontShowBanner = true;
             }
-            if (Banner != null)
-               Banner.hideBanner();
+            
+            if (Application.platform == RuntimePlatform.IPhonePlayer) {
+                AMRBannerManager.HideBanner();
+            }
+            else if (Application.platform == RuntimePlatform.Android) {
+                if (Banner != null)
+                    Banner.hideBanner();
+            }
 		}
 
         public void destroyBanner()
         {
             state = BannerState.New;
-            if (Banner != null)
-            {
-                Banner.destroyBanner();
+            
+            if (Application.platform == RuntimePlatform.IPhonePlayer) {
+                AMRBannerManager.DestroyBanner();
+            }
+            else if (Application.platform == RuntimePlatform.Android) {
+                if (Banner != null)
+                {
+                    Banner.destroyBanner();
+                }
             }
         }
 

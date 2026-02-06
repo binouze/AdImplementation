@@ -3,9 +3,9 @@ using System.Runtime.InteropServices;
 
 namespace AMR.iOS
 {
-	public class AMRRemoteConfig : IAMRRemoteConfig
-	{
-#if UNITY_IOS
+    public class AMRRemoteConfig : IAMRRemoteConfig
+    {
+        #if UNITY_IOS
 		[DllImport("__Internal")]
         private static extern string _getRemoteConfigString(string key, string defaultValue);
 
@@ -17,53 +17,52 @@ namespace AMR.iOS
 
 		[DllImport("__Internal")]
 		private static extern bool _getRemoteConfigBoolean(string key, bool defaultValue);
-#endif
+        #endif
 
-		public AMRRemoteConfig() {}
+        public AMRRemoteConfig() {}
 
-		public void fetchRemoteConfig(AMRRemoteConfigDelegate delegateObject)
-		{
-			throw new NotImplementedException();
-		}
+        public void fetchRemoteConfig(AMRRemoteConfigDelegate delegateObject, string appId, Action onComplete)
+        {
+            throw new NotImplementedException();
+        }
 
-		public double getRemoteConfigDouble(string key, double defaultValue)
-		{
-#if UNITY_IOS
+        public double getRemoteConfigDouble(string key, double defaultValue, bool isTestConfigForEditor = false)
+        {
+            #if UNITY_IOS
 			return _getRemoteConfigDouble(key, defaultValue);
 
-#else
-			return 0;
-#endif
-		}
+            #else
+            return 0;
+            #endif
+        }
 
-		public string getRemoteConfigString(string key, string defaultValue)
-		{
-#if UNITY_IOS
+        public string getRemoteConfigString(string key, string defaultValue, bool isTestConfigForEditor = false)
+        {
+            #if UNITY_IOS
 			return _getRemoteConfigString(key, defaultValue);
-#else
-			return "";
-#endif
-		}
+            #else
+            return "";
+            #endif
+        }
 
-		public long getRemoteConfigLong(string key, long defaultValue)
-		{
-#if UNITY_IOS
+        public long getRemoteConfigLong(string key, long defaultValue, bool isTestConfigForEditor = false)
+        {
+            #if UNITY_IOS
 			return _getRemoteConfigLong(key, defaultValue);
-#else
-			return 0;
+            #else
+            return 0;
 
-#endif
-		}
+            #endif
+        }
 
-		public bool getRemoteConfigBoolean(string key, bool defaultValue)
-		{
-#if UNITY_IOS
+        public bool getRemoteConfigBoolean(string key, bool defaultValue, bool isTestConfigForEditor = false)
+        {
+            #if UNITY_IOS
 			return _getRemoteConfigBoolean(key, defaultValue);
-#else
-			return false;
+            #else
+            return false;
 
-#endif
-		}
-	}
+            #endif
+        }
+    }
 }
-

@@ -19,7 +19,7 @@ namespace AMR.Android
             activity.Dispose();
         }
 
-        public void fetchRemoteConfig(AMRRemoteConfigDelegate delegateObject)
+        public void fetchRemoteConfig(AMRRemoteConfigDelegate delegateObject, string appId, Action onComplete)
         {
             if (rcListener == null)
             {
@@ -30,22 +30,22 @@ namespace AMR.Android
             config.Call("fetchRemoteConfig", new object[1] { rcListener });
         }
 
-        public double getRemoteConfigDouble(string key, double defaultValue)
+        public double getRemoteConfigDouble(string key, double defaultValue, bool isTestConfigForEditor = false)
         {
             return config.Call<double>("getRemoteConfigDoubleValue", new object[2] { key, defaultValue });
         }
 
-        public string getRemoteConfigString(string key, string defaultValue)
+        public string getRemoteConfigString(string key, string defaultValue, bool isTestConfigForEditor = false)
         {
             return config.Call<string>("getRemoteConfigStringValue", new object[2] { key, defaultValue });
         }
 
-        public long getRemoteConfigLong(string key, long defaultValue)
+        public long getRemoteConfigLong(string key, long defaultValue, bool isTestConfigForEditor = false)
         {
             return config.Call<long>("getRemoteConfigLongValue", new object[2] { key, defaultValue });
         }
 
-        public bool getRemoteConfigBoolean(string key, bool defaultValue)
+        public bool getRemoteConfigBoolean(string key, bool defaultValue, bool isTestConfigForEditor = false)
         {
             return config.Call<bool>("getRemoteConfigBooleanValue", new object[2] { key, defaultValue });
         }

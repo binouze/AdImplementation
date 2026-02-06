@@ -2,7 +2,6 @@
 using UnityEngine;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
-using System.Xml;
 
 namespace AMR.Android
 {
@@ -155,6 +154,48 @@ namespace AMR.Android
             return config.Call<string>("trackIAPForHuawei", new object[2] { toReturnArray, tags });
         }
 
+        public void trackEvent(string eventName, Dictionary<string, string> parameters)
+        {
+            if (parameters == null)
+            {
+                parameters= new Dictionary<string, string>();
+            }
+            trackEventCall(eventName, "design", "", 0, parameters);
+
+        }
+        public void trackEvent(string eventName, Dictionary<string, string> parameters, string currency, double value)
+        {
+            if (parameters == null)
+            {
+                parameters = new Dictionary<string, string>();
+            }
+            trackEventCall(eventName, "design", currency, value, parameters);
+        }
+        public void trackLog(string eventName, Dictionary<string, string> parameters)
+        {
+            if (parameters == null)
+            {
+                parameters = new Dictionary<string, string>();
+            }
+            trackEventCall(eventName, "log", "", 0, parameters);
+        }
+        public void trackScreenView(string screenName)
+        {
+            Dictionary<string, string> parameters = new Dictionary<string, string>();
+            trackEventCall(screenName, "screen_view", "", 0, parameters);
+        }
+
+        private void trackEventCall(string eventName, string eventType, string currency, double value, Dictionary<string, string> parameters)
+        {
+            parameters.Add("eventName", eventName);
+            parameters.Add("eventType", eventType);
+            parameters.Add("eventCurrency", currency);
+            parameters.Add("eventValue", value.ToString());
+
+            AndroidJavaObject javaMap = CreateJavaMapFromDictainary(parameters);
+            config.Call("trackEvent", javaMap);
+        }
+
         public string trackPurchaseForAmazon(string userId, string receiptId, double localizedPrice, string marketPlace, string isoCurrencyCode)
         {
             /* uniqueID = receipt for android */
@@ -263,6 +304,34 @@ namespace AMR.Android
                 {
                     using (AndroidJavaObject v = new AndroidJavaObject(
                         "java.lang.Boolean", kvp.Value))
+                    {
+                        args[0] = k;
+                        args[1] = v;
+                        AndroidJNI.CallObjectMethod(javaMap.GetRawObject(),
+                                putMethod, AndroidJNIHelper.CreateJNIArgArray(args));
+                    }
+                }
+            }
+
+            return javaMap;
+        }
+
+        private AndroidJavaObject CreateJavaMapFromDictainary(IDictionary<string, string> parameters)
+        {
+            AndroidJavaObject javaMap = new AndroidJavaObject("java.util.HashMap");
+            IntPtr putMethod = AndroidJNIHelper.GetMethodID(
+                javaMap.GetRawClass(), "put",
+                    "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
+
+            object[] args = new object[2];
+            foreach (KeyValuePair<string, string> kvp in parameters)
+            {
+
+                using (AndroidJavaObject k = new AndroidJavaObject(
+                    "java.lang.String", kvp.Key))
+                {
+                    using (AndroidJavaObject v = new AndroidJavaObject(
+                        "java.lang.String", kvp.Value))
                     {
                         args[0] = k;
                         args[1] = v;

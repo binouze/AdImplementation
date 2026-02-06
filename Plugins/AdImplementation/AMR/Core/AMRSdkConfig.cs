@@ -8,6 +8,7 @@ namespace AMR
     {
         public string ApplicationIdAndroid;
         public string ApplicationIdIOS;
+        public string ApplicationIdEditor;
         public string BannerIdAndroid;
         public string BannerIdIOS;
         public string InterstitialIdAndroid;
@@ -18,7 +19,7 @@ namespace AMR
         public string OfferWallIdIOS;
         public string UserConsent;
         public string SubjectToGDPR;
-		public string SubjectToCCPA;
+        public string SubjectToCCPA;
         public string CanRequestAds;
         public string IsUserChild;
         public bool IsHuaweiApp;

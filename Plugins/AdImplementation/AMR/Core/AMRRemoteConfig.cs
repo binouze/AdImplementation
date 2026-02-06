@@ -1,11 +1,13 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using AMR;
 
 namespace AMR
 {
-	public class AMRRemoteConfig
-	{
+    public class AMRRemoteConfig
+    {
         private static AMRRemoteConfig instance;
+
         private static AMRRemoteConfig Instance
         {
             get
@@ -14,6 +16,7 @@ namespace AMR
                 {
                     instance = new AMRRemoteConfig();
                 }
+
                 return instance;
             }
         }
@@ -30,48 +33,53 @@ namespace AMR
             {
                 platformConfig = new Android.AMRRemoteConfig();
             }
+            else if (Application.platform == RuntimePlatform.LinuxEditor || Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.OSXEditor)
+            {
+                platformConfig = new Core.UnityEditor.AMRRemoteConfig();
+            }
         }
 
 
         #region Remote Config Value
-        public static double getDouble(string key, double defaultValue)
+
+        public static double getDouble(string key, double defaultValue, bool isTestConfigForEditor = false)
         {
             if (AMRSDK.initialized() == false || !isKeyApplicable(key))
             {
                 return defaultValue;
             }
 
-            return Instance.platformConfig.getRemoteConfigDouble(key, defaultValue);
+            return Instance.platformConfig.getRemoteConfigDouble(key, defaultValue, isTestConfigForEditor);
         }
 
-        public static long getLong(string key, long defaultValue)
+        public static long getLong(string key, long defaultValue, bool isTestConfigForEditor = false)
         {
             if (AMRSDK.initialized() == false || !isKeyApplicable(key))
             {
                 return defaultValue;
             }
 
-            return Instance.platformConfig.getRemoteConfigLong(key, defaultValue);
+            return Instance.platformConfig.getRemoteConfigLong(key, defaultValue, isTestConfigForEditor);
         }
 
-        public static string getString(string key, string defaultValue)
+        public static string getString(string key, string defaultValue, bool isTestConfigForEditor = false)
         {
             if (AMRSDK.initialized() == false || !isKeyApplicable(key))
             {
                 return defaultValue;
             }
 
-            return Instance.platformConfig.getRemoteConfigString(key, defaultValue);
+            return Instance.platformConfig.getRemoteConfigString(key, defaultValue, isTestConfigForEditor);
         }
 
-        public static bool getBoolean(string key, bool defaultValue)
+        public static bool getBoolean(string key, bool defaultValue, bool isTestConfigForEditor = false)
         {
             if (AMRSDK.initialized() == false || !isKeyApplicable(key))
             {
                 return defaultValue;
             }
 
-            return Instance.platformConfig.getRemoteConfigBoolean(key, defaultValue);
+            return Instance.platformConfig.getRemoteConfigBoolean(key, defaultValue, isTestConfigForEditor);
         }
 
         private static bool isKeyApplicable(string key)
@@ -85,13 +93,17 @@ namespace AMR
         }
 
 
-        public static void fetch(AMRRemoteConfigDelegate rmDelegate)
+        public static void fetch(AMRRemoteConfigDelegate rmDelegate, string appId, Action onComplete)
         {
-            if (AMRSDK.initialized() == false) { return; }
-            Instance.platformConfig.fetchRemoteConfig(rmDelegate);
+            if (AMRSDK.initialized() == false)
+            {
+                AMRUtil.Log("AMRSDK not initialized!");
+                return;
+            }
+
+            Instance.platformConfig.fetchRemoteConfig(rmDelegate, appId, onComplete);
         }
 
         #endregion
     }
-
 }

@@ -10,10 +10,10 @@ typedef NS_ENUM(NSInteger, AMRBannerPosition) {
 char* cStringCopy(const char* string) {
     if (string == NULL)
         return NULL;
-    
+
     char* res = (char*)malloc(strlen(string) + 1);
     strcpy(res, string);
-    
+
     return res;
 }
 
@@ -40,51 +40,51 @@ static NSString* CreateNSString(const char* string) {
     UIViewController *topVC = [AMRSDKPluginHelper topViewController];
     CGFloat bannerWidth = bannerView.frame.size.width;
     CGFloat bannerHeight = bannerView.frame.size.height;
-    
+
     if (@available(iOS 11.0, *)) {
         [topVC.view addSubview:bannerView];
         bannerView.translatesAutoresizingMaskIntoConstraints = NO;
-        
+
         NSMutableArray<NSLayoutConstraint*> *constraints = [NSMutableArray arrayWithArray:
                                                             @[
-                                                              [bannerView.widthAnchor constraintEqualToConstant:bannerWidth],
-                                                              [bannerView.heightAnchor constraintEqualToConstant:bannerHeight],
-                                                              ]];
-        
+            [bannerView.widthAnchor constraintEqualToConstant:bannerWidth],
+            [bannerView.heightAnchor constraintEqualToConstant:bannerHeight],
+        ]];
+
         if (position == AMRBannerPositionTop) {
             [constraints addObjectsFromArray:@[[bannerView.topAnchor constraintEqualToAnchor:bannerView.superview.safeAreaLayoutGuide.topAnchor],
                                                [bannerView.centerXAnchor constraintEqualToAnchor:bannerView.superview.safeAreaLayoutGuide.centerXAnchor]]];
-            
+
         } else if (position == AMRBannerPositionCenter) {
             [constraints addObjectsFromArray:@[[bannerView.centerXAnchor constraintEqualToAnchor:bannerView.superview.safeAreaLayoutGuide.centerXAnchor],
                                                [bannerView.centerYAnchor constraintEqualToAnchor:bannerView.superview.safeAreaLayoutGuide.centerYAnchor]]];
-            
+
         } else if (position == AMRBannerPositionBottom) {
             [constraints addObjectsFromArray:@[[bannerView.bottomAnchor constraintEqualToAnchor:(bannerView.superview.safeAreaLayoutGuide.bottomAnchor) constant:-bannerBottomOffset],
                                                [bannerView.centerXAnchor constraintEqualToAnchor:bannerView.superview.safeAreaLayoutGuide.centerXAnchor]]];
         }
-        
+
         [NSLayoutConstraint activateConstraints:constraints];
     } else {
         CGRect bannerFrame = CGRectMake(0, 0, bannerWidth, bannerHeight);
         CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width;
         CGFloat screenHeight = [UIScreen mainScreen].bounds.size.height;
-        
+
         if (position == AMRBannerPositionTop) {
             bannerFrame.origin.x = .5 * (screenWidth - bannerFrame.size.width);
             bannerView.autoresizingMask = (UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleBottomMargin);
-            
+
         } else if (position == AMRBannerPositionCenter) {
             bannerFrame.origin.x = .5 * (screenWidth - bannerFrame.size.width);
             bannerFrame.origin.y = .5 * (screenHeight - bannerFrame.size.height);
             bannerView.autoresizingMask = (UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin);
-            
+
         } else if (position == AMRBannerPositionBottom) {
             bannerFrame.origin.x = .5 * (screenWidth - bannerFrame.size.width);
             bannerFrame.origin.y = screenHeight - bannerFrame.size.height - bannerBottomOffset;
             bannerView.autoresizingMask = (UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin);
         }
-        
+
         bannerView.frame = bannerFrame;
         [topVC.view addSubview:bannerView];
     }
@@ -96,17 +96,17 @@ static NSString* CreateNSString(const char* string) {
     CGFloat bannerHeight = bannerView.frame.size.height;
     CGFloat bannerX = positionX;
     CGFloat bannerY = [UIScreen mainScreen].bounds.size.height - positionY - bannerHeight;
-    
+
     if (@available(iOS 11.0, *)) {
         [topVC.view addSubview:bannerView];
         bannerView.translatesAutoresizingMaskIntoConstraints = NO;
-        
+
         NSMutableArray<NSLayoutConstraint*> *constraints = [NSMutableArray arrayWithArray:
                                                             @[
-                                                              [bannerView.widthAnchor constraintEqualToConstant:bannerWidth],
-                                                              [bannerView.heightAnchor constraintEqualToConstant:bannerHeight],
-                                                              ]];
-        
+            [bannerView.widthAnchor constraintEqualToConstant:bannerWidth],
+            [bannerView.heightAnchor constraintEqualToConstant:bannerHeight],
+        ]];
+
         [constraints addObjectsFromArray:@[
             [NSLayoutConstraint constraintWithItem:bannerView
                                          attribute:NSLayoutAttributeLeft
@@ -122,7 +122,7 @@ static NSString* CreateNSString(const char* string) {
                                         multiplier:1.0f
                                           constant:bannerY]
         ]];
-        
+
         [NSLayoutConstraint activateConstraints:constraints];
     } else {
         CGRect bannerFrame = CGRectMake(bannerX, bannerY, bannerWidth, bannerHeight);
@@ -144,10 +144,19 @@ static NSString* CreateNSString(const char* string) {
     currencyCode:(NSString *)currencyCode
           amount:(double)amount
             tags:(NSString *)tags;
++ (void)trackScreenView:(NSString *)screenName;
++ (void)trackEvent:(NSString *)eventName
+      paramsString:(NSString *)paramsString;
++ (void)trackEvent:(NSString *)eventName
+      paramsString:(NSString *)paramsString
+          currency:(NSString *)currency
+             value:(double)value;
++ (void)trackLog:(NSString *)eventName
+    paramsString:(NSString *)paramsString;
 + (void)trackReportForExternalRevenue:(NSString *)adFormat
-        revenue:(double)revenue
-        placementId:(NSString *)placementId
-        adUnitId:(NSString *)adUnitId;
+                              revenue:(double)revenue
+                          placementId:(NSString *)placementId
+                             adUnitId:(NSString *)adUnitId;
 + (void)setUserId:(NSString *)userId;
 + (void)setAdjustUserId:(NSString *)adjustUserId;
 + (void)setCanRequestAds:(bool)canRequestAds;
@@ -159,6 +168,14 @@ static NSString* CreateNSString(const char* string) {
 + (void)setUserChild:(bool)userChild;
 + (void)spendVirtualCurrency;
 + (void)sendUnityEvent:(NSString *)event params:(NSArray *)params;
+@end
+
+@interface AMRBannerManager : NSObject <AMRBannerDelegate>
++ (void)loadBannerForZoneId:(NSString *)zoneId position:(AMRBannerPosition)position offset:(int)offset;
++ (void)loadBannerForZoneId:(NSString *)zoneId positionX:(double)positionX positionY:(double)positionY;
++ (void)showBanner;
++ (void)hideBanner;
++ (void)destroyBanner;
 @end
 
 @interface AMRInterstitialManager : NSObject <AMRInterstitialDelegate>
@@ -174,16 +191,9 @@ static NSString* CreateNSString(const char* string) {
 + (BOOL)isReadyToShowForZoneId:(NSString *)zoneId;
 @end
 
-@interface BannerDelegateWrapper : NSObject <AMRBannerDelegate> @end
 @interface OfferWallDelegateWrapper : NSObject <AMROfferWallDelegate> @end
 @interface VirtualCurrencyDelegateWrapper : NSObject <AMRVirtualCurrencyDelegate> @end
 @interface TrackPurchaseResponseDelegateWrapper : NSObject <AMRTrackPurchaseResponseDelegate> @end
-
-// banner
-typedef void (* BannerSuccessCallback)(int bannerRefPtr, const char* networkName, double ecpm);
-typedef void (* BannerFailCallback)(int bannerRefPtr, const char* errorMessage);
-typedef void (* BannerShowCallback)(int bannerRefPtr, const char* zoneId, const char* networkName, double ecpm, const char* adSpaceId);
-typedef void (* BannerClickCallback)(int bannerRefPtr, const char* networkName);
 
 // offerWall
 typedef void (* OfferWallSuccessCallback)(int offerWallRefPtr, const char* networkName, double ecpm);
@@ -200,22 +210,6 @@ typedef void (* TrackPurchaseResponseCallback)(int trackPurchaseRefPtr, const ch
 typedef void (* IsGDPRApplicableCallback)(int IsGDPRApplicableRefPtr, bool status);
 typedef void (* PrivacyConsentRequiredCallback)(int PrivacyConsentRequiredRefPtr, int consentStatus);
 
-
-// banner
-typedef const void *AMRBannerRef;
-static int bannerFillCount;
-static AMRBanner *banner;
-static BannerDelegateWrapper *bannerDelegate;
-static BannerSuccessCallback bannerSuccessCallback;
-static BannerFailCallback bannerFailCallback;
-static BannerShowCallback bannerShowCallback;
-static BannerClickCallback bannerClickCallback;
-static int bannerHandle;
-static int bannerOffset;
-static double bannerPosX;
-static double bannerPosY;
-static int useCoordinates;
-static AMRBannerPosition position;
 
 // offerWall
 typedef const void *AMROfferWallRef;
@@ -236,7 +230,7 @@ static TrackPurchaseResponseDelegateWrapper *trackPurchaseResponseDelegate;
 
 + (void)startWithAppId:(NSString *)appId {
     [AMRSDK setLogLevel:AMRLogLevelSilent];
-    
+
     [AMRSDK startWithAppId:appId completion:^(AMRError * _Nullable error) {
         if (error) {
             [self sendUnityEvent:@"SDKInitializeEvent" params:@[@(NO), error.errorDescription]];
@@ -248,14 +242,14 @@ static TrackPurchaseResponseDelegateWrapper *trackPurchaseResponseDelegate;
 
 + (void)startTestSuite:(NSString *)zoneIds {
     NSArray *zoneList = [zoneIds componentsSeparatedByString: @","];
-    
+
     [AMRSDK startTestSuiteWithZones:zoneList];
 }
 
 + (void)trackPurchase:(NSString *)identifier
          currencyCode:(NSString *)currencyCode
                amount:(double)amount {
-    
+
     [AMRSDK trackPurchase:identifier
              currencyCode:currencyCode
                    amount:amount];
@@ -266,19 +260,77 @@ static TrackPurchaseResponseDelegateWrapper *trackPurchaseResponseDelegate;
           amount:(double)amount
             tags:(NSString *)tags {
     NSArray *tagArray = [tags componentsSeparatedByString: @","];
-    
+
     [AMRSDK trackIAP:identifier
         currencyCode:currencyCode
               amount:amount
                 tags:tagArray];
 }
 
++ (void)trackScreenView:(NSString *)screenName {
+    [AMRSDK trackScreenView:screenName];
+}
+
++ (void)trackEvent:(NSString *)eventName
+      paramsString:(NSString *)paramsString {
+    if (paramsString == nil) {
+        [AMRSDK trackEvent:eventName parameters:nil];
+        return;
+    }
+
+    NSError *jsonError;
+    NSData *objectData = [paramsString dataUsingEncoding:NSUTF8StringEncoding];
+    NSDictionary *dictParams = [NSJSONSerialization JSONObjectWithData:objectData
+                                                               options:NSJSONReadingMutableContainers
+                                                                 error:&jsonError];
+
+    if (jsonError == nil && dictParams != nil) {
+        [AMRSDK trackEvent:eventName parameters:dictParams];
+    }
+}
+
++ (void)trackEvent:(NSString *)eventName
+      paramsString:(NSString *)paramsString
+          currency:(NSString *)currency
+             value:(double)value {
+    if (paramsString == nil) {
+        [AMRSDK trackEvent:eventName parameters:nil currency: currency value: value];
+        return;
+    }
+
+    NSError *jsonError;
+    NSData *objectData = [paramsString dataUsingEncoding:NSUTF8StringEncoding];
+    NSDictionary *dictParams = [NSJSONSerialization JSONObjectWithData:objectData
+                                                               options:NSJSONReadingMutableContainers
+                                                                 error:&jsonError];
+
+    if (jsonError == nil && dictParams != nil) {
+        [AMRSDK trackEvent:eventName parameters:dictParams currency: currency value: value];
+    }
+}
+
++ (void)trackLog:(NSString *)eventName
+    paramsString:(NSString *)paramsString {
+    if (paramsString == nil) {
+        [AMRSDK trackLog:eventName parameters:nil];
+        return;
+    }
+
+    NSError *jsonError;
+    NSData *objectData = [paramsString dataUsingEncoding:NSUTF8StringEncoding];
+    NSDictionary *dictParams = [NSJSONSerialization JSONObjectWithData:objectData
+                                                               options:NSJSONReadingMutableContainers
+                                                                 error:&jsonError];
+
+    if (jsonError == nil && dictParams != nil) {
+        [AMRSDK trackLog:eventName parameters:dictParams];
+    }
+}
+
 + (void)trackReportForExternalRevenue:(NSString *)adFormat
-        revenue:(double)revenue
-        placementId:(NSString *)placementId
+                              revenue:(double)revenue
+                          placementId:(NSString *)placementId
                              adUnitId:(NSString *)adUnitId {
-    NSLog(@"<Erge> -- %@", adFormat);
-    
     AMRExternalRevenue *extRevenue = [AMRExternalRevenue alloc];
     extRevenue.revenue = revenue;
     extRevenue.placementId = placementId;
@@ -286,7 +338,7 @@ static TrackPurchaseResponseDelegateWrapper *trackPurchaseResponseDelegate;
     extRevenue.adFormat = [self toAdFormat:adFormat];
     extRevenue.network = @"ADMOB_MEDIATION";
 
-                      
+
     [AMRSDK trackExternalAdRevenue :extRevenue];
 }
 
@@ -298,7 +350,7 @@ static TrackPurchaseResponseDelegateWrapper *trackPurchaseResponseDelegate;
     } else if ([adFormat isEqualToString:  @"REWARDED_INTER"]) {
         return AMRExternalRevenueAdFormatRewardedInterstitial;
     } else if ([adFormat isEqualToString:  @"APPOPEN"]) {
-      return AMRExternalRevenueAdFormatAppOpen;
+        return AMRExternalRevenueAdFormatAppOpen;
     } else if ([adFormat isEqualToString:  @"BANNER"]) {
         return AMRExternalRevenueAdFormatBanner;
     } else if ([adFormat isEqualToString:  @"NATIVE"]) {
@@ -306,7 +358,7 @@ static TrackPurchaseResponseDelegateWrapper *trackPurchaseResponseDelegate;
     } else if ([adFormat isEqualToString:  @"LEADER"]) {
         return AMRExternalRevenueAdFormatMREC;
     }
-    
+
     return AMRExternalRevenueAdFormatInterstitial;
 }
 
@@ -325,9 +377,9 @@ static TrackPurchaseResponseDelegateWrapper *trackPurchaseResponseDelegate;
         NSError *jsonError;
         NSData *objectData = [jsonParams dataUsingEncoding:NSUTF8StringEncoding];
         NSDictionary *dictParams = [NSJSONSerialization JSONObjectWithData:objectData
-                                              options:NSJSONReadingMutableContainers
-                                                error:&jsonError];
-        
+                                                                   options:NSJSONReadingMutableContainers
+                                                                     error:&jsonError];
+
         if (jsonError == nil && dictParams != nil) {
             [AMRSDK setTCFVendors:dictParams];
         }
@@ -365,6 +417,243 @@ static TrackPurchaseResponseDelegateWrapper *trackPurchaseResponseDelegate;
 
 @end
 
+@implementation AMRBannerManager {
+    AMRBanner *_banner;
+    AMRBannerPosition _position;
+    double _bannerPosX;
+    double _bannerPosY;
+    int _offset;
+    bool _useCoordiante;
+}
+
+#pragma mark - NSObject
+
++ (instancetype)sharedInstance {
+    static AMRBannerManager *sharedInstance = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sharedInstance = [[AMRBannerManager alloc] init];
+    });
+    return sharedInstance;
+}
+
+- (instancetype)init {
+    if (!(self = [super init]))
+        return nil;
+
+    _banner = nil;
+
+    return self;
+}
+
+#pragma mark - Public
+
++ (void)loadBannerForZoneId:(NSString *)zoneId position:(AMRBannerPosition)position offset:(int)offset {
+    [[AMRBannerManager sharedInstance] loadBannerForZoneId:zoneId position:position offset:offset];
+}
+
++ (void)loadBannerForZoneId:(NSString *)zoneId positionX:(double)positionX positionY:(double)positionY {
+    [[AMRBannerManager sharedInstance] loadBannerForZoneId:zoneId positionX:positionX positionY:positionY];
+}
+
++ (void)showBanner {
+    [[AMRBannerManager sharedInstance] showBanner];
+}
+
++ (void)hideBanner {
+    [[AMRBannerManager sharedInstance] hideBanner];
+}
+
++ (void)destroyBanner {
+    [[AMRBannerManager sharedInstance] destroyBanner];
+}
+
+#pragma mark - Private
+
+- (void)loadBannerForZoneId:(NSString *)zoneId position:(AMRBannerPosition)position offset:(int)offset {
+    _useCoordiante = 0;
+    _position = position;
+    _offset = offset;
+    _banner = [AMRBanner bannerForZoneId:zoneId];
+    _banner.delegate = self;
+    [_banner loadBanner];
+}
+
+- (void)loadBannerForZoneId:(NSString *)zoneId positionX:(double)positionX positionY:(int)positionY {
+    _bannerPosX = positionX;
+    _bannerPosY = positionY;
+    _useCoordiante = 1;
+    _banner = [AMRBanner bannerForZoneId:zoneId];
+    _banner.delegate = self;
+    [_banner loadBanner];
+}
+
+- (void)showBanner {
+    if (_banner == nil) { return; }
+
+    if (_useCoordiante == 1) {
+        [self updateBannerView:_banner.bannerView forPositionX:_bannerPosX positionY:_bannerPosY];
+    } else {
+        [self updateBannerView:_banner.bannerView forPosition:_position offset:_offset];
+    }
+}
+
+- (void)hideBanner {
+    if (_banner != nil && _banner.bannerView != nil) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self->_banner.bannerView removeFromSuperview];
+        });
+    }
+}
+
+- (void)destroyBanner {
+    if (_banner == nil) { return; }
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (self->_banner.bannerView != nil) {
+            [self->_banner.bannerView removeFromSuperview];
+        }
+
+        self->_banner.delegate = nil;
+        self->_banner = nil;
+    });
+}
+
+#pragma mark - <AMRBannerDelegate>
+
+- (void)didReceiveBanner:(AMRBanner *)banner {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self sendUnityEvent:@"DidReceiveBanner" params:@[banner.zoneId, banner.networkName, banner.ecpm]];
+    });
+}
+
+- (void)didFailToReceiveBanner:(AMRBanner *)banner error:(AMRError *)error {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self sendUnityEvent:@"DidFailToReceiveBanner" params:@[banner.zoneId, error.errorDescription]];
+    });
+}
+
+- (void)didShowBanner:(AMRBanner *)banner {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self sendUnityEvent:@"DidShowBanner" params:@[banner.zoneId, banner.networkName, banner.ecpm, banner.adSpaceId]];
+    });
+}
+
+- (void)didClickBanner:(AMRBanner *)banner {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self sendUnityEvent:@"DidClickBanner" params:@[banner.zoneId, banner.networkName]];
+    });
+}
+
+#pragma mark - Util
+
+- (void)sendUnityEvent:(NSString *)event params:(NSArray *)params {
+    NSString *paramsString = [params componentsJoinedByString:@"<>"];
+    UnitySendMessage("AMRBannerManager", event.UTF8String, paramsString.UTF8String);
+}
+
+- (UIViewController *)topViewController {
+    return [[[UIApplication sharedApplication] delegate] window].rootViewController;
+}
+
+- (void)updateBannerView:(UIView *)bannerView forPosition:(AMRBannerPosition)position offset:(int)bannerBottomOffset {
+    UIViewController *topVC = [self topViewController];
+    CGFloat bannerWidth = bannerView.frame.size.width;
+    CGFloat bannerHeight = bannerView.frame.size.height;
+
+    if (@available(iOS 11.0, *)) {
+        [topVC.view addSubview:bannerView];
+        bannerView.translatesAutoresizingMaskIntoConstraints = NO;
+
+        NSMutableArray<NSLayoutConstraint*> *constraints = [NSMutableArray arrayWithArray:
+                                                            @[
+            [bannerView.widthAnchor constraintEqualToConstant:bannerWidth],
+            [bannerView.heightAnchor constraintEqualToConstant:bannerHeight],
+        ]];
+
+        if (position == AMRBannerPositionTop) {
+            [constraints addObjectsFromArray:@[[bannerView.topAnchor constraintEqualToAnchor:bannerView.superview.safeAreaLayoutGuide.topAnchor],
+                                               [bannerView.centerXAnchor constraintEqualToAnchor:bannerView.superview.safeAreaLayoutGuide.centerXAnchor]]];
+
+        } else if (position == AMRBannerPositionCenter) {
+            [constraints addObjectsFromArray:@[[bannerView.centerXAnchor constraintEqualToAnchor:bannerView.superview.safeAreaLayoutGuide.centerXAnchor],
+                                               [bannerView.centerYAnchor constraintEqualToAnchor:bannerView.superview.safeAreaLayoutGuide.centerYAnchor]]];
+
+        } else if (position == AMRBannerPositionBottom) {
+            [constraints addObjectsFromArray:@[[bannerView.bottomAnchor constraintEqualToAnchor:(bannerView.superview.safeAreaLayoutGuide.bottomAnchor) constant:-bannerBottomOffset],
+                                               [bannerView.centerXAnchor constraintEqualToAnchor:bannerView.superview.safeAreaLayoutGuide.centerXAnchor]]];
+        }
+
+        [NSLayoutConstraint activateConstraints:constraints];
+    } else {
+        CGRect bannerFrame = CGRectMake(0, 0, bannerWidth, bannerHeight);
+        CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width;
+        CGFloat screenHeight = [UIScreen mainScreen].bounds.size.height;
+
+        if (position == AMRBannerPositionTop) {
+            bannerFrame.origin.x = .5 * (screenWidth - bannerFrame.size.width);
+            bannerView.autoresizingMask = (UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleBottomMargin);
+
+        } else if (position == AMRBannerPositionCenter) {
+            bannerFrame.origin.x = .5 * (screenWidth - bannerFrame.size.width);
+            bannerFrame.origin.y = .5 * (screenHeight - bannerFrame.size.height);
+            bannerView.autoresizingMask = (UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin);
+
+        } else if (position == AMRBannerPositionBottom) {
+            bannerFrame.origin.x = .5 * (screenWidth - bannerFrame.size.width);
+            bannerFrame.origin.y = screenHeight - bannerFrame.size.height - bannerBottomOffset;
+            bannerView.autoresizingMask = (UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin);
+        }
+
+        bannerView.frame = bannerFrame;
+        [topVC.view addSubview:bannerView];
+    }
+}
+
+- (void)updateBannerView:(UIView *)bannerView forPositionX:(double)positionX positionY:(double)positionY {
+    UIViewController *topVC = [AMRSDKPluginHelper topViewController];
+    CGFloat bannerWidth = bannerView.frame.size.width;
+    CGFloat bannerHeight = bannerView.frame.size.height;
+    CGFloat bannerX = positionX;
+    CGFloat bannerY = [UIScreen mainScreen].bounds.size.height - positionY - bannerHeight;
+
+    if (@available(iOS 11.0, *)) {
+        [topVC.view addSubview:bannerView];
+        bannerView.translatesAutoresizingMaskIntoConstraints = NO;
+
+        NSMutableArray<NSLayoutConstraint*> *constraints = [NSMutableArray arrayWithArray:
+                                                            @[
+            [bannerView.widthAnchor constraintEqualToConstant:bannerWidth],
+            [bannerView.heightAnchor constraintEqualToConstant:bannerHeight],
+        ]];
+
+        [constraints addObjectsFromArray:@[
+            [NSLayoutConstraint constraintWithItem:bannerView
+                                         attribute:NSLayoutAttributeLeft
+                                         relatedBy:NSLayoutRelationEqual
+                                            toItem:topVC.view attribute:NSLayoutAttributeLeft
+                                        multiplier:1.0
+                                          constant:bannerX],
+            [NSLayoutConstraint constraintWithItem:bannerView
+                                         attribute:NSLayoutAttributeTop
+                                         relatedBy:NSLayoutRelationEqual
+                                            toItem:topVC.view
+                                         attribute:NSLayoutAttributeTop
+                                        multiplier:1.0f
+                                          constant:bannerY]
+        ]];
+
+        [NSLayoutConstraint activateConstraints:constraints];
+    } else {
+        CGRect bannerFrame = CGRectMake(bannerX, bannerY, bannerWidth, bannerHeight);
+        bannerView.autoresizingMask = (UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin);
+        bannerView.frame = bannerFrame;
+        [topVC.view addSubview:bannerView];
+    }
+}
+
+@end
+
 @implementation AMRInterstitialManager {
     NSMutableDictionary<NSString*, AMRInterstitial*> *_interstitials;
 }
@@ -383,9 +672,9 @@ static TrackPurchaseResponseDelegateWrapper *trackPurchaseResponseDelegate;
 - (instancetype)init {
     if (!(self = [super init]))
         return nil;
-    
+
     _interstitials = [NSMutableDictionary new];
-    
+
     return self;
 }
 
@@ -425,21 +714,21 @@ static TrackPurchaseResponseDelegateWrapper *trackPurchaseResponseDelegate;
         bool isReadyToShow;
 
         Class interstitialClass = [interstitial class];
-        
+
         NSMethodSignature *methodSignature = [interstitialClass instanceMethodSignatureForSelector:NSSelectorFromString(@"isReadyToShow")];
         NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:methodSignature];
-        
+
         [invocation setTarget:interstitial];
         [invocation setSelector:NSSelectorFromString(@"isReadyToShow")];
 
         [invocation invoke];
         [invocation getReturnValue:&isReadyToShow];
-        
+
         return isReadyToShow;
-        
+
         return [[interstitial class] instancesRespondToSelector:@selector(isReadyToShow)];
     }
-    
+
     return false;
 }
 
@@ -450,15 +739,15 @@ static TrackPurchaseResponseDelegateWrapper *trackPurchaseResponseDelegate;
         NSLog(@"<AMRUnity> Invalid zoneid");
         return nil;
     }
-    
+
     AMRInterstitial *interstitial = [_interstitials objectForKey:zoneId];
-    
+
     if (!interstitial) {
         interstitial = [AMRInterstitial interstitialForZoneId:zoneId];
         interstitial.delegate = self;
         [_interstitials setObject:interstitial forKey:zoneId];
     }
-    
+
     return interstitial;
 }
 
@@ -531,9 +820,9 @@ static TrackPurchaseResponseDelegateWrapper *trackPurchaseResponseDelegate;
 - (instancetype)init {
     if (!(self = [super init]))
         return nil;
-    
+
     _rewardedVideos = [NSMutableDictionary new];
-    
+
     return self;
 }
 
@@ -577,9 +866,9 @@ static TrackPurchaseResponseDelegateWrapper *trackPurchaseResponseDelegate;
         NSError *jsonError;
         NSData *objectData = [jsonParams dataUsingEncoding:NSUTF8StringEncoding];
         NSDictionary *dictParams = [NSJSONSerialization JSONObjectWithData:objectData
-                                              options:NSJSONReadingMutableContainers
-                                                error:&jsonError];
-        
+                                                                   options:NSJSONReadingMutableContainers
+                                                                     error:&jsonError];
+
         if (jsonError == nil && dictParams != nil) {
             rw.customData = dictParams;
         }
@@ -592,21 +881,21 @@ static TrackPurchaseResponseDelegateWrapper *trackPurchaseResponseDelegate;
         bool isReadyToShow;
 
         Class rewardedClass = [rw class];
-        
+
         NSMethodSignature *methodSignature = [rewardedClass instanceMethodSignatureForSelector:NSSelectorFromString(@"isReadyToShow")];
         NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:methodSignature];
-        
+
         [invocation setTarget:rw];
         [invocation setSelector:NSSelectorFromString(@"isReadyToShow")];
 
         [invocation invoke];
         [invocation getReturnValue:&isReadyToShow];
-        
+
         return isReadyToShow;
-        
+
         return [[rw class] instancesRespondToSelector:@selector(isReadyToShow)];
     }
-    
+
     return false;
 }
 
@@ -617,15 +906,15 @@ static TrackPurchaseResponseDelegateWrapper *trackPurchaseResponseDelegate;
         NSLog(@"<AMRUnity> Invalid zoneid");
         return nil;
     }
-    
+
     AMRRewardedVideo *rw = [_rewardedVideos objectForKey:zoneId];
-    
+
     if (!rw) {
         rw = [AMRRewardedVideo rewardedVideoForZoneId:zoneId];
         rw.delegate = self;
         [_rewardedVideos setObject:rw forKey:zoneId];
     }
-    
+
     return rw;
 }
 
@@ -686,44 +975,6 @@ static TrackPurchaseResponseDelegateWrapper *trackPurchaseResponseDelegate;
 
 @end
 
-@implementation BannerDelegateWrapper
-
-- (void)didReceiveBanner:(AMRBanner *)banner {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (bannerSuccessCallback) {
-            bannerSuccessCallback(bannerHandle, [banner.networkName UTF8String], [banner.ecpm doubleValue]);
-        }
-        
-        bannerFillCount += 1;
-    });
-}
-
-- (void)didFailToReceiveBanner:(AMRBanner *)banner error:(AMRError *)error {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (bannerFailCallback) {
-            bannerFailCallback(bannerHandle, [error.errorDescription UTF8String]);
-        }
-    });
-}
-
-- (void)didShowBanner:(AMRBanner *)banner {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (bannerShowCallback) {
-            bannerShowCallback(bannerHandle, [banner.zoneId UTF8String], [banner.networkName UTF8String], [banner.ecpm doubleValue], [banner.adSpaceId UTF8String]);
-        }
-    });
-}
-
-- (void)didClickBanner:(AMRBanner *)banner {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (bannerClickCallback) {
-            bannerClickCallback(bannerHandle, [banner.networkName UTF8String]);
-        }
-    });
-}
-
-@end
-
 @implementation OfferWallDelegateWrapper
 
 - (void)didReceiveOfferWall:(AMROfferWall *)offerWall {
@@ -767,286 +1018,258 @@ static TrackPurchaseResponseDelegateWrapper *trackPurchaseResponseDelegate;
 extern "C"
 {
 #pragma mark - SDK
-    void _startWithAppId(const char* appId) {
-        [AMRSDKPlugin startWithAppId:CreateNSString(appId)];
-    }
-    
-    void _startTestSuite(const char* zoneIds) {
-        [AMRSDKPlugin startTestSuite:CreateNSString(zoneIds)];
-    }
-    
-    void _trackPurchase(const char* identifier,
-                        const char* currencyCode,
-                        double amount) {
-        [AMRSDKPlugin trackPurchase:CreateNSString(identifier)
-                       currencyCode:CreateNSString(currencyCode)
-                             amount:amount];
-    }
+void _startWithAppId(const char* appId) {
+    [AMRSDKPlugin startWithAppId:CreateNSString(appId)];
+}
 
-    void _trackIAP(const char* identifier,
-                   const char* currencyCode,
-                   double amount,
-                   const char* tags) {
-        [AMRSDKPlugin trackIAP:CreateNSString(identifier)
-                  currencyCode:CreateNSString(currencyCode)
-                        amount:amount
-                          tags:CreateNSString(tags)];
-    }
+void _startTestSuite(const char* zoneIds) {
+    [AMRSDKPlugin startTestSuite:CreateNSString(zoneIds)];
+}
 
-    void _trackAdmobMediationRevenue(const char* adFormat,
-                   double revenue,
-                   const char* placementId,
-                   const char* adUnitId) {
+void _trackPurchase(const char* identifier,
+                    const char* currencyCode,
+                    double amount) {
+    [AMRSDKPlugin trackPurchase:CreateNSString(identifier)
+                   currencyCode:CreateNSString(currencyCode)
+                         amount:amount];
+}
 
-        [AMRSDKPlugin trackReportForExternalRevenue:CreateNSString(adFormat)
-            revenue:revenue
-            placementId:CreateNSString(placementId)
-            adUnitId:CreateNSString(adUnitId)];
-    }
-    
-    void _setUserId(const char* userId) {
-        [AMRSDKPlugin setUserId:CreateNSString(userId)];
-    }
-    
-    void _setAdjustUserId(const char* adjustUserId) {
-        [AMRSDKPlugin setAdjustUserId:CreateNSString(adjustUserId)];
-    }
+void _trackIAP(const char* identifier,
+               const char* currencyCode,
+               double amount,
+               const char* tags) {
+    [AMRSDKPlugin trackIAP:CreateNSString(identifier)
+              currencyCode:CreateNSString(currencyCode)
+                    amount:amount
+                      tags:CreateNSString(tags)];
+}
 
-    void _setCanRequestAds(bool canRequestAds) {
-        [AMRSDKPlugin setCanRequestAds:canRequestAds];
-    }
+void _trackScreenView(const char* screenName) {
+    [AMRSDKPlugin trackScreenView:CreateNSString(screenName)];
+}
 
-    void _setCustomVendors(const char* jsonParams) {
-        [AMRSDKPlugin setCustomVendors:CreateNSString(jsonParams)];
-    }
+void _trackEvent(const char* eventName, const char* paramsString) {
+    [AMRSDKPlugin trackEvent:CreateNSString(eventName)
+                paramsString:CreateNSString(paramsString)];
+}
 
-    void _setClientCampaignId(const char* campaignId) {
-        [AMRSDKPlugin setClientCampaignId:CreateNSString(campaignId)];
-    }
-    
-    void _setUserConsent(bool consent) {
-        [AMRSDKPlugin setUserConsent:consent];
-    }
-    
-    void _subjectToGDPR(bool subject) {
-        [AMRSDKPlugin subjectToGDPR:subject];
-    }
+void _trackEventWithCurrency(const char* eventName, const char* paramsString, const char* currency, double value) {
+    [AMRSDKPlugin trackEvent:CreateNSString(eventName)
+                paramsString:CreateNSString(paramsString)
+                    currency:CreateNSString(currency)
+                       value:value];
+}
 
-    void _subjectToCCPA(bool subject) {
-        [AMRSDKPlugin subjectToCCPA:subject];
-    }
+void _trackLog(const char* eventName, const char* paramsString) {
+    [AMRSDKPlugin trackLog:CreateNSString(eventName)
+              paramsString:CreateNSString(paramsString)];
+}
 
-    void _setUserChild(bool userChild) {
-        [AMRSDKPlugin setUserChild:userChild];
-    }
+void _trackAdmobMediationRevenue(const char* adFormat,
+                                 double revenue,
+                                 const char* placementId,
+                                 const char* adUnitId) {
 
-    void _spendVirtualCurrency() {
-        [AMRSDKPlugin spendVirtualCurrency];
-    }
-    
-#pragma mark - BANNER
-    
-    void _setBannerSuccessCallback(BannerSuccessCallback cb) {
-        bannerSuccessCallback = cb;
-    }
-    
-    void _setBannerFailCallback(BannerFailCallback cb) {
-        bannerFailCallback = cb;
-    }
+    [AMRSDKPlugin trackReportForExternalRevenue:CreateNSString(adFormat)
+                                        revenue:revenue
+                                    placementId:CreateNSString(placementId)
+                                       adUnitId:CreateNSString(adUnitId)];
+}
 
-    void _setBannerShowCallback(BannerShowCallback cb) {
-        bannerShowCallback = cb;
-    }
-    
-    void _setBannerClickCallback(BannerClickCallback cb) {
-        bannerClickCallback = cb;
-    }
-    
-    AMRBannerRef _loadBannerForZoneId(const char* zoneId,
-                                      AMRBannerPosition pos,
-                                      int offset,
-                                      int x) {
-        bannerHandle = x;
-        useCoordinates = 0;
-        position = pos;
-        bannerOffset = offset;
-        banner = [AMRBanner bannerForZoneId:CreateNSString(zoneId)];
-        bannerDelegate = [BannerDelegateWrapper new];
-        banner.delegate = bannerDelegate;
-        [banner loadBanner];
-        bannerFillCount = 0;
-        return (__bridge AMRBannerRef)banner;
-    }
+void _setUserId(const char* userId) {
+    [AMRSDKPlugin setUserId:CreateNSString(userId)];
+}
 
-    AMRBannerRef _loadBannerForZoneIdWithPosition(const char* zoneId,
-                                                 double positionX,
-                                                 double positionY,
-                                                 int x) {
-        bannerHandle = x;
-        bannerPosX = positionX;
-        bannerPosY = positionY;
-        useCoordinates = 1;
-        banner = [AMRBanner bannerForZoneId:CreateNSString(zoneId)];
-        bannerDelegate = [BannerDelegateWrapper new];
-        banner.delegate = bannerDelegate;
-        [banner loadBanner];
-        bannerFillCount = 0;
-        return (__bridge AMRBannerRef)banner;
-    }
-    
-    void _showBanner(AMRBannerRef bannerRef) {
-        AMRBanner *internalBanner = (__bridge AMRBanner*)bannerRef;
-        if (useCoordinates == 1) {
-            [AMRSDKPluginHelper updateBannerView:internalBanner.bannerView forPositionX:bannerPosX positionY:bannerPosY];
-        } else {
-            [AMRSDKPluginHelper updateBannerView:internalBanner.bannerView forPosition:position offset:bannerOffset];
-        }
-    }
-    
-    void _hideBanner(AMRBannerRef bannerRef) {
-        AMRBanner *internalBanner = (__bridge AMRBanner*)bannerRef;
-        [internalBanner.bannerView removeFromSuperview];
-    }
+void _setAdjustUserId(const char* adjustUserId) {
+    [AMRSDKPlugin setAdjustUserId:CreateNSString(adjustUserId)];
+}
 
-    void _destroyBanner(AMRBannerRef bannerRef) {
-        AMRBanner *internalBanner = (__bridge AMRBanner*)bannerRef;
-        [internalBanner.bannerView removeFromSuperview];
-        internalBanner.delegate = nil;
-        internalBanner = nil;
-    }
-    
+void _setCanRequestAds(bool canRequestAds) {
+    [AMRSDKPlugin setCanRequestAds:canRequestAds];
+}
+
+void _setCustomVendors(const char* jsonParams) {
+    [AMRSDKPlugin setCustomVendors:CreateNSString(jsonParams)];
+}
+
+void _setClientCampaignId(const char* campaignId) {
+    [AMRSDKPlugin setClientCampaignId:CreateNSString(campaignId)];
+}
+
+void _setUserConsent(bool consent) {
+    [AMRSDKPlugin setUserConsent:consent];
+}
+
+void _subjectToGDPR(bool subject) {
+    [AMRSDKPlugin subjectToGDPR:subject];
+}
+
+void _subjectToCCPA(bool subject) {
+    [AMRSDKPlugin subjectToCCPA:subject];
+}
+
+void _setUserChild(bool userChild) {
+    [AMRSDKPlugin setUserChild:userChild];
+}
+
+void _spendVirtualCurrency() {
+    [AMRSDKPlugin spendVirtualCurrency];
+}
+
+#pragma mark - Banner
+
+void _loadBannerForZoneId(const char* zoneId, int position, int offset) {
+    [AMRBannerManager loadBannerForZoneId:CreateNSString(zoneId) position:(AMRBannerPosition)position offset:offset];
+}
+
+void _loadBannerWithCoordinateForZoneId(const char* zoneId, double positionX, double positionY) {
+    [AMRBannerManager loadBannerForZoneId:CreateNSString(zoneId) positionX:positionX positionY:positionY];
+}
+
+void _showBanner() {
+    [AMRBannerManager showBanner];
+}
+
+void _hideBanner() {
+    [AMRBannerManager hideBanner];
+}
+
+void _destroyBanner() {
+    [AMRBannerManager destroyBanner];
+}
+
 #pragma mark - INTERSTITIAL
-    
-    void _loadInterstitialForZoneId(const char* zoneId) {
-        [AMRInterstitialManager loadInterstitialForZoneId:CreateNSString(zoneId)];
-    }
 
-    void _showInterstitial(const char* zoneId, const char* tag) {
-        [AMRInterstitialManager showInterstitialForZoneId:CreateNSString(zoneId) tag:CreateNSString(tag)];
-    }
+void _loadInterstitialForZoneId(const char* zoneId) {
+    [AMRInterstitialManager loadInterstitialForZoneId:CreateNSString(zoneId)];
+}
 
-    bool _isInterstitialReadyToShow(const char* zoneId) {
-        return [AMRInterstitialManager isReadyToShowForZoneId:CreateNSString(zoneId)];
-    }
-    
+void _showInterstitial(const char* zoneId, const char* tag) {
+    [AMRInterstitialManager showInterstitialForZoneId:CreateNSString(zoneId) tag:CreateNSString(tag)];
+}
+
+bool _isInterstitialReadyToShow(const char* zoneId) {
+    return [AMRInterstitialManager isReadyToShowForZoneId:CreateNSString(zoneId)];
+}
+
 #pragma mark - REWARDED VIDEO
-    
-    void _loadRewardedVideoForZoneId(const char* zoneId) {
-        [AMRRewardedVideoManager loadRewardedVideoForZoneId:CreateNSString(zoneId)];
-    }
-    
-    void _showRewardedVideo(const char* zoneId, const char* tag) {
-        [AMRRewardedVideoManager showRewardedVideoForZoneId:CreateNSString(zoneId) tag:CreateNSString(tag)];
-    }
 
-    void _setSSVCustomData(const char* zoneId, const char* jsonParams) {
-        [AMRRewardedVideoManager setSSVCustomDataForZoneId:CreateNSString(zoneId) jsonParams:CreateNSString(jsonParams)];
-    }
+void _loadRewardedVideoForZoneId(const char* zoneId) {
+    [AMRRewardedVideoManager loadRewardedVideoForZoneId:CreateNSString(zoneId)];
+}
 
-    bool _isRewardedVideoReadyToShow(const char* zoneId) {
-        return [AMRRewardedVideoManager isReadyToShowForZoneId:CreateNSString(zoneId)];
-    }
-    
+void _showRewardedVideo(const char* zoneId, const char* tag) {
+    [AMRRewardedVideoManager showRewardedVideoForZoneId:CreateNSString(zoneId) tag:CreateNSString(tag)];
+}
+
+void _setSSVCustomData(const char* zoneId, const char* jsonParams) {
+    [AMRRewardedVideoManager setSSVCustomDataForZoneId:CreateNSString(zoneId) jsonParams:CreateNSString(jsonParams)];
+}
+
+bool _isRewardedVideoReadyToShow(const char* zoneId) {
+    return [AMRRewardedVideoManager isReadyToShowForZoneId:CreateNSString(zoneId)];
+}
+
 #pragma mark - OFFERWALL
-    
-    void _setOfferWallSuccessCallback(OfferWallSuccessCallback cb) {
-        offerWallSuccessCallback = cb;
-    }
-    
-    void _setOfferWallFailCallback(OfferWallFailCallback cb) {
-        offerWallFailCallback = cb;
-    }
-    
-    void _setOfferWallDismissCallback(OfferWallDismissCallback cb) {
-        offerWallDismissCallback = cb;
-    }
-    
-    AMROfferWallRef _loadOfferWallForZoneId(const char* zoneId, int x) {
-        offerWallHandle = x;
-        offerWall = [AMROfferWall offerWallForZoneId:CreateNSString(zoneId)];
-        offerWallDelegate = [OfferWallDelegateWrapper new];
-        offerWall.delegate = offerWallDelegate;
-        [offerWall loadOfferWall];
-        return (__bridge AMROfferWallRef)offerWall;
-    }
-    
-    void _showOfferWall(AMROfferWallRef offerWallRef) {
-        AMROfferWall *internalOfferWall = (__bridge AMROfferWall*)offerWallRef;
-        [internalOfferWall showFromViewController:[AMRSDKPluginHelper topViewController]];
-    }
-    
-    void _showOfferWallWithTag(const char* tag, AMROfferWallRef offerWallRef) {
-        AMROfferWall *internalOfferWall = (__bridge AMROfferWall*)offerWallRef;
-        [internalOfferWall showFromViewController:[AMRSDKPluginHelper topViewController] withTag:CreateNSString(tag)];
-    }
-    
-#pragma mark - Virtual Currency
-    
-    void _setVirtualCurrencyDidSpendCallback() {
-        virtualCurrencyDelegate = [VirtualCurrencyDelegateWrapper new];
-        [AMRSDK setVirtualCurrencyDelegate:virtualCurrencyDelegate];
-    }
-    
-#pragma mark - Track Purchase
-    
-    void _setTrackPurchaseResponseCallback() {
-        trackPurchaseResponseDelegate = [TrackPurchaseResponseDelegateWrapper new];
-        [AMRSDK setTrackPurchaseResponseDelegate:trackPurchaseResponseDelegate];
-    }
-    
-#pragma mark - Privacy
-    
-    void _setIsGDPRApplicableCallback() {
-        [AMRSDK isGDPRApplicable:^(BOOL isGDPRApplicable) {
-            [AMRSDKPlugin sendUnityEvent:@"IsGdprApplicableEvent" params:@[@((int)isGDPRApplicable)]];
-        }];
-    }
 
-    void _setPrivacyConsentRequiredCallback() {
-        [AMRSDK isPrivacyConsentRequired:^(AMRPrivacyConsentStatus consentStatus) {
-            [AMRSDKPlugin sendUnityEvent:@"PrivacyConsentRequiredEvent" params:@[@((int)consentStatus)]];
-        }];
-    }
+void _setOfferWallSuccessCallback(OfferWallSuccessCallback cb) {
+    offerWallSuccessCallback = cb;
+}
+
+void _setOfferWallFailCallback(OfferWallFailCallback cb) {
+    offerWallFailCallback = cb;
+}
+
+void _setOfferWallDismissCallback(OfferWallDismissCallback cb) {
+    offerWallDismissCallback = cb;
+}
+
+AMROfferWallRef _loadOfferWallForZoneId(const char* zoneId, int x) {
+    offerWallHandle = x;
+    offerWall = [AMROfferWall offerWallForZoneId:CreateNSString(zoneId)];
+    offerWallDelegate = [OfferWallDelegateWrapper new];
+    offerWall.delegate = offerWallDelegate;
+    [offerWall loadOfferWall];
+    return (__bridge AMROfferWallRef)offerWall;
+}
+
+void _showOfferWall(AMROfferWallRef offerWallRef) {
+    AMROfferWall *internalOfferWall = (__bridge AMROfferWall*)offerWallRef;
+    [internalOfferWall showFromViewController:[AMRSDKPluginHelper topViewController]];
+}
+
+void _showOfferWallWithTag(const char* tag, AMROfferWallRef offerWallRef) {
+    AMROfferWall *internalOfferWall = (__bridge AMROfferWall*)offerWallRef;
+    [internalOfferWall showFromViewController:[AMRSDKPluginHelper topViewController] withTag:CreateNSString(tag)];
+}
+
+#pragma mark - Virtual Currency
+
+void _setVirtualCurrencyDidSpendCallback() {
+    virtualCurrencyDelegate = [VirtualCurrencyDelegateWrapper new];
+    [AMRSDK setVirtualCurrencyDelegate:virtualCurrencyDelegate];
+}
+
+#pragma mark - Track Purchase
+
+void _setTrackPurchaseResponseCallback() {
+    trackPurchaseResponseDelegate = [TrackPurchaseResponseDelegateWrapper new];
+    [AMRSDK setTrackPurchaseResponseDelegate:trackPurchaseResponseDelegate];
+}
+
+#pragma mark - Privacy
+
+void _setIsGDPRApplicableCallback() {
+    [AMRSDK isGDPRApplicable:^(BOOL isGDPRApplicable) {
+        [AMRSDKPlugin sendUnityEvent:@"IsGdprApplicableEvent" params:@[@((int)isGDPRApplicable)]];
+    }];
+}
+
+void _setPrivacyConsentRequiredCallback() {
+    [AMRSDK isPrivacyConsentRequired:^(AMRPrivacyConsentStatus consentStatus) {
+        [AMRSDKPlugin sendUnityEvent:@"PrivacyConsentRequiredEvent" params:@[@((int)consentStatus)]];
+    }];
+}
 
 #pragma mark - Remote Config
-    char * _getRemoteConfigString(const char* key, const char* defaultValue) {
-        AMRRemoteConfigValue *value = [AMRSDK getConfigForKey:CreateNSString(key)];
-        
-        if (value != nil && value.stringValue != nil) {
-            const char *cString = [value.stringValue UTF8String];
-            return cStringCopy(cString);
-        }
-        
-        return cStringCopy(defaultValue);
+char * _getRemoteConfigString(const char* key, const char* defaultValue) {
+    AMRRemoteConfigValue *value = [AMRSDK getConfigForKey:CreateNSString(key)];
+
+    if (value != nil && value.stringValue != nil) {
+        const char *cString = [value.stringValue UTF8String];
+        return cStringCopy(cString);
     }
 
-    double _getRemoteConfigDouble(const char* key, double defaultValue) {
-        AMRRemoteConfigValue *value = [AMRSDK getConfigForKey:CreateNSString(key)];
-        
-        if (value == nil) {
-            return defaultValue;
-        }
-        
-        return value.numberValue.doubleValue;
+    return cStringCopy(defaultValue);
+}
+
+double _getRemoteConfigDouble(const char* key, double defaultValue) {
+    AMRRemoteConfigValue *value = [AMRSDK getConfigForKey:CreateNSString(key)];
+
+    if (value == nil) {
+        return defaultValue;
     }
 
-    long _getRemoteConfigLong(const char* key, long defaultValue) {
-        AMRRemoteConfigValue *value = [AMRSDK getConfigForKey:CreateNSString(key)];
-        
-        if (value == nil) {
-            return defaultValue;
-        }
-        
-        return value.numberValue.longValue;
+    return value.numberValue.doubleValue;
+}
+
+long _getRemoteConfigLong(const char* key, long defaultValue) {
+    AMRRemoteConfigValue *value = [AMRSDK getConfigForKey:CreateNSString(key)];
+
+    if (value == nil) {
+        return defaultValue;
     }
 
-    bool _getRemoteConfigBoolean(const char* key, bool defaultValue) {
-        AMRRemoteConfigValue *value = [AMRSDK getConfigForKey:CreateNSString(key)];
-        
-        if (value == nil) {
-            return defaultValue;
-        }
-        
-        return value.numberValue.boolValue;
+    return value.numberValue.longValue;
+}
+
+bool _getRemoteConfigBoolean(const char* key, bool defaultValue) {
+    AMRRemoteConfigValue *value = [AMRSDK getConfigForKey:CreateNSString(key)];
+
+    if (value == nil) {
+        return defaultValue;
     }
+
+    return value.numberValue.boolValue;
+}
 }

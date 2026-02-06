@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using AMR.Core;
 using UnityEngine;
 
 namespace AMR.iOS
@@ -19,6 +20,18 @@ namespace AMR.iOS
 
         [DllImport("__Internal")]
         private static extern void _trackIAP(string identifier, string currencyCode, double amount, string tags);
+
+        [DllImport("__Internal")]
+        private static extern void _trackEvent(string eventName, string paramsString);
+        
+        [DllImport("__Internal")]
+        private static extern void _trackEventWithCurrency(string eventName, string paramsString, string currency, double value);
+        
+        [DllImport("__Internal")]
+        private static extern void _trackLog(string eventName, string paramsString);
+        
+        [DllImport("__Internal")]
+        private static extern void _trackScreenView(string screenName);
 
         [DllImport("__Internal")]
         private static extern void _setUserId(string userId);
@@ -391,6 +404,35 @@ namespace AMR.iOS
         }
 
         public string trackIAPForHuawei(string uniqueID, string signature, string[] tags) { return ""; }
+
+        public void trackEvent(string eventName, Dictionary<string, string> parameters)
+        {
+            #if UNITY_IOS
+            _trackEvent(eventName, MiniJson.Serialize(parameters));
+            #endif
+        }
+
+        public void trackEvent(string eventName, Dictionary<string, string> parameters, string currency, double value)
+        {
+            #if UNITY_IOS
+            _trackEventWithCurrency(eventName, MiniJson.Serialize(parameters), currency, value);
+            #endif
+        }
+
+        public void trackLog(string eventName, Dictionary<string, string> parameters)
+        {
+            #if UNITY_IOS
+            _trackLog(eventName, MiniJson.Serialize(parameters));
+            #endif
+        }
+
+        public void trackScreenView(string screenName)
+        {
+            #if UNITY_IOS
+            _trackScreenView(screenName);
+            #endif
+        }
+
         public void setUnityMainThread() { }
         public int getDeviceScore() {
             return 100;

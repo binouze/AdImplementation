@@ -1,0 +1,9 @@
+apply plugin: 'com.android.library'
+
+android {
+    namespace "com.admost.sdk"
+    compileSdkVersion 34
+    defaultConfig {
+        minSdkVersion 21
+    }
+}

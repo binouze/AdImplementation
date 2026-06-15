@@ -4,7 +4,7 @@
 		<iosPod name="AMRAdapterAdmob" version="~> 13.1" minTargetSdk="13.0"/>
 		<iosPod name="AMRAdapterApplovin" version="~> 13.6" minTargetSdk="13.0"/>
 		<iosPod name="AMRAdapterChartboost" version="~> 9.11" minTargetSdk="13.0"/>
-		<iosPod name="AMRAdapterLiftoff" version="~> 7.7" minTargetSdk="13.0"/>
+		<iosPod name="AMRAdapterLiftoff" version="7.7.0" minTargetSdk="13.0"/>
 		<iosPod name="AMRAdapterUnity" version="~> 4.17" minTargetSdk="13.0"/>
 
 	</iosPods>

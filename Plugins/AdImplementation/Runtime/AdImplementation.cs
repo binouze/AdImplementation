@@ -387,7 +387,12 @@ namespace com.binouze
         public static void ShowInterstitial( Action<bool> OnComplete, string tag = null )
         {
             Log( "ShowInterstitial" );
-            _ = ShowInterstitial( null, OnComplete, tag );
+            try {
+                _ = ShowInterstitial( null, OnComplete, tag );
+            }
+            catch( Exception e ) {
+                Debug.LogException( e );
+            }
         }
 
         /// <summary>
@@ -498,7 +503,12 @@ namespace com.binouze
         public static void ShowRewarded( Action<bool> OnComplete, string tag = null, Dictionary<string,string> ssvExtra = null, Action OnReward = null )
         {
             Log( "ShowRewarded" );
-            _ = ShowRewarded( null, OnComplete, tag, ssvExtra, OnReward );
+            try {
+                _ = ShowRewarded( null, OnComplete, tag, ssvExtra, OnReward );
+            }
+            catch( Exception e ) {
+                Debug.LogException( e );
+            }
         }
 
         /// <summary>

@@ -351,8 +351,8 @@ namespace com.binouze
                     data[kv.Key] = kv.Value;
             }
             
-            if( data.Count > 0 )  
-                ad.setSSVCustomData( data );
+            // custom data for the s2s callback
+            ad.setSSVCustomData( data );
             
             // play video
             ad.ShowRewardedVideo( tag );

@@ -424,13 +424,14 @@ namespace com.binouze
         /// </summary>
         /// <param name="OnComplete"></param>
         /// <param name="tag"></param>
+        /// <param name="ssvExtra"></param>
         /// <param name="OnReward"></param>
-        public void ShowRewarded( Action<bool> OnComplete, string tag = null, Action OnReward = null )
+        public void ShowRewarded( Action<bool> OnComplete, string tag = null, Dictionary<string,string> ssvExtra = null, Action OnReward = null )
         {
             Log( "ShowRewarded" );
             
             if( AdRewarUnit?.Count > 0 )
-                ShowRewarded( AdRewarUnit[0], OnComplete, tag, OnReward );
+                ShowRewarded( AdRewarUnit[0], OnComplete, tag, ssvExtra, OnReward );
         }
 
         /// <summary>
@@ -439,8 +440,9 @@ namespace com.binouze
         /// <param name="zoneID"></param>
         /// <param name="OnComplete"></param>
         /// <param name="tag"></param>
+        /// <param name="ssvExtra"></param>
         /// <param name="OnReward"></param>
-        public void ShowRewarded( string zoneID, Action<bool> OnComplete, string tag = null, Action OnReward = null )
+        public void ShowRewarded( string zoneID, Action<bool> OnComplete, string tag = null, Dictionary<string,string> ssvExtra = null, Action OnReward = null )
         {
             Log( $"ShowRewarded zoneID:{zoneID}" );
             
@@ -450,7 +452,7 @@ namespace com.binouze
                 OnAdPlayComplete  = OnComplete;
                 OnAdRewarded      = OnReward;
                 IsRewardedPlaying = true;
-                var ok = RewardedAdsControlller.PlayAd( zoneID, this, tag );
+                var ok = RewardedAdsControlller.PlayAd( zoneID, this, tag, ssvExtra );
                 if( ! ok )
                     OnComplete?.Invoke( false );
             }
@@ -564,6 +566,7 @@ namespace com.binouze
             {
                 RewardAdInfo.Complete = true;
                 OnAdRewarded?.Invoke();
+                OnAdRewarded = null;
             }
         }
 

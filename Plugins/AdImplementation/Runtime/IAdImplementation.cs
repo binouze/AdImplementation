@@ -20,8 +20,8 @@ namespace com.binouze
         public void LoadRewarded( string zoneID = null );
         
         public void ShowInterstitial( string zoneID, Action<bool> OnComplete, string tag = null );
-        public void ShowRewarded( string zoneID, Action<bool> OnComplete, string tag = null, Action OnReward = null );
+        public void ShowRewarded( string zoneID, Action<bool> OnComplete, string tag = null, Dictionary<string,string> ssvExtra = null, Action OnReward = null );
         public void ShowInterstitial( Action<bool> OnComplete, string tag = null );
-        public void ShowRewarded( Action<bool> OnComplete, string tag = null, Action OnReward = null );
+        public void ShowRewarded( Action<bool> OnComplete, string tag = null, Dictionary<string,string> ssvExtra = null, Action OnReward = null );
     }
 }

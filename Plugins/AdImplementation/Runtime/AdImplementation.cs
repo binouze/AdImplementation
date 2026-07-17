@@ -387,7 +387,7 @@ namespace com.binouze
         public static void ShowInterstitial( Action<bool> OnComplete, string tag = null )
         {
             Log( "ShowInterstitial" );
-            ShowInterstitial( null, OnComplete, tag );
+            _ = ShowInterstitial( null, OnComplete, tag );
         }
 
         /// <summary>
@@ -398,7 +398,7 @@ namespace com.binouze
         /// <param name="OnComplete"></param>
         /// <param name="tag"></param>
         [UsedImplicitly]
-        public static async void ShowInterstitial( string zoneID, Action<bool> OnComplete, string tag = null )
+        public static async Task ShowInterstitial( string zoneID, Action<bool> OnComplete, string tag = null )
         {
             Log( $"ShowInterstitial {zoneID}" );
             
@@ -492,12 +492,13 @@ namespace com.binouze
         /// </summary>
         /// <param name="OnComplete"></param>
         /// <param name="tag"></param>
+        /// <param name="ssvExtra"></param>
         /// <param name="OnReward"></param>
         [UsedImplicitly]
-        public static void ShowRewarded( Action<bool> OnComplete, string tag = null, Action OnReward = null )
+        public static void ShowRewarded( Action<bool> OnComplete, string tag = null, Dictionary<string,string> ssvExtra = null, Action OnReward = null )
         {
             Log( "ShowRewarded" );
-            ShowRewarded( null, OnComplete, tag, OnReward );
+            _ = ShowRewarded( null, OnComplete, tag, ssvExtra, OnReward );
         }
 
         /// <summary>
@@ -507,9 +508,10 @@ namespace com.binouze
         /// <param name="zoneID"></param>
         /// <param name="OnComplete"></param>
         /// <param name="tag"></param>
+        /// <param name="ssvExtra"></param>
         /// <param name="OnReward"></param>
         [UsedImplicitly]
-        public static async void ShowRewarded( string zoneID, Action<bool> OnComplete, string tag = null, Action OnReward = null )
+        public static async Task ShowRewarded( string zoneID, Action<bool> OnComplete, string tag = null, Dictionary<string,string> ssvExtra = null, Action OnReward = null )
         {
             Log( $"ShowRewarded {zoneID}" );
         
@@ -554,6 +556,7 @@ namespace com.binouze
                     } );
                 }, 
                     tag, 
+                    ssvExtra,
                     () =>
                     {
                         if( OnReward != null )

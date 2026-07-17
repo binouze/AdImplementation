@@ -73,8 +73,9 @@ namespace com.binouze
         /// <param name="zoneID"></param>
         /// <param name="eventsReceiver"></param>
         /// <param name="tag"></param>
+        /// <param name="ssvExtra"></param>
         /// <returns></returns>
-        public bool PlayAd( string zoneID, IAdMostAdDelegate eventsReceiver, string tag = null )
+        public bool PlayAd( string zoneID, IAdMostAdDelegate eventsReceiver, string tag = null, Dictionary<string,string> ssvExtra = null )
         {
             Log( $"PlayAd zoneID:{zoneID}" );
 
@@ -94,7 +95,7 @@ namespace com.binouze
                 // mettre a jour l'ad en cours de lecture
                 ad = _ad;
                 ad.SetEventReceiver( eventsReceiver );
-                _ad.Show(tag);
+                _ad.Show(tag, ssvExtra);
                 
                 Log( "PlayAd startPlaying" );
                 return true;

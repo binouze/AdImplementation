@@ -387,12 +387,7 @@ namespace com.binouze
         public static void ShowInterstitial( Action<bool> OnComplete, string tag = null )
         {
             Log( "ShowInterstitial" );
-            try {
-                _ = ShowInterstitial( null, OnComplete, tag );
-            }
-            catch( Exception e ) {
-                Debug.LogException( e );
-            }
+            _ = ShowInterstitial( null, OnComplete, tag );
         }
 
         /// <summary>
@@ -406,48 +401,55 @@ namespace com.binouze
         public static async Task ShowInterstitial( string zoneID, Action<bool> OnComplete, string tag = null )
         {
             Log( $"ShowInterstitial {zoneID}" );
-            
-            if( !HasInterstitialAvailableForZone(zoneID) )
+            try 
             {
-                var available = false;
-                var loading   = false;
-                
-                if( MaxTimeLoadingBeforeShowAds > 0 && HasInterstitialLoadingForZone( zoneID ) )
+                if( !HasInterstitialAvailableForZone(zoneID) )
                 {
-                    loading = true;
-                    OnAdWaitToStart?.Invoke();
+                    var available = false;
+                    var loading   = false;
                     
-                    var tend = Time.realtimeSinceStartup + MaxTimeLoadingBeforeShowAds;
-                    while( Time.realtimeSinceStartup < tend && !available )
+                    if( MaxTimeLoadingBeforeShowAds > 0 && HasInterstitialLoadingForZone( zoneID ) )
                     {
-                        available = HasInterstitialAvailableForZone( zoneID );
-                        await Task.Yield();
+                        loading = true;
+                        OnAdWaitToStart?.Invoke();
+                        
+                        var tend = Time.realtimeSinceStartup + MaxTimeLoadingBeforeShowAds;
+                        while( Time.realtimeSinceStartup < tend && !available )
+                        {
+                            available = HasInterstitialAvailableForZone( zoneID );
+                            await Task.Yield();
+                        }
+                    }
+
+                    if( !available )
+                    {
+                        if( loading )
+                            OnAdClose?.Invoke();
+                        
+                        Log( "ShowInterstitial NOT AVAILABLE" );
+                        OnComplete?.Invoke( false );
+                        return;
                     }
                 }
-
-                if( !available )
+                
+                ShowGdprIfRequired( () =>
                 {
-                    if( loading )
-                        OnAdClose?.Invoke();
-                    
-                    Log( "ShowInterstitial NOT AVAILABLE" );
-                    OnComplete?.Invoke( false );
-                    return;
-                }
-            }
-            
-            ShowGdprIfRequired( () =>
-            {
-                OnAdOpen?.Invoke();
-                implementation.ShowInterstitial( zoneID, ok =>
-                {
-                    AdsAsyncUtils.CallOnMainThread( () =>
+                    OnAdOpen?.Invoke();
+                    implementation.ShowInterstitial( zoneID, ok =>
                     {
-                        OnAdClose?.Invoke();
-                        OnComplete?.Invoke( ok );
-                    });
-                }, tag );
-            } );
+                        AdsAsyncUtils.CallOnMainThread( () =>
+                        {
+                            OnAdClose?.Invoke();
+                            OnComplete?.Invoke( ok );
+                        });
+                    }, tag );
+                } );
+            }
+            catch( Exception e ) 
+            {
+                Debug.LogException( e );
+                OnComplete?.Invoke( false );
+            }
         }
         
         
@@ -503,12 +505,7 @@ namespace com.binouze
         public static void ShowRewarded( Action<bool> OnComplete, string tag = null, Dictionary<string,string> ssvExtra = null, Action OnReward = null )
         {
             Log( "ShowRewarded" );
-            try {
-                _ = ShowRewarded( null, OnComplete, tag, ssvExtra, OnReward );
-            }
-            catch( Exception e ) {
-                Debug.LogException( e );
-            }
+            _ = ShowRewarded( null, OnComplete, tag, ssvExtra, OnReward );
         }
 
         /// <summary>
@@ -524,55 +521,62 @@ namespace com.binouze
         public static async Task ShowRewarded( string zoneID, Action<bool> OnComplete, string tag = null, Dictionary<string,string> ssvExtra = null, Action OnReward = null )
         {
             Log( $"ShowRewarded {zoneID}" );
-        
-            if( !HasRewardedAvailableForZone(zoneID) )
+            try 
             {
-                var available = false;
-                var loading   = false;
-                
-                if( MaxTimeLoadingBeforeShowAds > 0 && HasRewardedLoadingForZone( zoneID ) )
+                if( !HasRewardedAvailableForZone(zoneID) )
                 {
-                    loading = true;
-                    OnAdWaitToStart?.Invoke();
+                    var available = false;
+                    var loading   = false;
                     
-                    var tend = Time.realtimeSinceStartup + MaxTimeLoadingBeforeShowAds;
-                    while( Time.realtimeSinceStartup < tend && !available )
+                    if( MaxTimeLoadingBeforeShowAds > 0 && HasRewardedLoadingForZone( zoneID ) )
                     {
-                        available = HasRewardedAvailableForZone( zoneID );
-                        await Task.Yield();
+                        loading = true;
+                        OnAdWaitToStart?.Invoke();
+                        
+                        var tend = Time.realtimeSinceStartup + MaxTimeLoadingBeforeShowAds;
+                        while( Time.realtimeSinceStartup < tend && !available )
+                        {
+                            available = HasRewardedAvailableForZone( zoneID );
+                            await Task.Yield();
+                        }
+                    }
+
+                    if( !available )
+                    {
+                        if( loading )
+                            OnAdClose?.Invoke();
+                        
+                        Log( "ShowRewarded NOT AVAILABLE" );
+                        OnComplete?.Invoke( false );
+                        return;
                     }
                 }
-
-                if( !available )
+                
+                ShowGdprIfRequired( () =>
                 {
-                    if( loading )
-                        OnAdClose?.Invoke();
-                    
-                    Log( "ShowRewarded NOT AVAILABLE" );
-                    OnComplete?.Invoke( false );
-                    return;
-                }
+                    OnAdOpen?.Invoke();
+                    implementation.ShowRewarded( zoneID, ok =>
+                    {
+                        AdsAsyncUtils.CallOnMainThread( () =>
+                        {
+                            OnAdClose?.Invoke();
+                            OnComplete?.Invoke( ok );
+                        } );
+                    }, 
+                        tag, 
+                        ssvExtra,
+                        () =>
+                        {
+                            if( OnReward != null )
+                                AdsAsyncUtils.CallOnMainThread( OnReward );
+                        } );
+                } );
             }
-            
-            ShowGdprIfRequired( () =>
+            catch( Exception e ) 
             {
-                OnAdOpen?.Invoke();
-                implementation.ShowRewarded( zoneID, ok =>
-                {
-                    AdsAsyncUtils.CallOnMainThread( () =>
-                    {
-                        OnAdClose?.Invoke();
-                        OnComplete?.Invoke( ok );
-                    } );
-                }, 
-                    tag, 
-                    ssvExtra,
-                    () =>
-                    {
-                        if( OnReward != null )
-                            AdsAsyncUtils.CallOnMainThread( OnReward );
-                    } );
-            } );
+                Debug.LogException( e );
+                OnComplete?.Invoke( false );
+            }
         }
         
 

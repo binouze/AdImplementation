@@ -251,6 +251,7 @@ namespace com.binouze
             AdPlaying = false;
             OnAdPlayComplete?.Invoke( ok );
             OnAdPlayComplete = null;
+            OnAdRewarded     = null;
 
             // send view statistics about this ad
             adinfo.SendIfNeeded();

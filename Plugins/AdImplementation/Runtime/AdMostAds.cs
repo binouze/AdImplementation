@@ -265,10 +265,10 @@ namespace com.binouze
         }
 
 
-        public virtual void LoadAd()                { throw new NotImplementedException(); }
-        public virtual bool IsLoaded()              { throw new NotImplementedException(); }
-        public virtual bool IsLoading()              { throw new NotImplementedException(); }
-        public virtual void Show(string tag = null) { throw new NotImplementedException(); }
+        public virtual void LoadAd()                                                           { throw new NotImplementedException(); }
+        public virtual bool IsLoaded()                                                         { throw new NotImplementedException(); }
+        public virtual bool IsLoading()                                                        { throw new NotImplementedException(); }
+        public virtual void Show(string tag = null, Dictionary<string,string> ssvExtra = null) { throw new NotImplementedException(); }
         
         
         
@@ -327,15 +327,31 @@ namespace com.binouze
         public override bool IsLoaded() => ad.Status == AMRRewardedVideoAd.AdStatus.Loaded;
         public override bool IsLoading() => ad.Status == AMRRewardedVideoAd.AdStatus.Loading;
 
-        public override void Show( string tag = null )
+        public override void Show( string tag = null, Dictionary<string,string> ssvExtra = null )
         {
             Log( $"Show {ad.Status}" );
             
             // adding tag to ssv custom datas if defined
-            if( tag != null )
+            /*if( tag != null )
             {
                 ad.setSSVCustomData( new Dictionary<string, string>{ {"tag", tag} } );
+            }*/
+            
+            var data = new Dictionary<string, string>();
+            
+            if( tag != null )
+            {
+                data["tag"] = tag;
             }
+            
+            if( ssvExtra != null )
+            {
+                foreach( var kv in ssvExtra )
+                    data[kv.Key] = kv.Value;
+            }
+            
+            if( data.Count > 0 )  
+                ad.setSSVCustomData( data );
             
             // play video
             ad.ShowRewardedVideo( tag );
@@ -377,7 +393,7 @@ namespace com.binouze
         public override bool IsLoaded()  => ad.Status == AMRInterstitialAd.AdStatus.Loaded;
         public override bool IsLoading() => ad.Status == AMRInterstitialAd.AdStatus.Loading;
 
-        public override void Show( string tag = null )
+        public override void Show( string tag = null, Dictionary<string,string> ssvExtra = null )
         {
             Log( $"Show {ad.Status}" );
             ad.ShowInterstitial( tag );

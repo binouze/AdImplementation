@@ -492,11 +492,12 @@ namespace com.binouze
         /// </summary>
         /// <param name="OnComplete"></param>
         /// <param name="tag"></param>
+        /// <param name="OnReward"></param>
         [UsedImplicitly]
-        public static void ShowRewarded( Action<bool> OnComplete, string tag = null )
+        public static void ShowRewarded( Action<bool> OnComplete, string tag = null, Action OnReward = null )
         {
             Log( "ShowRewarded" );
-            ShowRewarded( null, OnComplete, tag );
+            ShowRewarded( null, OnComplete, tag, OnReward );
         }
 
         /// <summary>
@@ -506,8 +507,9 @@ namespace com.binouze
         /// <param name="zoneID"></param>
         /// <param name="OnComplete"></param>
         /// <param name="tag"></param>
+        /// <param name="OnReward"></param>
         [UsedImplicitly]
-        public static async void ShowRewarded( string zoneID, Action<bool> OnComplete, string tag = null )
+        public static async void ShowRewarded( string zoneID, Action<bool> OnComplete, string tag = null, Action OnReward = null )
         {
             Log( $"ShowRewarded {zoneID}" );
         
@@ -550,7 +552,13 @@ namespace com.binouze
                         OnAdClose?.Invoke();
                         OnComplete?.Invoke( ok );
                     } );
-                }, tag );
+                }, 
+                    tag, 
+                    () =>
+                    {
+                        if( OnReward != null )
+                            AdsAsyncUtils.CallOnMainThread( OnReward );
+                    } );
             } );
         }
         

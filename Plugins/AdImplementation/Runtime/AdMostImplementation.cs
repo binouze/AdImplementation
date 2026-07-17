@@ -30,6 +30,7 @@ namespace com.binouze
 
         private static bool         AdPlaying;
         private static Action<bool> OnAdPlayComplete;
+        private static Action       OnAdRewarded;
 
         private static readonly AdMostAd RewardedAdsControlller    = new (true);
         private static readonly AdMostAd InterstitalAdsControlller = new (false);
@@ -423,12 +424,13 @@ namespace com.binouze
         /// </summary>
         /// <param name="OnComplete"></param>
         /// <param name="tag"></param>
-        public void ShowRewarded( Action<bool> OnComplete, string tag = null )
+        /// <param name="OnReward"></param>
+        public void ShowRewarded( Action<bool> OnComplete, string tag = null, Action OnReward = null )
         {
             Log( "ShowRewarded" );
             
             if( AdRewarUnit?.Count > 0 )
-                ShowRewarded( AdRewarUnit[0], OnComplete, tag );
+                ShowRewarded( AdRewarUnit[0], OnComplete, tag, OnReward );
         }
 
         /// <summary>
@@ -437,7 +439,8 @@ namespace com.binouze
         /// <param name="zoneID"></param>
         /// <param name="OnComplete"></param>
         /// <param name="tag"></param>
-        public void ShowRewarded( string zoneID, Action<bool> OnComplete, string tag = null )
+        /// <param name="OnReward"></param>
+        public void ShowRewarded( string zoneID, Action<bool> OnComplete, string tag = null, Action OnReward = null )
         {
             Log( $"ShowRewarded zoneID:{zoneID}" );
             
@@ -445,6 +448,7 @@ namespace com.binouze
             {
                 AdPlaying         = true;
                 OnAdPlayComplete  = OnComplete;
+                OnAdRewarded      = OnReward;
                 IsRewardedPlaying = true;
                 var ok = RewardedAdsControlller.PlayAd( zoneID, this, tag );
                 if( ! ok )
@@ -557,7 +561,10 @@ namespace com.binouze
             Log( $"OnAdComplete rewarded:{IsRewardedPlaying}" );
 
             if( IsRewardedPlaying )
+            {
                 RewardAdInfo.Complete = true;
+                OnAdRewarded?.Invoke();
+            }
         }
 
         public void OnAdFailToShow()

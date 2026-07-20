@@ -316,11 +316,6 @@ namespace com.binouze
             ad.SetOnVideoComplete( OnAdComplete );
             ad.SetOnVideoDismiss( OnAdDismissed );
             ad.SetOnVideoReward( OnAdReward );
-            
-            AMRSDK.setOnRewardedVideoComplete( () =>
-            {
-                Log( $"AMRSDK RewardedVideoComplete" );
-            } );
         }
 
         public override void LoadAd()

@@ -561,7 +561,19 @@ namespace com.binouze
 
         public void OnAdComplete()
         {
-            Log( $"OnAdComplete rewarded:{IsRewardedPlaying}" );
+            Log( $"OnAdComplete rewarded:{IsRewardedPlaying} {OnAdRewarded}" );
+
+            /*if( IsRewardedPlaying )
+            {
+                RewardAdInfo.Complete = true;
+                OnAdRewarded?.Invoke();
+                OnAdRewarded = null;
+            }*/
+        }
+        
+        public void OnAdReward(double amount)
+        {
+            Log( $"OnAdReward {amount} rewarded:{IsRewardedPlaying} {OnAdRewarded}" );
 
             if( IsRewardedPlaying )
             {

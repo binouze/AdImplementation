@@ -557,8 +557,10 @@ namespace com.binouze
                     OnAdOpen?.Invoke();
                     implementation.ShowRewarded( zoneID, ok =>
                     {
+                        Log( "ShowRewarded COMPLETE waitForMainThread" );
                         AdsAsyncUtils.CallOnMainThread( () =>
                         {
+                            Log( "ShowRewarded COMPLETE mainThreadOK" );
                             OnAdClose?.Invoke();
                             OnComplete?.Invoke( ok );
                         } );
@@ -567,8 +569,15 @@ namespace com.binouze
                         ssvExtra,
                         () =>
                         {
+                            Log( $"ShowRewarded ONREWARD {OnReward} waitForMainThread" );
                             if( OnReward != null )
-                                AdsAsyncUtils.CallOnMainThread( OnReward );
+                            {
+                                AdsAsyncUtils.CallOnMainThread( () =>
+                                {
+                                    Log( "ShowRewarded ONREWARD mainThreadOK" );
+                                    OnReward.Invoke();
+                                } );
+                            }
                         } );
                 } );
             }

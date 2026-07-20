@@ -252,7 +252,7 @@ namespace com.binouze
                 return;
             
             Log( $"OnAdReward {amount}" );
-            EventReceiver?.OnAdComplete();
+            EventReceiver?.OnAdReward(amount);
         }
 
         protected void OnAdDismissed( string zoneID )
@@ -404,11 +404,12 @@ namespace com.binouze
     
     public interface IAdMostAdDelegate
     {
-        void OnAdShow( string networkName, double ecpm );
+        void OnAdShow( string     networkName, double ecpm );
         void OnAdImpression(AMRAd ad);
         void OnAdClick();
         void OnAdDismissed();
         void OnAdComplete();
+        void OnAdReward(double amount);
         void OnAdFailToShow();
     }
 }

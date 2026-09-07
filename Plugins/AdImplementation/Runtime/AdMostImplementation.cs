@@ -247,7 +247,7 @@ namespace com.binouze
         {
             var adinfo = rewarded ? RewardAdInfo : InterstitialAdInfo;
             Log( $"AdComplete ok: {ok}, adinfo:{adinfo}" );
-            
+
             AdPlaying = false;
             OnAdPlayComplete?.Invoke( ok );
             OnAdPlayComplete = null;
@@ -255,6 +255,22 @@ namespace com.binouze
 
             // send view statistics about this ad
             adinfo.SendIfNeeded();
+        }
+
+        /// <summary>
+        /// La regie n'a jamais rappele apres un show (voir AdImplementation.SetMaxTimeBeforeAdShown): liberer
+        /// AdPlaying, sinon HasRewardedAvailable / HasInterstitialAvailable renvoient false pour toute la
+        /// session et plus aucune pub n'est possible jusqu'au relaunch de l'app.
+        /// On ne touche PAS a OnAdPlayComplete / OnAdRewarded: si la pub finit malgre tout par s'afficher, ses
+        /// callbacks doivent continuer a fonctionner (le jeu peut ainsi livrer le gain d'une rewarded tardive).
+        /// </summary>
+        public void ForceResetAdPlaying()
+        {
+            if( !AdPlaying )
+                return;
+
+            Log( "ForceResetAdPlaying: AdPlaying etait reste a true, on le libere" );
+            AdPlaying = false;
         }
 
         private static ImpressionDatas ImpressionDatasFromAdMostDatas( AMRAd ad, bool rewarded )
@@ -483,7 +499,10 @@ namespace com.binouze
         public void OnAdShow( string networkName, double ecpm )
         {
             Log( $"OnAdShow networkName:{networkName} ecpm:{ecpm}" );
-            
+
+            // la pub est REELLEMENT a l'ecran: prevenir le jeu (SetOnAdShown) et desarmer le filet de securite
+            AdImplementation.NotifyAdShown();
+
             if( IsRewardedPlaying ) { RewardAdInfo.Start( networkName, ecpm ); }
             else                    { InterstitialAdInfo.Start( networkName, ecpm ); }
         }

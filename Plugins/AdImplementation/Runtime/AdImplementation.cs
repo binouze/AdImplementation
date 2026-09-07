@@ -142,6 +142,33 @@ namespace com.binouze
             MaxTimeLoadingBeforeShowAds = val;
         }
 
+
+        private static float MaxTimeBeforeAdShown;
+        /// <summary>
+        /// temps maximum (en secondes) accorde a la regie pour AFFICHER la pub apres la demande d'affichage.
+        /// Passe ce delai sans que la regie ait signale l'affichage (OnAdShow) ni rappele (fermeture / echec),
+        /// on considere que la pub ne s'affichera jamais: OnAdClose puis OnComplete(false) sont appeles pour
+        /// rendre la main au jeu, et le flag interne AdPlaying de l'implementation est libere — sinon
+        /// HasRewardedAvailable et HasInterstitialAvailable renvoient false pour TOUTE LA SESSION (plus aucune
+        /// pub, rewarded comme interstitielle, jusqu'au relaunch de l'app).
+        /// 0 (defaut) = desactive, comportement inchange.
+        ///
+        /// ⚠ La demande d'affichage n'est PAS annulee (impossible cote SDK): si la pub finit malgre tout par
+        /// s'afficher, tous ses callbacks suivent normalement — OnAdShown, le reward, puis OnComplete une
+        /// SECONDE fois. Le jeu doit donc encaisser un OnComplete tardif apres le OnComplete(false) du timeout:
+        /// c'est voulu, ca permet de livrer quand meme le gain d'une rewarded qui a fini par se lancer.
+        ///
+        /// Ne couvre PAS le cas "pub affichee mais jamais fermee": la surveillance s'arrete des que la regie
+        /// signale l'affichage (impossible de distinguer ici une pub de 3 minutes d'un blocage). Au jeu de
+        /// gerer ce cas s'il le souhaite, avec OnAdShown et ses propres signaux (pause/focus de l'app).
+        /// </summary>
+        /// <param name="val"></param>
+        [UsedImplicitly]
+        public static void SetMaxTimeBeforeAdShown(float val)
+        {
+            MaxTimeBeforeAdShown = val;
+        }
+
         public static string UserId { get; private set; } = string.Empty;
         /// <summary>
         /// definir l'identifiant du joueur
@@ -221,13 +248,42 @@ namespace com.binouze
 
         private static Action OnAdOpen;
         /// <summary>
-        /// recevoir un event lorsq'une video est affichee
+        /// recevoir un event lorsq'on demande l'affichage d'une video au SDK.
+        /// ⚠ ce n'est PAS la preuve que la video est apparue a l'ecran: OnAdOpen est appele juste AVANT de
+        /// passer la main au SDK. Pour savoir que la pub est reellement affichee, utiliser SetOnAdShown.
         /// </summary>
         /// <param name="onAdOpen"></param>
         [UsedImplicitly]
         public static void SetOnAdOpen( Action onAdOpen )
         {
             OnAdOpen = onAdOpen;
+        }
+
+        private static Action OnAdShown;
+        /// <summary>
+        /// recevoir un event lorsque la regie signale que la video est REELLEMENT affichee a l'ecran
+        /// (a ne pas confondre avec OnAdOpen, cf. ci-dessus). Appele sur le main thread.
+        /// </summary>
+        /// <param name="onAdShown"></param>
+        [UsedImplicitly]
+        public static void SetOnAdShown( Action onAdShown )
+        {
+            OnAdShown = onAdShown;
+        }
+
+        /// <summary>
+        /// appele par les implementations quand la regie signale que la pub est a l'ecran.
+        /// peut arriver depuis un thread natif: le flag est pose tout de suite (il sert au filet de securite
+        /// SetMaxTimeBeforeAdShown), et seul le callback du jeu passe par le main thread.
+        /// </summary>
+        internal static void NotifyAdShown()
+        {
+            AdShownReceived = true;
+            AdsAsyncUtils.CallOnMainThread( () =>
+            {
+                Log( "AD SHOWN" );
+                OnAdShown?.Invoke();
+            } );
         }
 
         private static Action OnAdClose;
@@ -337,9 +393,88 @@ namespace com.binouze
         }
         
 
-//  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████       
-//        
-//           ██ ███    ██ ████████ ███████ ██████  ███████ ████████ ██ ████████ ██  █████  ██      ███████ 
+//  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+//
+//        ███████ ██ ██      ███████ ████████     ███████ ██   ██  ██████  ██     ██
+//        ██      ██ ██      ██         ██        ██      ██   ██ ██    ██ ██     ██
+//        █████   ██ ██      █████      ██        ███████ ███████ ██    ██ ██  █  ██
+//        ██      ██ ██      ██         ██             ██ ██   ██ ██    ██ ██ ███ ██
+//        ██      ██ ███████ ███████    ██        ███████ ██   ██  ██████   ███ ███
+//
+//  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+
+
+        /// <summary>identifie la demande d'affichage en cours (invalide la surveillance des precedentes)</summary>
+        private static int  ShowId;
+        /// <summary>la regie a signale l'affichage de la pub en cours</summary>
+        private static bool AdShownReceived;
+        /// <summary>la regie a rappele (fermeture ou echec) pour la pub en cours</summary>
+        private static bool AdCompleteReceived;
+
+        /// <summary>a appeler juste avant de demander l'affichage au SDK</summary>
+        private static int NouvelleDemandeAffichage()
+        {
+            AdShownReceived    = false;
+            AdCompleteReceived = false;
+            AdsAsyncUtils.AppPauseeDepuisDerniereDemande = false;
+            return ++ShowId;
+        }
+
+        /// <summary>
+        /// Filet de securite: si la regie n'affiche jamais la pub ET ne rappelle jamais (ca arrive), le jeu
+        /// reste bloque sur son ecran d'attente pour toujours. Passe MaxTimeBeforeAdShown secondes, on rend la
+        /// main au jeu. Voir SetMaxTimeBeforeAdShown pour les details et les limites.
+        /// </summary>
+        private static async Task SurveillerAffichage( int showId, Action<bool> OnComplete )
+        {
+            var timeout = MaxTimeBeforeAdShown;
+            if( timeout <= 0 )
+                return;
+
+            var tend = Time.realtimeSinceStartup + timeout;
+            while( Time.realtimeSinceStartup < tend )
+            {
+                await Task.Yield();
+
+                if( !DoitContinuerASurveiller( showId ) )
+                    return;
+            }
+
+            if( !DoitContinuerASurveiller( showId ) )
+                return;
+
+            Log( $"SHOW TIMEOUT: aucun affichage ni retour de la regie apres {timeout}s, on rend la main au jeu" );
+
+            // liberer le flag AdPlaying de l'implementation, sinon plus aucune pub n'est possible de la session.
+            // on ne touche PAS aux callbacks en attente: si la pub finit par s'afficher ils doivent fonctionner.
+            implementation?.ForceResetAdPlaying();
+
+            OnAdClose?.Invoke();
+            OnComplete?.Invoke( false );
+        }
+
+        private static bool DoitContinuerASurveiller( int showId )
+        {
+            // une autre demande d'affichage a pris la main
+            if( showId != ShowId )
+                return false;
+
+            // la regie a repondu: soit la pub est a l'ecran, soit elle est deja fermee / en echec
+            if( AdShownReceived || AdCompleteReceived )
+                return false;
+
+            // l'app est passee en arriere plan depuis la demande: quelque chose s'est bien affiche par dessus
+            // le jeu (sur Android une pub s'affiche dans une autre Activity) meme si la regie ne l'a pas dit
+            if( AdsAsyncUtils.AppPauseeDepuisDerniereDemande )
+                return false;
+
+            return true;
+        }
+
+
+//  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+//
+//           ██ ███    ██ ████████ ███████ ██████  ███████ ████████ ██ ████████ ██  █████  ██      ███████
 //           ██ ████   ██    ██    ██      ██   ██ ██         ██    ██    ██    ██ ██   ██ ██      ██      
 //           ██ ██ ██  ██    ██    █████   ██████  ███████    ██    ██    ██    ██ ███████ ██      ███████ 
 //           ██ ██  ██ ██    ██    ██      ██   ██      ██    ██    ██    ██    ██ ██   ██ ██           ██ 
@@ -434,15 +569,22 @@ namespace com.binouze
                 
                 ShowGdprIfRequired( () =>
                 {
+                    var showId = NouvelleDemandeAffichage();
                     OnAdOpen?.Invoke();
                     implementation.ShowInterstitial( zoneID, ok =>
                     {
+                        if( showId == ShowId )
+                            AdCompleteReceived = true;
+
                         AdsAsyncUtils.CallOnMainThread( () =>
                         {
                             OnAdClose?.Invoke();
                             OnComplete?.Invoke( ok );
                         });
                     }, tag );
+
+                    // filet: si la regie n'affiche rien et ne rappelle jamais, rendre la main au jeu
+                    _ = SurveillerAffichage( showId, OnComplete );
                 } );
             }
             catch( Exception e ) 
@@ -554,9 +696,13 @@ namespace com.binouze
                 
                 ShowGdprIfRequired( () =>
                 {
+                    var showId = NouvelleDemandeAffichage();
                     OnAdOpen?.Invoke();
                     implementation.ShowRewarded( zoneID, ok =>
                     {
+                        if( showId == ShowId )
+                            AdCompleteReceived = true;
+
                         Log( "ShowRewarded COMPLETE waitForMainThread" );
                         AdsAsyncUtils.CallOnMainThread( () =>
                         {
@@ -564,8 +710,8 @@ namespace com.binouze
                             OnAdClose?.Invoke();
                             OnComplete?.Invoke( ok );
                         } );
-                    }, 
-                        tag, 
+                    },
+                        tag,
                         ssvExtra,
                         () =>
                         {
@@ -579,6 +725,9 @@ namespace com.binouze
                                 } );
                             }
                         } );
+
+                    // filet: si la regie n'affiche rien et ne rappelle jamais, rendre la main au jeu
+                    _ = SurveillerAffichage( showId, OnComplete );
                 } );
             }
             catch( Exception e ) 

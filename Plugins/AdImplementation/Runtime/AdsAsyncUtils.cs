@@ -70,15 +70,30 @@ namespace com.binouze
         
         private static readonly Queue<Action> ActionsToCallOnMainThread = new();
         
-        private void Update() 
+        private void Update()
         {
-            lock( ActionsToCallOnMainThread ) 
+            lock( ActionsToCallOnMainThread )
             {
-                while( ActionsToCallOnMainThread.Count > 0 ) 
+                while( ActionsToCallOnMainThread.Count > 0 )
                 {
                     ActionsToCallOnMainThread.Dequeue().Invoke();
                 }
             }
+        }
+
+
+        /// <summary>
+        /// true si l'app est passee en arriere plan depuis la derniere demande d'affichage de pub.
+        /// Sur Android une pub s'affiche dans une autre Activity: c'est la preuve que quelque chose s'est bien
+        /// affiche par dessus le jeu, meme si la regie n'a rien signale. Utilise par le filet de securite
+        /// AdImplementation.SetMaxTimeBeforeAdShown, remis a false a chaque nouvelle demande d'affichage.
+        /// </summary>
+        internal static bool AppPauseeDepuisDerniereDemande;
+
+        private void OnApplicationPause( bool pause )
+        {
+            if( pause )
+                AppPauseeDepuisDerniereDemande = true;
         }
         
         private static void _Enqueue( Action action )

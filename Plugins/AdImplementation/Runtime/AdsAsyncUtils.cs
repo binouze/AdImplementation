@@ -12,12 +12,35 @@ namespace com.binouze
 {
     internal class AdsAsyncUtils : MonoBehaviour
     {
-        [RuntimeInitializeOnLoadMethod( RuntimeInitializeLoadType.BeforeSceneLoad )]
-        private static void OnRuntimeStart()
+        /// <summary>
+        /// Voir AdImplementation.ResetStatics. Le dispatcher est un MonoBehaviour: son GameObject meurt avec la
+        /// session de jeu, alors que les statiques de la classe, elles, survivent quand le Domain Reload est
+        /// desactive. Comme SetInstance() n'est appele que depuis AdImplementation.Initialize() - qui sort tout
+        /// de suite sur son statique IsInIt -, la 2e session de play et les suivantes tournaient SANS
+        /// dispatcher: la file se remplissait et plus AUCUN callback de pub n'etait livre au jeu (ni OnAdShown,
+        /// ni OnAdClose, ni OnComplete) alors que la regie, elle, signalait bien tout.
+        /// </summary>
+        internal static void ResetStatics()
         {
             lock( ActionsToCallOnMainThread )
+            {
+                // callbacks de la session precedente: plus personne pour les traiter
                 ActionsToCallOnMainThread.Clear();
-            
+            }
+
+            AppPauseeDepuisDerniereDemande = false;
+            _instance                      = null; // le GameObject de la session precedente est detruit
+        }
+
+        /// <summary>
+        /// Recreer le dispatcher a chaque demarrage. Volontairement ici et pas dans ResetStatics
+        /// (SubsystemRegistration): creer un GameObject DontDestroyOnLoad aussi tot n'est pas sur. Et
+        /// CallOnMainThread ne peut pas s'en charger lui-meme, il est appele depuis des threads natifs ou
+        /// creer un GameObject / appeler FindObjectOfType leve.
+        /// </summary>
+        [RuntimeInitializeOnLoadMethod( RuntimeInitializeLoadType.BeforeSceneLoad )]
+        private static void CreerDispatcher()
+        {
             SetInstance();
         }
         

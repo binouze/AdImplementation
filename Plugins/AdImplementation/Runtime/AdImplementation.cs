@@ -13,6 +13,75 @@ namespace com.binouze
 {
     public static class AdImplementation
     {
+        /// <summary>
+        /// Remettre TOUT le module dans son etat de sortie d'usine, avant le moindre code de jeu.
+        ///
+        /// Le Domain Reload peut etre desactive (Project Settings > Editor > Enter Play Mode Options): les
+        /// statiques survivent alors d'une session de play a l'autre, alors que tout ce qui est
+        /// MonoBehaviour / GameObject, lui, est bel et bien detruit. On se retrouvait avec un module qui se
+        /// croit initialise (IsInIt) mais n'a plus de dispatcher main thread - donc plus aucun callback de pub
+        /// livre au jeu -, des callbacks pointant sur la session precedente, et un AdPlaying reste a true qui
+        /// bloque toutes les pubs suivantes.
+        ///
+        /// Sur device ce hook ne fait que reappliquer des valeurs deja par defaut (process neuf a chaque
+        /// lancement): aucun effet en production, et l'editeur se comporte enfin comme un process neuf.
+        /// </summary>
+        [RuntimeInitializeOnLoadMethod( RuntimeInitializeLoadType.SubsystemRegistration )]
+        private static void ResetStatics()
+        {
+            // ce qui est arme sur un thread de la session precedente
+            Init2Cancellation?.Cancel();
+            Init2Cancellation?.Dispose();
+            Init2Cancellation = null;
+
+            // etat d'initialisation
+            IsInIt  = false;
+            IsInIt2 = false;
+
+            // reglages: le jeu les repose tous a chaque lancement
+            LogEnabled                  = false;
+            IsDebug                     = false;
+            IsGDRPForced                = false;
+            IsGDRPReset                 = false;
+            AutoLoadAds                 = true;
+            UserConsentManagedExternaly = false;
+            MaxTimeLoadingBeforeShowAds = 0;
+            MaxTimeBeforeAdShown        = 0;
+            UserId                      = string.Empty;
+
+            // callbacks vers le jeu: ils pointent sur la session precedente
+            OnAdWaitToStart   = null;
+            OnAdOpen          = null;
+            OnAdShown         = null;
+            OnAdClose         = null;
+            OnAdClicked       = null;
+            OnAdViewInfo      = null;
+            OnImpressionDatas = null;
+            ShowGDPRPopup     = null;
+            MustShowGDPRPopup = null;
+
+            // suivi de la demande d'affichage en cours (filet SetMaxTimeBeforeAdShown)
+            ShowId             = 0;
+            AdShownReceived    = false;
+            AdCompleteReceived = false;
+
+            // consentement
+            ConsentType     = null;
+            ConsentResponse = "UNKNOWN";
+
+            // les autres classes du module: leurs statiques sont privees, elles se resettent elles-memes
+            AdsAsyncUtils.ResetStatics();
+            #if UNITY_EDITOR
+            AdsEditorHelper.ResetStatics();
+            #endif
+            if( implementation is AdMostImplementation admost )
+                admost.ResetStatics();
+
+            // NB: la couche AMR (SDK AdMost embarque) n'est volontairement pas touchee: ce sont des objets C#
+            // simples (pas de MonoBehaviour) qui survivent proprement, et cote device ils enveloppent des
+            // handles natifs qu'un reset C# ne remettrait pas a zero.
+        }
+        
         private static readonly IAdImplementation implementation;
         static AdImplementation()
         {

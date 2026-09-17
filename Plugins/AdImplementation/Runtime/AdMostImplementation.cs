@@ -9,6 +9,37 @@ namespace com.binouze
     public class AdMostImplementation : IAdImplementation, IAdMostAdDelegate
     {
         
+        /// <summary>
+        /// Remettre l'implementation dans son etat de sortie d'usine (voir AdImplementation.ResetStatics).
+        /// ⚠ Cet objet est tenu par un statique readonly d'AdImplementation: sans Domain Reload c'est le MEME
+        /// d'une session de play a l'autre, ses champs d'INSTANCE survivent donc aussi et doivent etre remis
+        /// ici, pas seulement les statiques.
+        /// </summary>
+        internal void ResetStatics()
+        {
+            // etat statique
+            IsInit            = false;
+            AdPlaying         = false;
+            IsRewardedPlaying = false;
+            OnAdPlayComplete  = null;
+            OnAdRewarded      = null;
+
+            // etat d'instance (le singleton survit au Play Mode)
+            AppID          = null;
+            AdRewarUnit    = null;
+            AdInterUnit    = null;
+            AdSupported    = false;
+            IsInitComplete = false;
+            CanRequestAds  = null;
+
+            RewardedAdsControlller.ResetStatics();
+            InterstitalAdsControlller.ResetStatics();
+
+            // NB: InterstitialAdInfo / RewardAdInfo ne sont volontairement PAS remis a zero. Ils sont persistes
+            // sur disque pour rattraper une pub interrompue par un kill de l'app, et Start() les reinitialise
+            // de toute facon a chaque nouvelle pub.
+        }
+        
 //  ████████████████████████████████████████████████████████████████████████████████████████████████████████████████████       
 //          
 //                       ██    ██  █████  ██████  ██  █████  ██████  ██      ███████ ███████ 

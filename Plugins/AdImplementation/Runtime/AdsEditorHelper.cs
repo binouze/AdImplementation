@@ -6,6 +6,21 @@ namespace com.binouze
 {
     public class AdsEditorHelper : MonoBehaviour
     {
+        /// <summary>
+        /// Voir AdImplementation.ResetStatics: sans Domain Reload, un dialogue de test laisse ouvert par la
+        /// session precedente se redessinerait par dessus la nouvelle.
+        /// </summary>
+        internal static void ResetStatics()
+        {
+            HasDialog = false;
+            Texte     = null;
+            Bouton1   = null;
+            Bouton2   = null;
+            Action1   = null;
+            Action2   = null;
+            _instance = null; // le GameObject de la session precedente est detruit
+        }
+        
         private static Rect _windowRect = new Rect(50, 50, 400, 400);
         
         private static bool   HasDialog;

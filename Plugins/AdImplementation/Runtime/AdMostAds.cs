@@ -7,6 +7,21 @@ namespace com.binouze
 {
     internal class AdMostAd
     {
+        /// <summary>
+        /// Vider les zones: leurs objets AMR, leurs event receivers et leurs rechargements differes datent de
+        /// la session de jeu precedente (voir AdImplementation.ResetStatics). Ce controleur est tenu par un
+        /// statique readonly d'AdMostImplementation, il survit donc au Play Mode.
+        /// </summary>
+        internal void ResetStatics()
+        {
+            foreach( var kv in ads )
+                kv.Value?.Liberer();
+    
+            ads.Clear();
+            ad = null;
+        }
+        
+        
         public AdMostAd( bool rewarded )
         {
             Rewarded = rewarded;
@@ -158,6 +173,16 @@ namespace com.binouze
 
     internal abstract class AbsAdMostAd
     {
+        /// <summary>
+        /// Couper ce qui est arme sur la session de jeu precedente: rechargement differe et callbacks vers un
+        /// receveur qui n'existe plus (voir AdImplementation.ResetStatics).
+        /// </summary>
+        internal void Liberer()
+        {
+            ClearEventReceiver();
+            ResetCancelationToken();
+        }
+        
         protected void Log( string str )
         {
             AdMostAd.LogZone( str, _adZoneId, Rewarded );

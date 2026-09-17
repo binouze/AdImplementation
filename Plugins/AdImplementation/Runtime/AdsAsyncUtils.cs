@@ -12,6 +12,16 @@ namespace com.binouze
 {
     internal class AdsAsyncUtils : MonoBehaviour
     {
+        [RuntimeInitializeOnLoadMethod( RuntimeInitializeLoadType.BeforeSceneLoad )]
+        private static void OnRuntimeStart()
+        {
+            lock( ActionsToCallOnMainThread )
+                ActionsToCallOnMainThread.Clear();
+            
+            SetInstance();
+        }
+        
+        
         public static async Task Delay(int milisecondsDelay)
         {
             #if UNITY_WEBGL

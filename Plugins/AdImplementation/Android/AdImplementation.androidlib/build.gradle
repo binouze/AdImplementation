@@ -1,0 +1,12 @@
+apply plugin: 'com.android.library'
+
+// module Android d'AdImplementation (hors du dossier AMR, qui est le SDK AdMost mis a jour tel quel) :
+// il ne contient que les regles R8 a appliquer a l'app qui utilise le package
+android {
+    namespace "com.binouze.adimplementation"
+    compileSdkVersion 34
+    defaultConfig {
+        minSdkVersion 21
+        consumerProguardFiles 'proguard-rules.pro'
+    }
+}

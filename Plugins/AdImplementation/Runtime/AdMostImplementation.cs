@@ -23,6 +23,10 @@ namespace com.binouze
             IsRewardedPlaying = false;
             OnAdPlayComplete  = null;
             OnAdRewarded      = null;
+            DemandeZone       = null;
+            DemandeReseau     = null;
+            DemandeAgeMinutes = -1;
+            DemandeHeure      = 0;
 
             // etat d'instance (le singleton survit au Play Mode)
             AppID          = null;
@@ -284,6 +288,10 @@ namespace com.binouze
             OnAdPlayComplete = null;
             OnAdRewarded     = null;
 
+            // heure de fermeture (ou d'echec) du visionnage en cours, pour mesurer la duree de la pub
+            if( adinfo.Started && !adinfo.Sent && adinfo.HeureFermeture == 0 )
+                adinfo.HeureFermeture = AdViewInfo.Maintenant();
+
             // send view statistics about this ad
             adinfo.SendIfNeeded();
         }
@@ -302,6 +310,20 @@ namespace com.binouze
 
             Log( "ForceResetAdPlaying: AdPlaying etait reste a true, on le libere" );
             AdPlaying = false;
+
+            // compter cet echec (la regie n'a rien affiche dans le delai) : envoye avec Echec + SansReponse. Si la pub
+            // finit par s'afficher, OnAdShow demarre un nouveau suivi avec la MEME HeureDemande : le serveur peut
+            // rapprocher les deux et garder le visionnage. Un echec tardif de cette meme demande n'est pas recompte
+            // (cf. OnAdFailToShow).
+            var adinfo = IsRewardedPlaying ? RewardAdInfo : InterstitialAdInfo;
+            if( !adinfo.Started || adinfo.Sent )
+                DemarrerSuivi( adinfo, DemandeReseau ?? "N/A", 0 );
+            adinfo.Echec          = true;
+            adinfo.SansReponse    = true;
+            adinfo.Complete       = false;
+            adinfo.HeureFermeture = AdViewInfo.Maintenant();
+            adinfo.Save();
+            adinfo.SendIfNeeded();
         }
 
         private static ImpressionDatas ImpressionDatasFromAdMostDatas( AMRAd ad, bool rewarded )
@@ -404,6 +426,7 @@ namespace com.binouze
                 AdPlaying         = true;
                 OnAdPlayComplete  = OnComplete;
                 IsRewardedPlaying = false;
+                NoterDemandeAffichage( InterstitalAdsControlller, zoneID );
                 var ok = InterstitalAdsControlller.PlayAd( zoneID, this, tag );
                 if( ! ok )
                     OnComplete?.Invoke( false );
@@ -500,6 +523,7 @@ namespace com.binouze
                 OnAdPlayComplete  = OnComplete;
                 OnAdRewarded      = OnReward;
                 IsRewardedPlaying = true;
+                NoterDemandeAffichage( RewardedAdsControlller, zoneID );
                 var ok = RewardedAdsControlller.PlayAd( zoneID, this, tag, ssvExtra );
                 if( ! ok )
                     OnComplete?.Invoke( false );
@@ -526,16 +550,50 @@ namespace com.binouze
         private static readonly AdViewInfo InterstitialAdInfo = AdViewInfo.Get( false );
         private static readonly AdViewInfo RewardAdInfo       = AdViewInfo.Get( true );
         private static          bool       IsRewardedPlaying;
-        
+
+        // la demande d'affichage en cours, notee juste avant PlayAd: de quoi mesurer l'age de la pub prechargee et
+        // l'attente du joueur (cf. AdViewInfo). Reinitialisee avec le reste dans ResetStatics.
+        private static string DemandeZone;
+        private static string DemandeReseau;
+        private static int    DemandeAgeMinutes = -1;
+        private static long   DemandeHeure;
+
+        private static void NoterDemandeAffichage( AdMostAd controleur, string zoneID )
+        {
+            DemandeZone       = zoneID;
+            DemandeReseau     = controleur.GetReseau( zoneID );
+            DemandeAgeMinutes = controleur.GetAgeMinutes( zoneID );
+            DemandeHeure      = AdViewInfo.Maintenant();
+        }
+
+        /// <summary>
+        /// demarrer le suivi d'un visionnage avec les infos de la demande d'affichage en cours
+        /// </summary>
+        private static void DemarrerSuivi( AdViewInfo adinfo, string networkName, double ecpm )
+        {
+            adinfo.Start( networkName, ecpm );
+            adinfo.Zone              = DemandeZone;
+            adinfo.NetworkChargement = networkName;
+            adinfo.AgeMinutes        = DemandeAgeMinutes;
+            adinfo.HeureDemande      = DemandeHeure;
+            adinfo.Save();
+        }
+
         public void OnAdShow( string networkName, double ecpm )
         {
             Log( $"OnAdShow networkName:{networkName} ecpm:{ecpm}" );
 
-            // la pub est REELLEMENT a l'ecran: prevenir le jeu (SetOnAdShown) et desarmer le filet de securite
+            // PAS de NotifyAdShown ici : AdMost envoie onShown AVANT de savoir si la regie affiche vraiment la pub
+            // (constate le 05/10/2026 : onShown puis « The ad has expired » chez Unity Ads). Prevenir le jeu ici
+            // desarmait les filets de securite (SetMaxTimeBeforeAdShown, et celui du jeu) pour une pub qui ne
+            // s'affichera peut-etre jamais. Le jeu est prevenu a l'impression (OnAdImpression).
+            // Sauf dans l'editeur : la simulation AMR envoie onShown mais jamais d'impression, et sa fenetre de test
+            // ne bloque pas le jeu (sans ca, SetOnAdShown ne partirait jamais et la securite se declencherait).
+            #if UNITY_EDITOR
             AdImplementation.NotifyAdShown();
+            #endif
 
-            if( IsRewardedPlaying ) { RewardAdInfo.Start( networkName, ecpm ); }
-            else                    { InterstitialAdInfo.Start( networkName, ecpm ); }
+            DemarrerSuivi( IsRewardedPlaying ? RewardAdInfo : InterstitialAdInfo, networkName, ecpm );
         }
 
         public void OnAdImpression( AMRAd ad )
@@ -545,7 +603,21 @@ namespace com.binouze
             
             Log( $"OnAdImpression rewarded:{IsRewardedPlaying} network:{ad.Network} zone:{ad.ZoneId} space:{ad.AdSpaceId} currency:{ad.Currency} revenu:{ad.Revenue}" );
 
+            // la pub est REELLEMENT a l'ecran (y compris celle qu'AdMost trouve a la volee apres un refus) : prevenir
+            // le jeu (SetOnAdShown) et desarmer le filet de securite. Sur Android, l'activite de la pub met aussi
+            // l'app en pause, ce que les filets detectent deja pour une regie qui n'enverrait pas d'impression.
+            AdImplementation.NotifyAdShown();
+
             var adinfo = IsRewardedPlaying ? RewardAdInfo : InterstitialAdInfo;
+
+            // la securite a deja envoye cette demande comme echec SansReponse, mais la pub (souvent une pub de
+            // remplacement trouvee a la volee par AdMost) s'affiche finalement. AdMost ne renvoie PAS de onShown dans
+            // ce cas (logs du 05/10/2026 : un seul OnAdShow, puis l'impression de la regie de remplacement) : on
+            // redemarre donc le suivi ici, avec la meme HeureDemande, pour que le visionnage soit envoye a la
+            // fermeture et que le serveur remplace l'echec par ce visionnage.
+            if( adinfo.Sent && adinfo.SansReponse && adinfo.HeureDemande == DemandeHeure )
+                DemarrerSuivi( adinfo, adinfo.NetworkChargement, adinfo.eCPM * 100 );
+
             adinfo.Revenus         = ad.Revenue;
             adinfo.RevenusCurrency = ad.Currency;
             // la regie qui a REELLEMENT servi la pub: quand la pub prechargee echoue a l'affichage (expiree), AdMost
@@ -553,6 +625,8 @@ namespace com.binouze
             // du chargement, posee par OnAdShow, serait fausse dans les stats envoyees au serveur.
             if( !string.IsNullOrEmpty( ad.Network ) )
                 adinfo.Network = ad.Network;
+            if( adinfo.HeureImpression == 0 )
+                adinfo.HeureImpression = AdViewInfo.Maintenant();
             adinfo.Save();
 
             AdImplementation.OnImpressionDatas?.Invoke( ImpressionDatasFromAdMostDatas( ad, IsRewardedPlaying ) );
@@ -634,11 +708,24 @@ namespace com.binouze
         {
             Log( $"OnAdFailToShow rewarded:{IsRewardedPlaying}" );
 
-            // AdMost signale onShown AVANT l'echec (constate le 05/10/2026 sur une pub Unity Ads expiree): OnAdShow
-            // a donc deja demarre le suivi de visionnage. La pub n'a jamais ete vue: on annule ce suivi pour ne
-            // pas envoyer au jeu (puis au serveur) un visionnage « non complete » qui n'a pas eu lieu.
+            // La pub n'a pas ete vue: c'est un ECHEC, envoye comme tel (Echec = true) et non comme un visionnage
+            // « non complete ». AdMost signale souvent onShown AVANT l'echec (constate le 05/10/2026 sur une pub Unity
+            // Ads expiree): le suivi est alors deja demarre, on le complete. Sinon on le demarre ici, pour que chaque
+            // echec soit compte. Le jeu doit traiter Echec a part (ni visionnage, ni stats anti-fraude).
             var adinfo = IsRewardedPlaying ? RewardAdInfo : InterstitialAdInfo;
-            adinfo.Started = false;
+
+            // echec deja compte pour cette demande par la securite SetMaxTimeBeforeAdShown (ForceResetAdPlaying) :
+            // on ne le recompte pas, on rend juste la main
+            if( adinfo.Sent && adinfo.Echec && adinfo.HeureDemande == DemandeHeure )
+            {
+                AdComplete( false, IsRewardedPlaying );
+                return;
+            }
+
+            if( !adinfo.Started || adinfo.Sent )
+                DemarrerSuivi( adinfo, DemandeReseau ?? "N/A", 0 );
+            adinfo.Echec    = true;
+            adinfo.Complete = false;
             adinfo.Save();
 
             AdComplete( false, IsRewardedPlaying );
@@ -660,7 +747,28 @@ namespace com.binouze
         // ReSharper disable once MemberCanBePrivate.Global
         public bool   Rewarded;
         public bool   Started;
-        
+
+        // -- mesure (06/10/2026) : de quoi regler la duree de vie des pubs par regie et suivre l'attente des joueurs --
+        /// <summary>l'emplacement AdMost de la pub</summary>
+        public string Zone;
+        /// <summary>la regie de la pub PRECHARGEE. Network = celle de l'impression : si elles different, la pub
+        /// prechargee a ete refusee et AdMost en a trouve une autre a la volee</summary>
+        public string NetworkChargement;
+        /// <summary>age de la pub prechargee au moment de la demande d'affichage, en minutes (-1 = inconnu)</summary>
+        public int    AgeMinutes = -1;
+        /// <summary>true si l'affichage a ECHOUE (pub refusee, rien trouve d'autre) : la pub n'a pas ete vue</summary>
+        public bool   Echec;
+        /// <summary>true si l'echec vient de la securite SetMaxTimeBeforeAdShown : la regie n'a rien affiche ni
+        /// rappele dans le delai. Si la pub s'affiche plus tard, un visionnage avec la meme HeureDemande suit.</summary>
+        public bool   SansReponse;
+        /// <summary>timestamps unix (s, UTC) de la demande d'affichage, de l'impression et de la fermeture (ou de
+        /// l'echec). 0 = inconnu. Impression - Demande = attente du joueur ; Fermeture - Impression = duree de la pub</summary>
+        public long   HeureDemande;
+        public long   HeureImpression;
+        public long   HeureFermeture;
+
+        public static long Maintenant() => DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+
         
         /// <summary>
         /// fonction pour enregistrer l'objet en json sur le disque dans le persistent data
@@ -727,7 +835,16 @@ namespace com.binouze
             UserID          = AdImplementation.UserId;
             Sent            = false;
             Started         = true;
-            
+
+            Zone              = null;
+            NetworkChargement = network;
+            AgeMinutes        = -1;
+            Echec             = false;
+            SansReponse       = false;
+            HeureDemande      = 0;
+            HeureImpression   = 0;
+            HeureFermeture    = 0;
+
             Save();
         }
         
@@ -753,7 +870,15 @@ namespace com.binouze
                    $"{nameof( RevenusCurrency )}: {RevenusCurrency}, " +
                    $"{nameof( UserID )}: {UserID}, "                   +
                    $"{nameof( Sent )}: {Sent}, "                       +
-                   $"{nameof( Started )}: {Started}";
+                   $"{nameof( Started )}: {Started}, "                 +
+                   $"{nameof( Zone )}: {Zone}, "                       +
+                   $"{nameof( NetworkChargement )}: {NetworkChargement}, " +
+                   $"{nameof( AgeMinutes )}: {AgeMinutes}, "           +
+                   $"{nameof( Echec )}: {Echec}, "                     +
+                   $"{nameof( SansReponse )}: {SansReponse}, "         +
+                   $"{nameof( HeureDemande )}: {HeureDemande}, "       +
+                   $"{nameof( HeureImpression )}: {HeureImpression}, " +
+                   $"{nameof( HeureFermeture )}: {HeureFermeture}";
         }
     }
 }

@@ -252,9 +252,9 @@ namespace com.binouze
         // meme et AdMost s'en occupe (ca passe parfois). Le jeu relance ses prechargements assez souvent pour que
         // le cas reste rare.
         //
-        // Valeurs par defaut, a ajuster avec les docs des regies (le jeu peut les surcharger, ex. depuis ses params
-        // serveur): Unity Ads mesure au test du 05/10/2026 (encore valide a 119 min une fois, expiree des 120-122 min
-        // les autres fois) -> 100 min; les autres regies, non mesurees -> 55 min par prudence.
+        // Valeur par defaut: 55 min pour toutes les regies, par prudence (Unity Ads a tenu jusqu'a ~2 h au test du
+        // 05/10/2026, les autres regies ne sont pas mesurees). Le jeu la surcharge par regie depuis ses params
+        // serveur, reglees a partir des mesures envoyees par AdViewInfo (age de la pub a l'affichage, echecs).
 
         private const int DUREE_VIE_DEFAUT_MINUTES = 55;
 

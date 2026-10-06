@@ -153,6 +153,22 @@ namespace com.binouze
         }
         
         /// <summary>
+        /// la regie de la pub chargee pour cet emplacement (null si aucune)
+        /// </summary>
+        public string GetReseau( string zoneID )
+        {
+            return !string.IsNullOrWhiteSpace( zoneID ) && ads.TryGetValue( zoneID, out var _ad ) ? _ad?.Reseau : null;
+        }
+
+        /// <summary>
+        /// l'age en minutes de la pub chargee pour cet emplacement (-1 si aucune)
+        /// </summary>
+        public int GetAgeMinutes( string zoneID )
+        {
+            return !string.IsNullOrWhiteSpace( zoneID ) && ads.TryGetValue( zoneID, out var _ad ) && _ad != null ? _ad.AgeMinutes() : -1;
+        }
+
+        /// <summary>
         /// returns true if an Ad is currently loading for a specific zone
         /// </summary>
         /// <param name="zoneID"></param>
@@ -216,6 +232,20 @@ namespace com.binouze
 
             var ageMinutes = (DateTime.UtcNow - HeureChargement).TotalMinutes;
             return ageMinutes >= AdImplementation.GetDureeVieMaxPubMinutes( NetworkName );
+        }
+
+        /// <summary>la regie qui a servi la pub chargee</summary>
+        public string Reseau => NetworkName;
+
+        /// <summary>
+        /// age de la pub chargee en minutes (-1 si aucune pub chargee)
+        /// </summary>
+        public int AgeMinutes()
+        {
+            if( HeureChargement == default )
+                return -1;
+
+            return (int)(DateTime.UtcNow - HeureChargement).TotalMinutes;
         }
 
         /// <summary>

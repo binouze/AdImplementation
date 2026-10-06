@@ -264,8 +264,7 @@ namespace com.binouze
         private static void ReinitialiserDureesVie()
         {
             DureesVieMinutes.Clear();
-            DureesVieMinutes["UNITYAD"] = 100;
-            DureeVieParDefautMinutes    = DUREE_VIE_DEFAUT_MINUTES;
+            DureeVieParDefautMinutes = DUREE_VIE_DEFAUT_MINUTES;
         }
 
         /// <summary>

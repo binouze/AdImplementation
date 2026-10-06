@@ -312,9 +312,10 @@ namespace com.binouze
             AdPlaying = false;
 
             // compter cet echec (la regie n'a rien affiche dans le delai) : envoye avec Echec + SansReponse. Si la pub
-            // finit par s'afficher, OnAdShow demarre un nouveau suivi avec la MEME HeureDemande : le serveur peut
-            // rapprocher les deux et garder le visionnage. Un echec tardif de cette meme demande n'est pas recompte
-            // (cf. OnAdFailToShow).
+            // finit par s'afficher, un nouveau suivi demarre avec la MEME HeureDemande : dans OnAdShow si onShown
+            // n'etait pas encore arrive, sinon dans OnAdImpression (AdMost ne renvoie pas de onShown pour une pub de
+            // remplacement). Le serveur peut ainsi rapprocher les deux et garder le visionnage. Un echec tardif de
+            // cette meme demande n'est pas recompte (cf. OnAdFailToShow).
             var adinfo = IsRewardedPlaying ? RewardAdInfo : InterstitialAdInfo;
             if( !adinfo.Started || adinfo.Sent )
                 DemarrerSuivi( adinfo, DemandeReseau ?? "N/A", 0 );

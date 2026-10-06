@@ -545,18 +545,15 @@ namespace com.binouze
             
             Log( $"OnAdImpression rewarded:{IsRewardedPlaying} network:{ad.Network} zone:{ad.ZoneId} space:{ad.AdSpaceId} currency:{ad.Currency} revenu:{ad.Revenue}" );
 
-            if( IsRewardedPlaying )
-            {
-                RewardAdInfo.Revenus         = ad.Revenue;
-                RewardAdInfo.RevenusCurrency = ad.Currency;
-                RewardAdInfo.Save();
-            }
-            else
-            {
-                InterstitialAdInfo.Revenus         = ad.Revenue;
-                InterstitialAdInfo.RevenusCurrency = ad.Currency;
-                InterstitialAdInfo.Save();
-            }
+            var adinfo = IsRewardedPlaying ? RewardAdInfo : InterstitialAdInfo;
+            adinfo.Revenus         = ad.Revenue;
+            adinfo.RevenusCurrency = ad.Currency;
+            // la regie qui a REELLEMENT servi la pub: quand la pub prechargee echoue a l'affichage (expiree), AdMost
+            // en recharge une a la volee, souvent chez une autre regie (Unity Ads -> AppLovin le 05/10/2026). Celle
+            // du chargement, posee par OnAdShow, serait fausse dans les stats envoyees au serveur.
+            if( !string.IsNullOrEmpty( ad.Network ) )
+                adinfo.Network = ad.Network;
+            adinfo.Save();
 
             AdImplementation.OnImpressionDatas?.Invoke( ImpressionDatasFromAdMostDatas( ad, IsRewardedPlaying ) );
         }
@@ -636,6 +633,14 @@ namespace com.binouze
         public void OnAdFailToShow()
         {
             Log( $"OnAdFailToShow rewarded:{IsRewardedPlaying}" );
+
+            // AdMost signale onShown AVANT l'echec (constate le 05/10/2026 sur une pub Unity Ads expiree): OnAdShow
+            // a donc deja demarre le suivi de visionnage. La pub n'a jamais ete vue: on annule ce suivi pour ne
+            // pas envoyer au jeu (puis au serveur) un visionnage « non complete » qui n'a pas eu lieu.
+            var adinfo = IsRewardedPlaying ? RewardAdInfo : InterstitialAdInfo;
+            adinfo.Started = false;
+            adinfo.Save();
+
             AdComplete( false, IsRewardedPlaying );
         }
     }

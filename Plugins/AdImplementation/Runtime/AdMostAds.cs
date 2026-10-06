@@ -76,6 +76,11 @@ namespace com.binouze
                 Log( "startLoading" );
                 _ad.LoadAd();
             }
+            // chargee mais perimee (voir AdImplementation.SetDureeVieMaxPub): on en recharge une neuve
+            else if( _ad.EstPerimee() )
+            {
+                _ad.RechargerCarPerimee();
+            }
             else
             {
                 Log( "already loaded" );
@@ -136,6 +141,9 @@ namespace com.binouze
             var ready = false;
             if( ads.TryGetValue( zoneID, out var _ad ) )
             {
+                // une pub perimee reste annoncee disponible: a l'affichage, AdMost recharge a la volee si la regie
+                // la refuse (et ca passe parfois). La peremption n'est traitee qu'au prechargement (LoadAd), que
+                // le jeu relance assez souvent pour qu'une pub depasse rarement sa duree de vie.
                 ready = _ad?.IsLoaded() ?? false;
             }
             
@@ -192,6 +200,33 @@ namespace com.binouze
         private   string NetworkName;
         private   double eCPM;
         protected bool   Rewarded;
+        /// <summary>heure (UTC) du dernier chargement reussi. DateTime et pas Time.realtimeSinceStartup: les
+        /// callbacks AMR peuvent arriver hors du main thread, et l'horloge doit continuer app en arriere-plan</summary>
+        private   DateTime HeureChargement;
+
+        /// <summary>
+        /// true si la pub chargee a depasse la duree de vie max de sa regie (AdImplementation.SetDureeVieMaxPub).
+        /// Aucun signal d'expiration n'existe cote AdMost: sans cette limite, un prechargement relance sur une pub
+        /// deja chargee ne ferait rien, et la pub finirait refusee par la regie a l'affichage.
+        /// </summary>
+        public bool EstPerimee()
+        {
+            if( !IsLoaded() || HeureChargement == default )
+                return false;
+
+            var ageMinutes = (DateTime.UtcNow - HeureChargement).TotalMinutes;
+            return ageMinutes >= AdImplementation.GetDureeVieMaxPubMinutes( NetworkName );
+        }
+
+        /// <summary>
+        /// relancer un chargement a la place d'une pub perimee
+        /// </summary>
+        public void RechargerCarPerimee()
+        {
+            Log( $"pub perimee ({NetworkName}, chargee il y a {(DateTime.UtcNow - HeureChargement).TotalMinutes:F0} min, duree de vie {AdImplementation.GetDureeVieMaxPubMinutes( NetworkName )} min) : rechargement" );
+            HeureChargement = default;
+            LoadAd();
+        }
         
         private   IAdMostAdDelegate EventReceiver;
         public void SetEventReceiver( IAdMostAdDelegate receiver )
@@ -210,9 +245,10 @@ namespace com.binouze
 
             Log( $"OnAdLoaded {networkName} {ecpm}" );
             
-            NbFail      = 0;
-            NetworkName = networkName;
-            eCPM        = ecpm;
+            NbFail          = 0;
+            NetworkName     = networkName;
+            eCPM            = ecpm;
+            HeureChargement = DateTime.UtcNow;
         }
 
         protected void OnAdFailedToLoad( string zoneID, string errorMsg )

@@ -48,6 +48,7 @@ namespace com.binouze
             MaxTimeLoadingBeforeShowAds = 0;
             MaxTimeBeforeAdShown        = 0;
             UserId                      = string.Empty;
+            ReinitialiserDureesVie();
 
             // callbacks vers le jeu: ils pointent sur la session precedente
             OnAdWaitToStart   = null;
@@ -236,6 +237,71 @@ namespace com.binouze
         public static void SetMaxTimeBeforeAdShown(float val)
         {
             MaxTimeBeforeAdShown = val;
+        }
+
+
+        // -- DUREE DE VIE DES PUBS CHARGEES --
+        //
+        // Une pub chargee EXPIRE chez la regie au bout d'un moment, et ni le SDK AdMost ni sa couche Unity ne le
+        // signalent: AMR*Ad.Status reste a Loaded, et meme isReadyToShow() natif repond true pour une pub expiree
+        // (teste le 05/10/2026 sur Android: Unity Ads « The ad has expired » a l'affichage alors que isReadyToShow
+        // disait true). A l'affichage, AdMost tente alors de recharger a la volee: le joueur attend 8 a 17 s, et
+        // l'affichage echoue si rien ne remplit. On fixe donc une duree de vie max par regie: passe ce delai, la
+        // pub est consideree comme perimee et le prochain prechargement (LoadInterstitial / LoadRewarded) en charge
+        // une neuve au lieu de ne rien faire. A l'affichage on ne change rien: une pub perimee est montree quand
+        // meme et AdMost s'en occupe (ca passe parfois). Le jeu relance ses prechargements assez souvent pour que
+        // le cas reste rare.
+        //
+        // Valeurs par defaut, a ajuster avec les docs des regies (le jeu peut les surcharger, ex. depuis ses params
+        // serveur): Unity Ads mesure au test du 05/10/2026 (encore valide a 119 min une fois, expiree des 120-122 min
+        // les autres fois) -> 100 min; les autres regies, non mesurees -> 55 min par prudence.
+
+        private const int DUREE_VIE_DEFAUT_MINUTES = 55;
+
+        private static readonly Dictionary<string,int> DureesVieMinutes = new();
+        private static int DureeVieParDefautMinutes = DUREE_VIE_DEFAUT_MINUTES;
+
+        private static void ReinitialiserDureesVie()
+        {
+            DureesVieMinutes.Clear();
+            DureesVieMinutes["UNITYAD"] = 100;
+            DureeVieParDefautMinutes    = DUREE_VIE_DEFAUT_MINUTES;
+        }
+
+        /// <summary>
+        /// definir la duree de vie max (en minutes) d'une pub chargee pour une regie, telle que nommee par AdMost
+        /// (UNITYAD, ADMOB, APPLOVIN, VUNGLE, CHARTBOOST...). minutes &lt;= 0 : revenir a la valeur par defaut.
+        /// </summary>
+        [UsedImplicitly]
+        public static void SetDureeVieMaxPub( string network, int minutes )
+        {
+            if( string.IsNullOrEmpty( network ) )
+                return;
+
+            if( minutes > 0 )
+                DureesVieMinutes[network.ToUpperInvariant()] = minutes;
+            else
+                DureesVieMinutes.Remove( network.ToUpperInvariant() );
+        }
+
+        /// <summary>
+        /// definir la duree de vie max (en minutes) des pubs des regies sans valeur propre
+        /// </summary>
+        [UsedImplicitly]
+        public static void SetDureeVieMaxPubParDefaut( int minutes )
+        {
+            DureeVieParDefautMinutes = minutes > 0 ? minutes : DUREE_VIE_DEFAUT_MINUTES;
+        }
+
+        /// <summary>
+        /// la duree de vie max (en minutes) d'une pub chargee par cette regie
+        /// </summary>
+        internal static int GetDureeVieMaxPubMinutes( string network )
+        {
+            if( !string.IsNullOrEmpty( network ) && DureesVieMinutes.TryGetValue( network.ToUpperInvariant(), out var minutes ) )
+                return minutes;
+
+            return DureeVieParDefautMinutes;
         }
 
         public static string UserId { get; private set; } = string.Empty;

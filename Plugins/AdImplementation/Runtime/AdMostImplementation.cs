@@ -297,6 +297,29 @@ namespace com.binouze
         }
 
         /// <summary>
+        /// PlayAd a refuse la demande (emplacement vide ou inconnu du controleur) ou leve une exception : en principe la
+        /// regie ne rappellera pas. On rend la main comme pour un echec d'affichage (OnAdFailToShow) : AdPlaying libere,
+        /// OnComplete( false ) appele une seule fois, et l'echec compte dans les infos de visionnage envoyees au jeu.
+        /// Avant le 07/10/2026, seul OnComplete( false ) etait appele : AdPlaying restait a true, donc plus aucune pub
+        /// de la session (HasRewardedAvailable / HasInterstitialAvailable a false), et le filet SurveillerAffichage ne
+        /// le liberait pas puisque la demande avait deja rappele.
+        /// </summary>
+        private static void EchecLancement( bool rewarded )
+        {
+            Log( $"EchecLancement rewarded:{rewarded} zone:{DemandeZone}" );
+
+            var adinfo = rewarded ? RewardAdInfo : InterstitialAdInfo;
+            // un visionnage precedent pas encore envoye part tel quel avant le suivi de cette demande
+            adinfo.SendIfNeeded();
+            DemarrerSuivi( adinfo, DemandeReseau ?? "N/A", 0 );
+            adinfo.Echec    = true;
+            adinfo.Complete = false;
+            adinfo.Save();
+
+            AdComplete( false, rewarded );
+        }
+
+        /// <summary>
         /// La regie n'a jamais rappele apres un show (voir AdImplementation.SetMaxTimeBeforeAdShown): liberer
         /// AdPlaying, sinon HasRewardedAvailable / HasInterstitialAvailable renvoient false pour toute la
         /// session et plus aucune pub n'est possible jusqu'au relaunch de l'app.
@@ -420,6 +443,11 @@ namespace com.binouze
         /// <param name="tag"></param>
         public void ShowInterstitial( string zoneID, Action<bool> OnComplete, string tag = null )
         {
+            // meme emplacement par defaut que HasInterstitialAvailable : sans ca, un show sans emplacement passait le
+            // test de disponibilite (pub chargee sur l'emplacement par defaut) puis echouait dans PlayAd
+            if( zoneID == null && AdInterUnit?.Count > 0 )
+                zoneID = AdInterUnit[0];
+            
             Log( $"ShowInterstitial zoneID:{zoneID}" );
             
             if( HasInterstitialAvailable(zoneID) )
@@ -428,9 +456,18 @@ namespace com.binouze
                 OnAdPlayComplete  = OnComplete;
                 IsRewardedPlaying = false;
                 NoterDemandeAffichage( InterstitalAdsControlller, zoneID );
-                var ok = InterstitalAdsControlller.PlayAd( zoneID, this, tag );
+                var ok = false;
+                try
+                {
+                    ok = InterstitalAdsControlller.PlayAd( zoneID, this, tag );
+                }
+                catch( Exception e )
+                {
+                    // une exception du SDK (appel natif) vaut refus : remontee telle quelle, elle laissait AdPlaying a true
+                    Debug.LogException( e );
+                }
                 if( ! ok )
-                    OnComplete?.Invoke( false );
+                    EchecLancement( false );
             }
             else
             {
@@ -516,6 +553,11 @@ namespace com.binouze
         /// <param name="OnReward"></param>
         public void ShowRewarded( string zoneID, Action<bool> OnComplete, string tag = null, Dictionary<string,string> ssvExtra = null, Action OnReward = null )
         {
+            // meme emplacement par defaut que HasRewardedAvailable : sans ca, un show sans emplacement passait le
+            // test de disponibilite (pub chargee sur l'emplacement par defaut) puis echouait dans PlayAd
+            if( zoneID == null && AdRewarUnit?.Count > 0 )
+                zoneID = AdRewarUnit[0];
+            
             Log( $"ShowRewarded zoneID:{zoneID}" );
             
             if( HasRewardedAvailable(zoneID) )
@@ -525,9 +567,18 @@ namespace com.binouze
                 OnAdRewarded      = OnReward;
                 IsRewardedPlaying = true;
                 NoterDemandeAffichage( RewardedAdsControlller, zoneID );
-                var ok = RewardedAdsControlller.PlayAd( zoneID, this, tag, ssvExtra );
+                var ok = false;
+                try
+                {
+                    ok = RewardedAdsControlller.PlayAd( zoneID, this, tag, ssvExtra );
+                }
+                catch( Exception e )
+                {
+                    // une exception du SDK (appel natif) vaut refus : remontee telle quelle, elle laissait AdPlaying a true
+                    Debug.LogException( e );
+                }
                 if( ! ok )
-                    OnComplete?.Invoke( false );
+                    EchecLancement( true );
             }
             else
             {

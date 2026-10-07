@@ -635,6 +635,13 @@ namespace com.binouze
         [UsedImplicitly]
         public static bool HasInterstitialLoadingForZone(string zoneID = null) => implementation.HasInterstitialLoading(zoneID);
 
+        /// <summary>
+        /// true si la video Intersticielle chargee pour une zone a depasse sa duree de vie (SetDureeVieMaxPub). Elle reste
+        /// annoncee disponible ; le prochain prechargement de cette zone en charge une neuve
+        /// </summary>
+        [UsedImplicitly]
+        public static bool IsInterstitialExpiredForZone(string zoneID = null) => implementation.EstPubPerimee(zoneID, false);
+
 
         /// <summary>
         /// lancer le prechargement d'une video intersticielle
@@ -757,6 +764,13 @@ namespace com.binouze
         /// </summary>
         [UsedImplicitly]
         public static bool HasRewardedLoadingForZone(string zoneID = null) => implementation.HasRewardedLoading(zoneID);
+
+        /// <summary>
+        /// true si la video Rewarded chargee pour une zone a depasse sa duree de vie (SetDureeVieMaxPub). Elle reste
+        /// annoncee disponible ; le prochain prechargement de cette zone en charge une neuve
+        /// </summary>
+        [UsedImplicitly]
+        public static bool IsRewardedExpiredForZone(string zoneID = null) => implementation.EstPubPerimee(zoneID, true);
         
         
         /// <summary>

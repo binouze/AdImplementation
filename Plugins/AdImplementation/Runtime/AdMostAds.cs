@@ -169,6 +169,14 @@ namespace com.binouze
         }
 
         /// <summary>
+        /// true si la pub chargee pour cet emplacement a depasse la duree de vie max de sa regie (false si aucune)
+        /// </summary>
+        public bool EstPerimee( string zoneID )
+        {
+            return !string.IsNullOrWhiteSpace( zoneID ) && ads.TryGetValue( zoneID, out var _ad ) && _ad != null && _ad.EstPerimee();
+        }
+
+        /// <summary>
         /// returns true if an Ad is currently loading for a specific zone
         /// </summary>
         /// <param name="zoneID"></param>

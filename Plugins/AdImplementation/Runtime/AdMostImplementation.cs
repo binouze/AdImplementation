@@ -350,6 +350,20 @@ namespace com.binouze
             adinfo.SendIfNeeded();
         }
 
+        /// <summary>
+        /// true si la pub chargee pour cet emplacement a depasse sa duree de vie (voir AdImplementation.SetDureeVieMaxPub).
+        /// Elle reste annoncee disponible (HasRewardedAvailable / HasInterstitialAvailable) : a l'affichage, AdMost en
+        /// recharge une a la volee si la regie la refuse.
+        /// </summary>
+        public bool EstPubPerimee( string zoneID, bool rewarded )
+        {
+            var unites = rewarded ? AdRewarUnit : AdInterUnit;
+            if( zoneID == null && unites?.Count > 0 )
+                zoneID = unites[0];
+
+            return (rewarded ? RewardedAdsControlller : InterstitalAdsControlller).EstPerimee( zoneID );
+        }
+
         private static ImpressionDatas ImpressionDatasFromAdMostDatas( AMRAd ad, bool rewarded )
         {
             return new ImpressionDatas

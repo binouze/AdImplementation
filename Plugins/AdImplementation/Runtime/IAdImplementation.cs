@@ -14,6 +14,10 @@ namespace com.binouze
         public bool HasInterstitialAvailable( string zoneID = null );
         public bool HasRewardedLoading( string       zoneID = null );
         public bool HasInterstitialLoading( string   zoneID = null );
+        /// <summary>
+        /// true si la pub chargee pour cet emplacement a depasse sa duree de vie (voir AdImplementation.SetDureeVieMaxPub)
+        /// </summary>
+        public bool EstPubPerimee( string zoneID, bool rewarded );
         public bool IsAdSupported();
 
         public void LoadInterstitial( string zoneID = null );

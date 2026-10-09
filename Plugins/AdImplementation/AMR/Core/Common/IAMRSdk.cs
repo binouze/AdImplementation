@@ -31,6 +31,8 @@ namespace AMR
         void trackEvent(string eventName, Dictionary<string, string> parameters, string currency, double value);
         void trackLog(string eventName, Dictionary<string, string> parameters);
         void trackScreenView(string screenName);
+        void trackHTTPRequestWithURL(string url, string method, double startTime, double duration, int statusCode, long requestPayloadSize, long responsePayloadSize, string errorMessage);
+        void trackSocketRequestWithURL(string url, string method, double startTime, double duration, int statusCode, long requestPayloadSize, long responsePayloadSize, string errorMessage);
         void spendVirtualCurrency();
         void setVirtualCurrencyDelegate(AMRVirtualCurrencyDelegate delegateObject);
         void setSDKInitializeDelegate(AMRInitializeDelegate delegateObject);
@@ -40,5 +42,6 @@ namespace AMR
         void setUnityMainThread();
         int getDeviceScore();
         void trackAdmobMediationRevenue(string adFormat, double revenue, string placementId, string adUnitId);
+        String getAdMostUserId();
     }
 }

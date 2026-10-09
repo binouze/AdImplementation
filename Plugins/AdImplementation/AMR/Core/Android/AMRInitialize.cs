@@ -80,6 +80,11 @@ namespace AMR.Android
 			config.Call("startTestSuite", new object[1] { zoneIds });
 		}
 
+        public string getAdMostUserId()
+        {
+            return config.Call<string>("getAdMostUserId");
+        }
+
         public void setUserId(string userId)
         {
             config.Call("setUserId", new object[1] { userId });
@@ -194,6 +199,18 @@ namespace AMR.Android
 
             AndroidJavaObject javaMap = CreateJavaMapFromDictainary(parameters);
             config.Call("trackEvent", javaMap);
+        }
+
+        public void trackHTTPRequestWithURL(string url, string method, double startTime, double duration, int statusCode, long requestPayloadSize, long responsePayloadSize, string errorMessage)
+        {
+            // TODO(android): wire up to com.amr.unity.ads.Config once the native method is available.
+            config.Call("trackHTTPRequest", url, method, startTime, duration, statusCode, requestPayloadSize, responsePayloadSize);
+        }
+
+        public void trackSocketRequestWithURL(string url, string method, double startTime, double duration, int statusCode, long requestPayloadSize, long responsePayloadSize, string errorMessage)
+        {
+            // TODO(android): wire up to com.amr.unity.ads.Config once the native method is available.
+            config.Call("trackSocketRequest", url, method, startTime, duration, statusCode, requestPayloadSize, responsePayloadSize);
         }
 
         public string trackPurchaseForAmazon(string userId, string receiptId, double localizedPrice, string marketPlace, string isoCurrencyCode)

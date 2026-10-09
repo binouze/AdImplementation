@@ -76,6 +76,8 @@ namespace AMR.Core.UnityEditor
         public void trackEvent(string eventName, Dictionary<string, string> parameters, string currency, double value) { }
         public void trackLog(string eventName, Dictionary<string, string> parameters) { }
         public void trackScreenView(string screenName) { }
+        public void trackHTTPRequestWithURL(string url, string method, double startTime, double duration, int statusCode, long requestPayloadSize, long responsePayloadSize, string errorMessage) { }
+        public void trackSocketRequestWithURL(string url, string method, double startTime, double duration, int statusCode, long requestPayloadSize, long responsePayloadSize, string errorMessage) { }
 
         public void spendVirtualCurrency() { }
         public void setVirtualCurrencyDelegate(AMRVirtualCurrencyDelegate delegateObject) { }
@@ -96,6 +98,11 @@ namespace AMR.Core.UnityEditor
         public int getDeviceScore()
         {
             return 0;
+        }
+
+        public string getAdMostUserId()
+        {
+            return null;
         }
 
         public void trackAdmobMediationRevenue(string adFormat, double revenue, string placementId, string adUnitId) { }

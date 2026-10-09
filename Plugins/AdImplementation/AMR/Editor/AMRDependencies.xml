@@ -1,32 +1,68 @@
 <dependencies>
+	<!-- iOS : Swift Packages en priorite (Swift Package Manager actif dans EDM), les pods restent en repli.
+	     Regle AdMost : tous les reseaux en SPM ou aucun (un melange lierait AMRSDK deux fois).
+	     Versions et blocs iosPods / androidPackages = package Unity genere par AdMost le 09/10/2026
+	     (plugin AMR 1.9.0). -->
+	<remoteSwiftPackage url="https://github.com/admost/AMR-IOS-SDK.git" version="1.6.3" upToNextMinor="true">
+		<swiftPackage name="AMRSDK" replacesPod="AMRSDK"/>
+	</remoteSwiftPackage>
+	<remoteSwiftPackage url="https://github.com/admost/AMR-IOS-ADAPTER-ADMOB.git" version="13.11.0" upToNextMinor="true">
+		<swiftPackage name="AMRAdapterAdmob" replacesPod="AMRAdapterAdmob"/>
+	</remoteSwiftPackage>
+	<remoteSwiftPackage url="https://github.com/admost/AMR-IOS-ADAPTER-APPLOVIN.git" version="13.6.4" upToNextMinor="true">
+		<swiftPackage name="AMRAdapterApplovin" replacesPod="AMRAdapterApplovin"/>
+	</remoteSwiftPackage>
+	<remoteSwiftPackage url="https://github.com/admost/AMR-IOS-ADAPTER-CHARTBOOST.git" version="9.14.2" upToNextMinor="true">
+		<swiftPackage name="AMRAdapterChartboost" replacesPod="AMRAdapterChartboost"/>
+	</remoteSwiftPackage>
+	<remoteSwiftPackage url="https://github.com/admost/AMR-IOS-ADAPTER-LIFTOFF.git" version="7.7.0" upToNextMinor="true">
+		<swiftPackage name="AMRAdapterLiftoff" replacesPod="AMRAdapterLiftoff"/>
+	</remoteSwiftPackage>
+	<!-- repo UNITYADS, produit et pod AMRAdapterUnity -->
+	<remoteSwiftPackage url="https://github.com/admost/AMR-IOS-ADAPTER-UNITYADS.git" version="4.21.0" upToNextMinor="true">
+		<swiftPackage name="AMRAdapterUnity" replacesPod="AMRAdapterUnity"/>
+	</remoteSwiftPackage>
+	<!-- AppLovinSDK et VungleAdsSDK sont des frameworks DYNAMIQUES, tires en transitif par leurs adapters.
+	     EDM ne lie les produits qu'a UnityFramework, un target framework : Xcode ne les embarque alors pas
+	     dans l'app -> l'app meurt dans dyld au lancement (Library not loaded: @rpath/AppLovinSDK.framework).
+	     Declares ici en direct avec target="Main" (option EDM 2.1), Xcode les embarque et les signe dans
+	     Unity-iPhone. Versions = EXACTEMENT celles epinglees par les adapters (.exact dans leur Package.swift) :
+	     AMRAdapterApplovin 13.6.4 -> AppLovin 13.6.4, AMRAdapterLiftoff 7.7.0 -> VungleAds 7.7.0.
+	     A resynchroniser a chaque montee d'adapter (sinon la resolution SPM echoue a l'ouverture dans Xcode). -->
+	<remoteSwiftPackage url="https://github.com/AppLovin/AppLovin-MAX-Swift-Package.git" version="13.6.4">
+		<swiftPackage name="AppLovinSDK" target="Main"/>
+	</remoteSwiftPackage>
+	<remoteSwiftPackage url="https://github.com/Vungle/VungleAdsSDK-SwiftPackageManager.git" version="7.7.0">
+		<swiftPackage name="VungleAdsSDK" target="Main"/>
+	</remoteSwiftPackage>
 	<iosPods>
-		<iosPod name="AMRSDK" version="~> 1.5" minTargetSdk="9.0"/>
-		<iosPod name="AMRAdapterAdmob" version="~> 13.1" minTargetSdk="13.0"/>
+		<iosPod name="AMRSDK" version="~> 1.6" minTargetSdk="13.0"/>
+		<iosPod name="AMRAdapterAdmob" version="~> 13.11" minTargetSdk="13.0"/>
 		<iosPod name="AMRAdapterApplovin" version="~> 13.6" minTargetSdk="13.0"/>
-		<iosPod name="AMRAdapterChartboost" version="~> 9.11" minTargetSdk="13.0"/>
-		<iosPod name="AMRAdapterLiftoff" version="7.7.0" minTargetSdk="13.0"/>
-		<iosPod name="AMRAdapterUnity" version="~> 4.17" minTargetSdk="13.0"/>
+		<iosPod name="AMRAdapterChartboost" version="~> 9.14" minTargetSdk="13.0"/>
+		<iosPod name="AMRAdapterLiftoff" version="~> 7.7" minTargetSdk="13.0"/>
+		<iosPod name="AMRAdapterUnity" version="~> 4.21" minTargetSdk="13.0"/>
 
 	</iosPods>
 	<androidPackages>
-		<androidPackage spec="com.admost.sdk:amr:3.2.8"/>
+		<androidPackage spec="com.admost.sdk:amr:3.3.2"/>
 		<androidPackage spec="com.google.android.gms:play-services-base:18.6.0"/>
 		<androidPackage spec="androidx.arch.core:core-common:2.1.0"/>
 		<androidPackage spec="androidx.arch.core:core-runtime:2.1.0"/>
 		<androidPackage spec="androidx.lifecycle:lifecycle-common:2.1.0"/>
-		<androidPackage spec="com.admost.sdk:unity-plugin:2.0.8"/>
+		<androidPackage spec="com.admost.sdk:unity-plugin:2.0.9"/>
 		<androidPackage spec="com.google.android.gms:play-services-ads-identifier:18.0.1"/>
-		<androidPackage spec="com.google.android.gms:play-services-ads:24.2.0"/>
-		<androidPackage spec="com.admost.sdk:admob-adapter:24.0.0.1.a49"/>
-		<androidPackage spec="com.admost.sdk:applovin-adapter:13.6.2.a49"/>
-		<androidPackage spec="com.admost.sdk:chartboost-adapter:9.11.1.a49"/>
+		<androidPackage spec="com.google.android.libraries.ads.mobile.sdk:ads-mobile-sdk:1.4.0"/>
+		<androidPackage spec="com.admost.sdk:admob-2-adapter:1.4.0.a50"/>
+		<androidPackage spec="com.admost.sdk:applovin-adapter:13.6.3.a50"/>
+		<androidPackage spec="com.admost.sdk:chartboost-adapter:9.12.0.a50"/>
 		<androidPackage spec="com.google.android.gms:play-services-ads-identifier:18.0.1"/>
-		<androidPackage spec="com.admost.sdk:vungle-adapter:7.7.3.a49"/>
+		<androidPackage spec="com.admost.sdk:vungle-adapter:7.7.4.a50"/>
 		<androidPackage spec="androidx.appcompat:appcompat:1.3.0"/>
 		<androidPackage spec="com.google.android.gms:play-services-ads-identifier:18.0.1"/>
 		<androidPackage spec="com.google.android.gms:play-services-tasks:18.0.1"/>
 		<androidPackage spec="com.google.android.gms:play-services-appset:16.0.2"/>
-		<androidPackage spec="com.admost.sdk:unity-adapter:4.17.0.a49"/>
+		<androidPackage spec="com.admost.sdk:unity-adapter:4.19.0.a50"/>
 		<repositories>
 			<repository>https://mvn-repo.admost.com/artifactory/amr-2</repository>
 			<repository>https://cboost.jfrog.io/artifactory/chartboost-ads/</repository>

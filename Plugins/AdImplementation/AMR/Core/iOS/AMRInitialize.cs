@@ -34,6 +34,12 @@ namespace AMR.iOS
         private static extern void _trackScreenView(string screenName);
 
         [DllImport("__Internal")]
+        private static extern void _trackHTTPRequestWithURL(string url, string method, double startTime, double duration, int statusCode, long requestPayloadSize, long responsePayloadSize, string errorMessage);
+
+        [DllImport("__Internal")]
+        private static extern void _trackSocketRequestWithURL(string url, string method, double startTime, double duration, int statusCode, long requestPayloadSize, long responsePayloadSize, string errorMessage);
+
+        [DllImport("__Internal")]
         private static extern void _setUserId(string userId);
 
         [DllImport("__Internal")]
@@ -77,6 +83,9 @@ namespace AMR.iOS
 
         [DllImport("__Internal")]
         private static extern void _trackAdmobMediationRevenue(string adFormat, double revenue, string placementId, string adUnitId);
+
+        [DllImport("__Internal")]
+        private static extern string _getAdMostUserId();
 #endif
 
         #region Singleton
@@ -430,6 +439,29 @@ namespace AMR.iOS
         {
             #if UNITY_IOS
             _trackScreenView(screenName);
+            #endif
+        }
+
+        public void trackHTTPRequestWithURL(string url, string method, double startTime, double duration, int statusCode, long requestPayloadSize, long responsePayloadSize, string errorMessage)
+        {
+            #if UNITY_IOS
+            _trackHTTPRequestWithURL(url, method, startTime, duration, statusCode, requestPayloadSize, responsePayloadSize, errorMessage);
+            #endif
+        }
+
+        public void trackSocketRequestWithURL(string url, string method, double startTime, double duration, int statusCode, long requestPayloadSize, long responsePayloadSize, string errorMessage)
+        {
+            #if UNITY_IOS
+            _trackSocketRequestWithURL(url, method, startTime, duration, statusCode, requestPayloadSize, responsePayloadSize, errorMessage);
+            #endif
+        }
+
+        public String getAdMostUserId()
+        {
+            #if UNITY_IOS
+            return _getAdMostUserId();
+            #else
+            return "";
             #endif
         }
 

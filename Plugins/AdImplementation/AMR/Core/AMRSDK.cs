@@ -7,7 +7,7 @@ namespace AMR
 {
 	public class AMRSDK
 	{
-        public const string AMR_PLUGIN_VERSION = "1.8.4"; 
+        public const string AMR_PLUGIN_VERSION = "1.9.0";
 	    
 	    public delegate void VirtualCurrencyDelegateDidSpend(string network, string currency, double amount);
         public delegate void SDKInitializeDelegateDidInitialize(bool isInitialized, string errorMessage);
@@ -224,9 +224,23 @@ namespace AMR
                 Instance.isInitialized = true;
             } else if (AMRUtil.IsPlatformEditor())
             {
-                Instance.Config = config;
-                Instance.isInitialized = true;
-                Instance.startWithAppId(null, config.ApplicationIdIOS, config.ApplicationIdAndroid, config.ApplicationIdEditor,config.IsUserChild, config.CanRequestAds, config.IsHuaweiApp);
+                if (string.IsNullOrEmpty(config.ApplicationIdEditor))
+                {
+                    AMRUtil.LogException("AMR ApplicationIdEditor is null or empty");
+                }
+                else
+                {
+                    if (IsGuidStrict(config.ApplicationIdEditor))
+                    {
+                        Instance.Config = config;
+                        Instance.isInitialized = true;
+                        Instance.startWithAppId(null, config.ApplicationIdIOS, config.ApplicationIdAndroid, config.ApplicationIdEditor,config.IsUserChild, config.CanRequestAds, config.IsHuaweiApp);
+                    }
+                    else
+                    {
+                        AMRUtil.LogException("AMR ApplicationIdEditor is not valid");
+                    }
+                }
             }
             else {
                 AMRUtil.Log("AMRSDK only supports Android, iOS and Unity Editor platforms.");
@@ -407,8 +421,28 @@ namespace AMR
             {
                 return;
             }
-            
+
             Instance.AMRSdk.trackScreenView(screenName);
+        }
+
+        public static void trackHTTPRequestWithURL(string url, string method, double startTime, double duration, int statusCode, long requestPayloadSize, long responsePayloadSize, string errorMessage = null)
+        {
+            if (!initialized() || Instance.AMRSdk == null)
+            {
+                return;
+            }
+
+            Instance.AMRSdk.trackHTTPRequestWithURL(url, method, startTime, duration, statusCode, requestPayloadSize, responsePayloadSize, errorMessage);
+        }
+
+        public static void trackSocketRequestWithURL(string url, string method, double startTime, double duration, int statusCode, long requestPayloadSize, long responsePayloadSize, string errorMessage = null)
+        {
+            if (!initialized() || Instance.AMRSdk == null)
+            {
+                return;
+            }
+
+            Instance.AMRSdk.trackSocketRequestWithURL(url, method, startTime, duration, statusCode, requestPayloadSize, responsePayloadSize, errorMessage);
         }
 
         public static string trackIAPForAndroid(string receipt, decimal localizedPrice, string isoCurrencyCode, string[] tags, bool isDebug = false)
@@ -629,6 +663,12 @@ namespace AMR
 	            AMRUtil.Log("AMRSDK has not been initialized.");
 	        }
 	    }
+
+        public static String getAdMostUserId()
+        {
+	        if (!initialized()) return "";
+	        return Instance.AMRSdk.getAdMostUserId();
+        }
 
         public static void onPause()
         {

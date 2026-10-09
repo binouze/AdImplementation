@@ -153,6 +153,22 @@ static NSString* CreateNSString(const char* string) {
              value:(double)value;
 + (void)trackLog:(NSString *)eventName
     paramsString:(NSString *)paramsString;
++ (void)trackHTTPRequestWithURL:(NSString *)url
+                         method:(NSString *)method
+                      startTime:(double)startTime
+                       duration:(double)duration
+                     statusCode:(int)statusCode
+             requestPayloadSize:(long long)requestPayloadSize
+            responsePayloadSize:(long long)responsePayloadSize
+                   errorMessage:(NSString *)errorMessage;
++ (void)trackSocketRequestWithURL:(NSString *)url
+                           method:(NSString *)method
+                        startTime:(double)startTime
+                         duration:(double)duration
+                       statusCode:(int)statusCode
+               requestPayloadSize:(long long)requestPayloadSize
+              responsePayloadSize:(long long)responsePayloadSize
+                     errorMessage:(NSString *)errorMessage;
 + (void)trackReportForExternalRevenue:(NSString *)adFormat
                               revenue:(double)revenue
                           placementId:(NSString *)placementId
@@ -196,9 +212,9 @@ static NSString* CreateNSString(const char* string) {
 @interface TrackPurchaseResponseDelegateWrapper : NSObject <AMRTrackPurchaseResponseDelegate> @end
 
 // offerWall
-typedef void (* OfferWallSuccessCallback)(int offerWallRefPtr, const char* networkName, double ecpm);
-typedef void (* OfferWallFailCallback)(int offerWallRefPtr, const char* errorMessage);
-typedef void (* OfferWallDismissCallback)(int offerWallRefPtr);
+typedef void (* OfferWallSuccessCallback)(intptr_t offerWallRefPtr, const char* networkName, double ecpm);
+typedef void (* OfferWallFailCallback)(intptr_t offerWallRefPtr, const char* errorMessage);
+typedef void (* OfferWallDismissCallback)(intptr_t offerWallRefPtr);
 
 // virtual currency
 typedef void (* VirtualCurrencyDidSpendCallback)(int virtualCurrencyRefPtr, const char* networkName, const char* currency, double amount);
@@ -218,7 +234,7 @@ static OfferWallDelegateWrapper *offerWallDelegate;
 static OfferWallSuccessCallback offerWallSuccessCallback;
 static OfferWallFailCallback offerWallFailCallback;
 static OfferWallDismissCallback offerWallDismissCallback;
-static int offerWallHandle;
+static intptr_t offerWallHandle;
 
 // virtualCurrency
 static VirtualCurrencyDelegateWrapper *virtualCurrencyDelegate;
@@ -325,6 +341,52 @@ static TrackPurchaseResponseDelegateWrapper *trackPurchaseResponseDelegate;
     if (jsonError == nil && dictParams != nil) {
         [AMRSDK trackLog:eventName parameters:dictParams];
     }
+}
+
++ (NSError *)errorFromMessage:(NSString *)errorMessage {
+    if (errorMessage == nil || [errorMessage isEqualToString:@""]) {
+        return nil;
+    }
+
+    return [NSError errorWithDomain:@"AMRUnity"
+                               code:-1
+                           userInfo:@{NSLocalizedDescriptionKey: errorMessage}];
+}
+
++ (void)trackHTTPRequestWithURL:(NSString *)url
+                         method:(NSString *)method
+                      startTime:(double)startTime
+                       duration:(double)duration
+                     statusCode:(int)statusCode
+             requestPayloadSize:(long long)requestPayloadSize
+            responsePayloadSize:(long long)responsePayloadSize
+                   errorMessage:(NSString *)errorMessage {
+    [AMRSDK trackHTTPRequestWithURL:[NSURL URLWithString:url]
+                             method:method
+                          startTime:startTime
+                           duration:duration
+                         statusCode:statusCode
+                 requestPayloadSize:requestPayloadSize
+                responsePayloadSize:responsePayloadSize
+                              error:[self errorFromMessage:errorMessage]];
+}
+
++ (void)trackSocketRequestWithURL:(NSString *)url
+                           method:(NSString *)method
+                        startTime:(double)startTime
+                         duration:(double)duration
+                       statusCode:(int)statusCode
+               requestPayloadSize:(long long)requestPayloadSize
+              responsePayloadSize:(long long)responsePayloadSize
+                     errorMessage:(NSString *)errorMessage {
+    [AMRSDK trackSocketRequestWithURL:[NSURL URLWithString:url]
+                               method:method
+                            startTime:startTime
+                             duration:duration
+                           statusCode:statusCode
+                   requestPayloadSize:requestPayloadSize
+                  responsePayloadSize:responsePayloadSize
+                                error:[self errorFromMessage:errorMessage]];
 }
 
 + (void)trackReportForExternalRevenue:(NSString *)adFormat
@@ -1065,6 +1127,42 @@ void _trackLog(const char* eventName, const char* paramsString) {
               paramsString:CreateNSString(paramsString)];
 }
 
+void _trackHTTPRequestWithURL(const char* url,
+                              const char* method,
+                              double startTime,
+                              double duration,
+                              int statusCode,
+                              long long requestPayloadSize,
+                              long long responsePayloadSize,
+                              const char* errorMessage) {
+    [AMRSDKPlugin trackHTTPRequestWithURL:CreateNSString(url)
+                                   method:CreateNSString(method)
+                                startTime:startTime
+                                 duration:duration
+                               statusCode:statusCode
+                       requestPayloadSize:requestPayloadSize
+                      responsePayloadSize:responsePayloadSize
+                             errorMessage:errorMessage == NULL ? nil : CreateNSString(errorMessage)];
+}
+
+void _trackSocketRequestWithURL(const char* url,
+                                const char* method,
+                                double startTime,
+                                double duration,
+                                int statusCode,
+                                long long requestPayloadSize,
+                                long long responsePayloadSize,
+                                const char* errorMessage) {
+    [AMRSDKPlugin trackSocketRequestWithURL:CreateNSString(url)
+                                     method:CreateNSString(method)
+                                  startTime:startTime
+                                   duration:duration
+                                 statusCode:statusCode
+                         requestPayloadSize:requestPayloadSize
+                        responsePayloadSize:responsePayloadSize
+                               errorMessage:errorMessage == NULL ? nil : CreateNSString(errorMessage)];
+}
+
 void _trackAdmobMediationRevenue(const char* adFormat,
                                  double revenue,
                                  const char* placementId,
@@ -1082,6 +1180,16 @@ void _setUserId(const char* userId) {
 
 void _setAdjustUserId(const char* adjustUserId) {
     [AMRSDKPlugin setAdjustUserId:CreateNSString(adjustUserId)];
+}
+
+char * _getAdMostUserId() {
+    NSString *userId = [AMRSDK AdmostUserId];
+
+    if (userId != nil) {
+        return cStringCopy([userId UTF8String]);
+    }
+
+    return cStringCopy("");
 }
 
 void _setCanRequestAds(bool canRequestAds) {
@@ -1184,7 +1292,7 @@ void _setOfferWallDismissCallback(OfferWallDismissCallback cb) {
     offerWallDismissCallback = cb;
 }
 
-AMROfferWallRef _loadOfferWallForZoneId(const char* zoneId, int x) {
+AMROfferWallRef _loadOfferWallForZoneId(const char* zoneId, intptr_t x) {
     offerWallHandle = x;
     offerWall = [AMROfferWall offerWallForZoneId:CreateNSString(zoneId)];
     offerWallDelegate = [OfferWallDelegateWrapper new];

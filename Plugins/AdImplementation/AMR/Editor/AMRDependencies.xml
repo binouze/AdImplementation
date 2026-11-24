@@ -62,7 +62,12 @@
 		<androidPackage spec="com.google.android.gms:play-services-ads-identifier:18.0.1"/>
 		<androidPackage spec="com.google.android.gms:play-services-tasks:18.0.1"/>
 		<androidPackage spec="com.google.android.gms:play-services-appset:16.0.2"/>
-		<androidPackage spec="com.admost.sdk:unity-adapter:4.19.0.a50"/>
+		<!-- Unity Ads retire sur Android (24/11/2026) : unity-ads 4.19+ tire com.unity3d.coherence:coherencelib,
+		     dont libunitycoherencenative.so (runtime WebAssembly qui telecharge un payload), cause presumee de
+		     suspensions Play « Device and Network Abuse ». Couper la demande chez AdMost ne retire pas la lib.
+		     Sans adaptateur, AdMost saute le reseau (ClassNotFoundException rattrapee, passage a l'item suivant).
+		     iOS non concerne, l'adaptateur iOS reste.
+		<androidPackage spec="com.admost.sdk:unity-adapter:4.19.0.a50"/> -->
 		<repositories>
 			<repository>https://mvn-repo.admost.com/artifactory/amr-2</repository>
 			<repository>https://cboost.jfrog.io/artifactory/chartboost-ads/</repository>

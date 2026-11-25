@@ -17,9 +17,7 @@
 # AdMost verifie la presence de chaque SDK de regie en cherchant ses classes PAR LEUR NOM (reflexion).
 # Si R8 les renomme, AdMost ecarte la regie sans erreur visible : « SDK class files not found : VUNGLE »
 # et « ... : CHARTBOOST » dans ADMOST_LOG (constate le 05/10/2026 sur Piggy Prize).
-# Chartboost 9.x n'embarque aucune regle consumer ; celles de Vungle 7.x laissent renommer les classes.
+# Chartboost 9.x n'embarque aucune regle consumer (Vungle, meme cas, retire le 25/11/2026).
 # ----------------------------------------------------------------------------------------------
 -dontwarn com.chartboost.**
 -keep class com.chartboost.** { *; }
--dontwarn com.vungle.**
--keep class com.vungle.** { *; }

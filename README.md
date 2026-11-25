@@ -3,10 +3,9 @@
 Simple ad implementation using AdMost
  - Included Adapters:
    - AdMob
-   - UnityAds
-   - AdColony
+   - UnityAds (iOS only)
    - AppLovin
-   - Liftoff (Vungle)
+   - Chartboost
 
 ### USAGE:
 
